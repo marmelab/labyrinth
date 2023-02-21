@@ -40,6 +40,8 @@ func TestNewBoard(t *testing.T) {
 		{
 			board, _ := NewBoard(3)
 			assert.NotNil(t, board.RemainingTile)
+			assert.NotNil(t, board.RemainingTile.Tile)
+			assert.Equal(t, Rotation0, board.RemainingTile.Rotation)
 		}
 	})
 }

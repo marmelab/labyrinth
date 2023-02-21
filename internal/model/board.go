@@ -25,7 +25,7 @@ type Board struct {
 	Tiles [][]*BoardTile
 
 	// RemainingTile is the tile that was not placed on the board.
-	RemainingTile *Tile
+	RemainingTile *BoardTile
 }
 
 // BoardTile represents a tile that is placed on a board with a given rotation.
@@ -128,7 +128,10 @@ func NewBoard(size int) (*Board, error) {
 		}
 	}
 
-	board.RemainingTile = tiles[len(tiles)-1]
+	board.RemainingTile = &BoardTile{
+		Tile:     tiles[len(tiles)-1],
+		Rotation: Rotation0,
+	}
 
 	return board, nil
 }
