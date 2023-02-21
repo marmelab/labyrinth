@@ -12,9 +12,40 @@ const (
 	BoardMargin = 4
 )
 
+type Button int
+
+const (
+	TopButton = iota
+	RightButton
+	BottomButton
+	LeftButton
+)
+
+type GuiHandler func(gui *gocui.Gui, view *gocui.View) error
+
 type gameLoop struct {
 	boardDrawer BoardDrawer
 	state       *model.Board
+}
+
+func (g gameLoop) button(gui *gocui.Gui, name, text string, topLeftX, topLeftY, bottomRightX, bottomRightY int, handler GuiHandler) (*gocui.View, error) {
+	button, err := gui.SetView(name, topLeftX, topLeftY, bottomRightX, bottomRightY)
+	if err != nil {
+		if err != gocui.ErrUnknownView {
+			return nil, errors.Join(fmt.Errorf("failed to initialize button %s", name), err)
+		}
+
+		button.Highlight = true
+		button.SelBgColor = gocui.ColorGreen
+		button.SelFgColor = gocui.ColorBlack
+
+		fmt.Fprint(button, text)
+		if err := gui.SetKeybinding(name, gocui.MouseLeft, gocui.ModNone, handler); err != nil {
+			return nil, errors.Join(fmt.Errorf("failed to set mouse click to %s", name), err)
+		}
+	}
+
+	return button, nil
 }
 
 func (g gameLoop) layout(gui *gocui.Gui) error {
@@ -33,38 +64,61 @@ func (g gameLoop) layout(gui *gocui.Gui) error {
 	for buttonIndex := 1; buttonIndex < tileCount; buttonIndex += 2 {
 		{
 			var (
+				name         = fmt.Sprintf("button-top-%d", buttonIndex)
+				topLeftX     = BoardMargin + (TileSize * buttonIndex)
+				topLeftY     = 0
+				bottomRightX = topLeftX + TileSize
+				bottomRightY = topLeftY + TileSize
+			)
+
+			g.button(gui, name, "↓ ", topLeftX, topLeftY, bottomRightX, bottomRightY, g.insertTile(TopButton, buttonIndex))
+		}
+
+		{
+			var (
+				name         = fmt.Sprintf("button-right-%d", buttonIndex)
+				topLeftX     = BoardMargin + (boardSize + 1)
+				topLeftY     = BoardMargin + (TileSize * buttonIndex)
+				bottomRightX = topLeftX + TileSize
+				bottomRightY = topLeftY + TileSize
+			)
+
+			g.button(gui, name, "← ", topLeftX, topLeftY, bottomRightX, bottomRightY, g.insertTile(RightButton, buttonIndex))
+		}
+
+		{
+			var (
+				name         = fmt.Sprintf("button-bottom-%d", buttonIndex)
 				topLeftX     = BoardMargin + (TileSize * buttonIndex)
 				topLeftY     = BoardMargin + (boardSize + 1)
 				bottomRightX = topLeftX + TileSize
 				bottomRightY = topLeftY + TileSize
 			)
 
-			if bottomButton, err := gui.SetView(fmt.Sprintf("button-bottom-%d", buttonIndex), topLeftX, topLeftY, bottomRightX, bottomRightY); err != nil {
-				if err != gocui.ErrUnknownView {
-					return errors.Join(fmt.Errorf("failed to initialize left button at row %d", buttonIndex), err)
-				}
-				fmt.Fprint(bottomButton, "↑")
-			}
+			g.button(gui, name, "↑ ", topLeftX, topLeftY, bottomRightX, bottomRightY, g.insertTile(BottomButton, buttonIndex))
 		}
 
 		{
 			var (
+				name         = fmt.Sprintf("button-left-%d", buttonIndex)
 				topLeftX     = 0
 				topLeftY     = BoardMargin + (TileSize * buttonIndex)
 				bottomRightX = topLeftX + TileSize
 				bottomRightY = topLeftY + TileSize
 			)
 
-			if leftButton, err := gui.SetView(fmt.Sprintf("button-left-%d", buttonIndex), topLeftX, topLeftY, bottomRightX, bottomRightY); err != nil {
-				if err != gocui.ErrUnknownView {
-					return errors.Join(fmt.Errorf("failed to initialize left button at row %d", buttonIndex), err)
-				}
-				fmt.Fprint(leftButton, "→")
-			}
+			g.button(gui, name, "→ ", topLeftX, topLeftY, bottomRightX, bottomRightY, g.insertTile(LeftButton, buttonIndex))
 		}
 	}
 
 	return nil
+}
+
+func (g gameLoop) insertTile(button Button, buttonIndex int) GuiHandler {
+	return func(gui *gocui.Gui, view *gocui.View) error {
+		fmt.Println(button, buttonIndex)
+		return nil
+	}
 }
 
 func (g gameLoop) quit(gui *gocui.Gui, v *gocui.View) error {
@@ -79,6 +133,9 @@ func (g gameLoop) Run() error {
 	defer gui.Close()
 
 	gui.SetManagerFunc(g.layout)
+
+	gui.Cursor = true
+	gui.Mouse = true
 
 	if err := gui.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, g.quit); err != nil {
 		return errors.Join(errors.New("failed to set exit key"), err)
