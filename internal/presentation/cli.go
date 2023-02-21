@@ -7,8 +7,17 @@ import (
 	"github.com/marmelab/labyrinth/internal/model"
 )
 
-// This is the shape parts for line assembly
-var shapesParts = map[model.Shape](map[model.Rotation](map[int]string)){
+const (
+	// TileHeigth is the tile height in lines.
+	TileHeigth = 3
+
+	// TreasureRow is the row where the trasure is placed on a shape.
+	// This is used to format a tile when printing it.
+	TreasureRow = 1
+)
+
+// This is the shape parts for line assembly.
+var tileShapeRows = map[model.Shape](map[model.Rotation](map[int]string)){
 	model.ShapeI: map[model.Rotation](map[int]string){
 		model.Rotation0: map[int]string{
 			0: "───",
@@ -77,6 +86,7 @@ var shapesParts = map[model.Shape](map[model.Rotation](map[int]string)){
 	},
 }
 
+// BoardDrawer is in charge of drawing the board to the CLI.
 type BoardDrawer interface {
 
 	// DrawTo draws the board to the writer.
@@ -86,18 +96,33 @@ type BoardDrawer interface {
 type boardDrawer struct {
 }
 
+// drawTileRow draws a tile row without a treasure.
+func (d boardDrawer) drawTileRow(w io.Writer, boardTile *model.BoardTile, tileRow int) error {
+	_, err := io.WriteString(w, tileShapeRows[boardTile.Tile.Shape][boardTile.Rotation][tileRow])
+	return err
+}
+
+// drawTileRowWithTreasure draws a tile rows with a treasure in it.
+func (d boardDrawer) drawTileRowWithTreasure(w io.Writer, boardTile *model.BoardTile) error {
+	_, err := io.WriteString(w,
+		fmt.Sprintf(
+			tileShapeRows[boardTile.Tile.Shape][boardTile.Rotation][TreasureRow],
+			string(boardTile.Tile.Treasure)))
+	return err
+}
+
 func (d boardDrawer) DrawTo(w io.Writer, board *model.Board) (err error) {
 	for _, line := range board.Tiles {
-		for i := 0; i < 3; i++ {
-			for _, bt := range line {
-				var bytes []byte
-				if i != 1 {
-					bytes = []byte(shapesParts[bt.Tile.Shape][bt.Rotation][i])
+		for tileRow := 0; tileRow < TileHeigth; tileRow++ {
+			for _, boardTile := range line {
+				var err error = nil
+				if tileRow != TreasureRow {
+					err = d.drawTileRow(w, boardTile, tileRow)
 				} else {
-					bytes = []byte(fmt.Sprintf(shapesParts[bt.Tile.Shape][bt.Rotation][i], string(bt.Tile.Treasure)))
+					err = d.drawTileRowWithTreasure(w, boardTile)
 				}
 
-				if _, err := w.Write(bytes); err != nil {
+				if err != nil {
 					return err
 				}
 			}

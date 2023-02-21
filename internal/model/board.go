@@ -21,7 +21,7 @@ var (
 // Board represents the game board.
 type Board struct {
 
-	// Tiles are the tile sthat are placed on a board.
+	// Tiles are the tiles that are placed on a board.
 	Tiles [][]*BoardTile
 
 	// RemainingTile is the tile that was not placed on the board.
