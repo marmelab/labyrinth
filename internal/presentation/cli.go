@@ -1,15 +1,14 @@
 package presentation
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/marmelab/labyrinth/internal/model"
 )
 
 const (
-	// TileHeigth is the tile height in lines.
-	TileHeigth int = 3
+	// TileSize is the tile height in lines.
+	TileSize int = 3
 
 	// UpperRow is the upper row of a tile
 	UpperRow int = 0
@@ -32,180 +31,125 @@ type BoardDrawer interface {
 type boardDrawer struct {
 }
 
-func (d boardDrawer) write(w io.Writer, str string) error {
-	_, err := io.WriteString(w, str)
-	return err
+func (d boardDrawer) writeTile(buffer, tile [][]rune, line, row int) {
+	for i := 0; i < TileSize; i++ {
+		var (
+			bufferX = line*TileSize + i
+			bufferY = row * TileSize
+		)
+		copy(buffer[bufferX][bufferY:], tile[i])
+	}
 }
 
-func (d boardDrawer) drawITileRow(w io.Writer, rotation model.Rotation, tileRow int, treasure rune) error {
-
-	if rotation == model.Rotation0 || rotation == model.Rotation180 {
-		switch tileRow {
-		case UpperRow, LowerRow:
-			return d.write(w, "───")
-		case TreasureRow:
-			return d.write(w, "."+string(treasure)+".")
-		default:
-			return fmt.Errorf("unsupported row: %v", tileRow)
+func (d boardDrawer) formatITile(rotation model.Rotation, tre rune) [][]rune {
+	switch rotation {
+	case model.Rotation0, model.Rotation180:
+		return [][]rune{
+			{'─', '─', '─'},
+			{'.', tre, '.'},
+			{'─', '─', '─'},
+		}
+	default:
+		return [][]rune{
+			{'│', '.', '│'},
+			{'│', tre, '│'},
+			{'│', '.', '│'},
 		}
 	}
-
-	if rotation == model.Rotation90 || rotation == model.Rotation270 {
-		switch tileRow {
-		case UpperRow, LowerRow:
-			return d.write(w, "│.│")
-		case TreasureRow:
-			return d.write(w, "│"+string(treasure)+"│")
-		default:
-			return fmt.Errorf("unsupported row: %v", tileRow)
-		}
-	}
-
-	return fmt.Errorf("unsupported rotation: %v", rotation)
 }
 
-func (d boardDrawer) drawTTileRow(w io.Writer, rotation model.Rotation, tileRow int, treasure rune) error {
-
-	if rotation == model.Rotation0 {
-		switch tileRow {
-		case UpperRow:
-			return d.write(w, "┘.└")
-		case TreasureRow:
-			return d.write(w, "."+string(treasure)+".")
-		case LowerRow:
-			return d.write(w, "───")
-		default:
-			return fmt.Errorf("unsupported row: %v", tileRow)
+func (d boardDrawer) formatTTile(rotation model.Rotation, tre rune) [][]rune {
+	switch rotation {
+	case model.Rotation0:
+		return [][]rune{
+			{'┘', '.', '└'},
+			{'.', tre, '.'},
+			{'─', '─', '─'},
+		}
+	case model.Rotation90:
+		return [][]rune{
+			{'│', '.', '└'},
+			{'│', tre, '.'},
+			{'│', '.', '┌'},
+		}
+	case model.Rotation180:
+		return [][]rune{
+			{'─', '─', '─'},
+			{'.', tre, '.'},
+			{'┐', '.', '┌'},
+		}
+	default:
+		return [][]rune{
+			{'┘', '.', '│'},
+			{'.', tre, '│'},
+			{'┐', '.', '│'},
 		}
 	}
-
-	if rotation == model.Rotation90 {
-		switch tileRow {
-		case UpperRow:
-			return d.write(w, "│.└")
-		case TreasureRow:
-			return d.write(w, "│"+string(treasure)+".")
-		case LowerRow:
-			return d.write(w, "│.┌")
-		default:
-			return fmt.Errorf("unsupported row: %v", tileRow)
-		}
-	}
-
-	if rotation == model.Rotation180 {
-		switch tileRow {
-		case UpperRow:
-			return d.write(w, "───")
-		case TreasureRow:
-			return d.write(w, "."+string(treasure)+".")
-		case LowerRow:
-			return d.write(w, "┐.┌")
-		default:
-			return fmt.Errorf("unsupported row: %v", tileRow)
-		}
-	}
-
-	if rotation == model.Rotation270 {
-		switch tileRow {
-		case UpperRow:
-			return d.write(w, "┘.│")
-		case TreasureRow:
-			return d.write(w, "."+string(treasure)+"│")
-		case LowerRow:
-			return d.write(w, "┐.│")
-		default:
-			return fmt.Errorf("unsupported row: %v", tileRow)
-		}
-	}
-
-	return fmt.Errorf("unsupported rotation: %v", rotation)
 }
 
-func (d boardDrawer) drawVTileRow(w io.Writer, rotation model.Rotation, tileRow int, treasure rune) error {
-
-	if rotation == model.Rotation0 {
-		switch tileRow {
-		case UpperRow:
-			return d.write(w, "──┐")
-		case TreasureRow:
-			return d.write(w, "."+string(treasure)+"│")
-		case LowerRow:
-			return d.write(w, "┐.│")
-		default:
-			return fmt.Errorf("unsupported row: %v", tileRow)
+func (d boardDrawer) formatVTile(rotation model.Rotation, tre rune) [][]rune {
+	switch rotation {
+	case model.Rotation0:
+		return [][]rune{
+			{'─', '─', '┐'},
+			{'.', tre, '│'},
+			{'┐', '.', '│'},
+		}
+	case model.Rotation90:
+		return [][]rune{
+			{'┘', '.', '│'},
+			{'.', tre, '│'},
+			{'─', '─', '┘'},
+		}
+	case model.Rotation180:
+		return [][]rune{
+			{'│', '.', '└'},
+			{'│', tre, '.'},
+			{'└', '─', '─'},
+		}
+	default:
+		return [][]rune{
+			{'┌', '─', '─'},
+			{'│', tre, '.'},
+			{'│', '.', '┌'},
 		}
 	}
-
-	if rotation == model.Rotation90 {
-		switch tileRow {
-		case UpperRow:
-			return d.write(w, "┘.│")
-		case TreasureRow:
-			return d.write(w, "."+string(treasure)+"│")
-		case LowerRow:
-			return d.write(w, "──┘")
-		default:
-			return fmt.Errorf("unsupported row: %v", tileRow)
-		}
-	}
-
-	if rotation == model.Rotation180 {
-		switch tileRow {
-		case UpperRow:
-			return d.write(w, "│.└")
-		case TreasureRow:
-			return d.write(w, "│"+string(treasure)+".")
-		case LowerRow:
-			return d.write(w, "└──")
-		default:
-			return fmt.Errorf("unsupported row: %v", tileRow)
-		}
-	}
-
-	if rotation == model.Rotation270 {
-		switch tileRow {
-		case UpperRow:
-			return d.write(w, "┌──")
-		case TreasureRow:
-			return d.write(w, "│"+string(treasure)+".")
-		case LowerRow:
-			return d.write(w, "│.┌")
-		default:
-			return fmt.Errorf("unsupported row: %v", tileRow)
-		}
-	}
-
-	return fmt.Errorf("unsupported rotation: %v", rotation)
 }
 
-// drawTileRow draws a tile row without a treasure.
-func (d boardDrawer) drawTileRow(w io.Writer, boardTile *model.BoardTile, tileRow int) error {
+func (d boardDrawer) drawTile(buffer [][]rune, boardTile *model.BoardTile, line, row int) {
 	switch boardTile.Tile.Shape {
 	case model.ShapeI:
-		return d.drawITileRow(w, boardTile.Rotation, tileRow, boardTile.Tile.Treasure)
+		d.writeTile(buffer, d.formatITile(boardTile.Rotation, boardTile.Tile.Treasure), line, row)
 
 	case model.ShapeT:
-		return d.drawTTileRow(w, boardTile.Rotation, tileRow, boardTile.Tile.Treasure)
+		d.writeTile(buffer, d.formatTTile(boardTile.Rotation, boardTile.Tile.Treasure), line, row)
 
 	case model.ShapeV:
-		return d.drawVTileRow(w, boardTile.Rotation, tileRow, boardTile.Tile.Treasure)
+		d.writeTile(buffer, d.formatVTile(boardTile.Rotation, boardTile.Tile.Treasure), line, row)
 	}
+}
 
-	return fmt.Errorf("unsupported tile shape : %v", boardTile.Tile.Shape)
+func (d boardDrawer) initBuffer(tileCount int) [][]rune {
+	var (
+		bufferSize = TileSize * tileCount
+		buffer     = make([][]rune, bufferSize)
+	)
+	for i := 0; i < bufferSize; i++ {
+		buffer[i] = make([]rune, bufferSize)
+	}
+	return buffer
 }
 
 func (d boardDrawer) DrawTo(w io.Writer, board *model.Board) (err error) {
-	for _, line := range board.Tiles {
-		for tileRow := 0; tileRow < TileHeigth; tileRow++ {
-			for _, boardTile := range line {
-				if err := d.drawTileRow(w, boardTile, tileRow); err != nil {
-					return err
-				}
-			}
+	buffer := d.initBuffer(len(board.Tiles))
 
-			if _, err := w.Write([]byte{'\n'}); err != nil {
-				return err
-			}
+	for i, line := range board.Tiles {
+		for j, boardTile := range line {
+			d.drawTile(buffer, boardTile, i, j)
+		}
+
+		for outputLine := 0; outputLine < TileSize; outputLine++ {
+			io.WriteString(w, string(buffer[i*TileSize+outputLine])+"\n")
 		}
 	}
 	return nil
