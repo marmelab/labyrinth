@@ -1,7 +1,7 @@
 package model
 
 // NoTreasure is when tile has no treasure in it.
-const NoTreasure = '.'
+const NoTreasure = '·'
 
 // Shape reprents a tile shape.
 type Shape int

@@ -10,6 +10,12 @@ const (
 	// TileSize is the tile height in lines.
 	TileSize int = 3
 
+	// TileBorderSize is the tile border size in lines.
+	TileBorderSize = 1
+
+	// TileOuterSize is the tile height in lines including border.
+	TileOuterSize int = TileSize + TileBorderSize
+
 	// UpperRow is the upper row of a tile
 	UpperRow int = 0
 
@@ -26,6 +32,9 @@ type BoardDrawer interface {
 
 	// DrawTo draws the board to the writer.
 	DrawTo(w io.Writer, board *model.Board) (err error)
+
+	// DrawBoardTileTo draws a board tile to the writer.
+	DrawBoardTileTo(w io.Writer, boardTile *model.BoardTile) (err error)
 }
 
 type boardDrawer struct {
@@ -46,14 +55,14 @@ func (d boardDrawer) formatITile(rotation model.Rotation, tre rune) [][]rune {
 	case model.Rotation0, model.Rotation180:
 		return [][]rune{
 			{'─', '─', '─'},
-			{'.', tre, '.'},
+			{' ', tre, ' '},
 			{'─', '─', '─'},
 		}
 	default:
 		return [][]rune{
-			{'│', '.', '│'},
+			{'│', ' ', '│'},
 			{'│', tre, '│'},
-			{'│', '.', '│'},
+			{'│', ' ', '│'},
 		}
 	}
 }
@@ -62,27 +71,27 @@ func (d boardDrawer) formatTTile(rotation model.Rotation, tre rune) [][]rune {
 	switch rotation {
 	case model.Rotation0:
 		return [][]rune{
-			{'┘', '.', '└'},
-			{'.', tre, '.'},
+			{'┘', ' ', '└'},
+			{' ', tre, ' '},
 			{'─', '─', '─'},
 		}
 	case model.Rotation90:
 		return [][]rune{
-			{'│', '.', '└'},
-			{'│', tre, '.'},
-			{'│', '.', '┌'},
+			{'│', ' ', '└'},
+			{'│', tre, ' '},
+			{'│', ' ', '┌'},
 		}
 	case model.Rotation180:
 		return [][]rune{
 			{'─', '─', '─'},
-			{'.', tre, '.'},
-			{'┐', '.', '┌'},
+			{' ', tre, ' '},
+			{'┐', ' ', '┌'},
 		}
 	default:
 		return [][]rune{
-			{'┘', '.', '│'},
-			{'.', tre, '│'},
-			{'┐', '.', '│'},
+			{'┘', ' ', '│'},
+			{' ', tre, '│'},
+			{'┐', ' ', '│'},
 		}
 	}
 }
@@ -92,26 +101,26 @@ func (d boardDrawer) formatVTile(rotation model.Rotation, tre rune) [][]rune {
 	case model.Rotation0:
 		return [][]rune{
 			{'─', '─', '┐'},
-			{'.', tre, '│'},
-			{'┐', '.', '│'},
+			{' ', tre, '│'},
+			{'┐', ' ', '│'},
 		}
 	case model.Rotation90:
 		return [][]rune{
-			{'┘', '.', '│'},
-			{'.', tre, '│'},
+			{'┘', ' ', '│'},
+			{' ', tre, '│'},
 			{'─', '─', '┘'},
 		}
 	case model.Rotation180:
 		return [][]rune{
-			{'│', '.', '└'},
-			{'│', tre, '.'},
+			{'│', ' ', '└'},
+			{'│', tre, ' '},
 			{'└', '─', '─'},
 		}
 	default:
 		return [][]rune{
 			{'┌', '─', '─'},
-			{'│', tre, '.'},
-			{'│', '.', '┌'},
+			{'│', tre, ' '},
+			{'│', ' ', '┌'},
 		}
 	}
 }
@@ -152,6 +161,17 @@ func (d boardDrawer) DrawTo(w io.Writer, board *model.Board) (err error) {
 			io.WriteString(w, string(buffer[i*TileSize+outputLine])+"\n")
 		}
 	}
+	return nil
+}
+
+func (d boardDrawer) DrawBoardTileTo(w io.Writer, boardTile *model.BoardTile) (err error) {
+	buffer := d.initBuffer(1)
+
+	d.drawTile(buffer, boardTile, 0, 0)
+	for outputLine := 0; outputLine < TileSize; outputLine++ {
+		io.WriteString(w, string(buffer[outputLine])+"\n")
+	}
+
 	return nil
 }
 

@@ -6,6 +6,61 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestBoard(t *testing.T) {
+	t.Run("RotateRemainingTileClockwise()", func(t *testing.T) {
+		t.Run("Should rotate remaining tile clockwise", func(t *testing.T) {
+			board := &Board{
+				RemainingTile: &BoardTile{
+					Rotation: Rotation0,
+				},
+			}
+
+			board.RotateRemainingTileClockwise()
+			assert.Equal(t, Rotation90, board.RemainingTile.Rotation)
+
+			board.RotateRemainingTileClockwise()
+			assert.Equal(t, Rotation180, board.RemainingTile.Rotation)
+
+			board.RotateRemainingTileClockwise()
+			assert.Equal(t, Rotation270, board.RemainingTile.Rotation)
+
+			board.RotateRemainingTileClockwise()
+			assert.Equal(t, Rotation0, board.RemainingTile.Rotation)
+		})
+	})
+
+	t.Run("RotateRemainingTileAntiClockwise()", func(t *testing.T) {
+		t.Run("Should rotate remaining tile anticlockwise", func(t *testing.T) {
+			board := &Board{
+				RemainingTile: &BoardTile{
+					Rotation: Rotation0,
+				},
+			}
+
+			board.RotateRemainingTileAntiClockwise()
+			assert.Equal(t, Rotation270, board.RemainingTile.Rotation)
+
+			board.RotateRemainingTileAntiClockwise()
+			assert.Equal(t, Rotation180, board.RemainingTile.Rotation)
+
+			board.RotateRemainingTileAntiClockwise()
+			assert.Equal(t, Rotation90, board.RemainingTile.Rotation)
+
+			board.RotateRemainingTileAntiClockwise()
+			assert.Equal(t, Rotation0, board.RemainingTile.Rotation)
+		})
+	})
+
+	t.Run("Size()", func(t *testing.T) {
+		t.Run("Should return board size", func(t *testing.T) {
+			board := &Board{
+				Tiles: make([][]*BoardTile, 3),
+			}
+			assert.Equal(t, 3, board.Size())
+		})
+	})
+}
+
 func TestNewBoard(t *testing.T) {
 	t.Run("Should return an error if size is even.", func(t *testing.T) {
 		board, err := NewBoard(2)

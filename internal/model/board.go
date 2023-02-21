@@ -28,6 +28,37 @@ type Board struct {
 	RemainingTile *BoardTile
 }
 
+func (b *Board) RotateRemainingTileClockwise() {
+	switch b.RemainingTile.Rotation {
+	case Rotation0:
+		b.RemainingTile.Rotation = Rotation90
+	case Rotation90:
+		b.RemainingTile.Rotation = Rotation180
+	case Rotation180:
+		b.RemainingTile.Rotation = Rotation270
+	case Rotation270:
+		b.RemainingTile.Rotation = Rotation0
+	}
+}
+
+func (b *Board) RotateRemainingTileAntiClockwise() {
+	switch b.RemainingTile.Rotation {
+	case Rotation0:
+		b.RemainingTile.Rotation = Rotation270
+	case Rotation90:
+		b.RemainingTile.Rotation = Rotation0
+	case Rotation180:
+		b.RemainingTile.Rotation = Rotation90
+	case Rotation270:
+		b.RemainingTile.Rotation = Rotation180
+	}
+}
+
+// Size returns the board size in tiles.
+func (b Board) Size() int {
+	return len(b.Tiles)
+}
+
 // BoardTile represents a tile that is placed on a board with a given rotation.
 type BoardTile struct {
 
