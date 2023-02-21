@@ -13,7 +13,6 @@ func main() {
 		log.Fatalf("Failed to initialize board: %v.", err)
 	}
 
-	//presentation.NewBoardDrawer().DrawTo(os.Stdout, board)
 	if err := presentation.GameLoop(board); err != nil {
 		log.Fatalf("Failed to run main loop: %v.", err)
 	}
