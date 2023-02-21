@@ -9,82 +9,18 @@ import (
 
 const (
 	// TileHeigth is the tile height in lines.
-	TileHeigth = 3
+	TileHeigth int = 3
+
+	// UpperRow is the upper row of a tile
+	UpperRow int = 0
 
 	// TreasureRow is the row where the trasure is placed on a shape.
 	// This is used to format a tile when printing it.
-	TreasureRow = 1
-)
+	TreasureRow int = 1
 
-// This is the shape parts for line assembly.
-var tileShapeRows = map[model.Shape](map[model.Rotation](map[int]string)){
-	model.ShapeI: map[model.Rotation](map[int]string){
-		model.Rotation0: map[int]string{
-			0: "───",
-			1: ".%s.",
-			2: "───",
-		},
-		model.Rotation90: map[int]string{
-			0: "│.│",
-			1: "│%s│",
-			2: "│.│",
-		},
-		model.Rotation180: map[int]string{
-			0: "───",
-			1: ".%s.",
-			2: "───",
-		},
-		model.Rotation270: map[int]string{
-			0: "│.│",
-			1: "│%s│",
-			2: "│.│",
-		},
-	},
-	model.ShapeT: map[model.Rotation](map[int]string){
-		model.Rotation0: map[int]string{
-			0: "┘.└",
-			1: ".%s.",
-			2: "───",
-		},
-		model.Rotation90: map[int]string{
-			0: "│.└",
-			1: "│%s.",
-			2: "│.┌",
-		},
-		model.Rotation180: map[int]string{
-			0: "───",
-			1: ".%s.",
-			2: "┐.┌",
-		},
-		model.Rotation270: map[int]string{
-			0: "┘.│",
-			1: ".%s│",
-			2: "┐.│",
-		},
-	},
-	model.ShapeV: map[model.Rotation](map[int]string){
-		model.Rotation0: map[int]string{
-			0: "──┐",
-			1: ".%s│",
-			2: "┐.│",
-		},
-		model.Rotation90: map[int]string{
-			0: "┘.│",
-			1: ".%s│",
-			2: "──┘",
-		},
-		model.Rotation180: map[int]string{
-			0: "│.└",
-			1: "│%s.",
-			2: "└──",
-		},
-		model.Rotation270: map[int]string{
-			0: "┌──",
-			1: "│%s.",
-			2: "│.┌",
-		},
-	},
-}
+	// LowerRow is the lower row of a tile
+	LowerRow int = 2
+)
 
 // BoardDrawer is in charge of drawing the board to the CLI.
 type BoardDrawer interface {
@@ -96,33 +32,173 @@ type BoardDrawer interface {
 type boardDrawer struct {
 }
 
-// drawTileRow draws a tile row without a treasure.
-func (d boardDrawer) drawTileRow(w io.Writer, boardTile *model.BoardTile, tileRow int) error {
-	_, err := io.WriteString(w, tileShapeRows[boardTile.Tile.Shape][boardTile.Rotation][tileRow])
+func (d boardDrawer) write(w io.Writer, str string) error {
+	_, err := io.WriteString(w, str)
 	return err
 }
 
-// drawTileRowWithTreasure draws a tile rows with a treasure in it.
-func (d boardDrawer) drawTileRowWithTreasure(w io.Writer, boardTile *model.BoardTile) error {
-	_, err := io.WriteString(w,
-		fmt.Sprintf(
-			tileShapeRows[boardTile.Tile.Shape][boardTile.Rotation][TreasureRow],
-			string(boardTile.Tile.Treasure)))
-	return err
+func (d boardDrawer) drawITileRow(w io.Writer, rotation model.Rotation, tileRow int, treasure rune) error {
+
+	if rotation == model.Rotation0 || rotation == model.Rotation180 {
+		switch tileRow {
+		case UpperRow, LowerRow:
+			return d.write(w, "───")
+		case TreasureRow:
+			return d.write(w, "."+string(treasure)+".")
+		default:
+			return fmt.Errorf("unsupported row: %v", tileRow)
+		}
+	}
+
+	if rotation == model.Rotation90 || rotation == model.Rotation270 {
+		switch tileRow {
+		case UpperRow, LowerRow:
+			return d.write(w, "│.│")
+		case TreasureRow:
+			return d.write(w, "│"+string(treasure)+"│")
+		default:
+			return fmt.Errorf("unsupported row: %v", tileRow)
+		}
+	}
+
+	return fmt.Errorf("unsupported rotation: %v", rotation)
+}
+
+func (d boardDrawer) drawTTileRow(w io.Writer, rotation model.Rotation, tileRow int, treasure rune) error {
+
+	if rotation == model.Rotation0 {
+		switch tileRow {
+		case UpperRow:
+			return d.write(w, "┘.└")
+		case TreasureRow:
+			return d.write(w, "."+string(treasure)+".")
+		case LowerRow:
+			return d.write(w, "───")
+		default:
+			return fmt.Errorf("unsupported row: %v", tileRow)
+		}
+	}
+
+	if rotation == model.Rotation90 {
+		switch tileRow {
+		case UpperRow:
+			return d.write(w, "│.└")
+		case TreasureRow:
+			return d.write(w, "│"+string(treasure)+".")
+		case LowerRow:
+			return d.write(w, "│.┌")
+		default:
+			return fmt.Errorf("unsupported row: %v", tileRow)
+		}
+	}
+
+	if rotation == model.Rotation180 {
+		switch tileRow {
+		case UpperRow:
+			return d.write(w, "───")
+		case TreasureRow:
+			return d.write(w, "."+string(treasure)+".")
+		case LowerRow:
+			return d.write(w, "┐.┌")
+		default:
+			return fmt.Errorf("unsupported row: %v", tileRow)
+		}
+	}
+
+	if rotation == model.Rotation270 {
+		switch tileRow {
+		case UpperRow:
+			return d.write(w, "┘.│")
+		case TreasureRow:
+			return d.write(w, "."+string(treasure)+"│")
+		case LowerRow:
+			return d.write(w, "┐.│")
+		default:
+			return fmt.Errorf("unsupported row: %v", tileRow)
+		}
+	}
+
+	return fmt.Errorf("unsupported rotation: %v", rotation)
+}
+
+func (d boardDrawer) drawVTileRow(w io.Writer, rotation model.Rotation, tileRow int, treasure rune) error {
+
+	if rotation == model.Rotation0 {
+		switch tileRow {
+		case UpperRow:
+			return d.write(w, "──┐")
+		case TreasureRow:
+			return d.write(w, "."+string(treasure)+"│")
+		case LowerRow:
+			return d.write(w, "┐.│")
+		default:
+			return fmt.Errorf("unsupported row: %v", tileRow)
+		}
+	}
+
+	if rotation == model.Rotation90 {
+		switch tileRow {
+		case UpperRow:
+			return d.write(w, "┘.│")
+		case TreasureRow:
+			return d.write(w, "."+string(treasure)+"│")
+		case LowerRow:
+			return d.write(w, "──┘")
+		default:
+			return fmt.Errorf("unsupported row: %v", tileRow)
+		}
+	}
+
+	if rotation == model.Rotation180 {
+		switch tileRow {
+		case UpperRow:
+			return d.write(w, "│.└")
+		case TreasureRow:
+			return d.write(w, "│"+string(treasure)+".")
+		case LowerRow:
+			return d.write(w, "└──")
+		default:
+			return fmt.Errorf("unsupported row: %v", tileRow)
+		}
+	}
+
+	if rotation == model.Rotation270 {
+		switch tileRow {
+		case UpperRow:
+			return d.write(w, "┌──")
+		case TreasureRow:
+			return d.write(w, "│"+string(treasure)+".")
+		case LowerRow:
+			return d.write(w, "│.┌")
+		default:
+			return fmt.Errorf("unsupported row: %v", tileRow)
+		}
+	}
+
+	return fmt.Errorf("unsupported rotation: %v", rotation)
+}
+
+// drawTileRow draws a tile row without a treasure.
+func (d boardDrawer) drawTileRow(w io.Writer, boardTile *model.BoardTile, tileRow int) error {
+	switch boardTile.Tile.Shape {
+	case model.ShapeI:
+		return d.drawITileRow(w, boardTile.Rotation, tileRow, boardTile.Tile.Treasure)
+
+	case model.ShapeT:
+		return d.drawTTileRow(w, boardTile.Rotation, tileRow, boardTile.Tile.Treasure)
+
+	case model.ShapeV:
+		return d.drawVTileRow(w, boardTile.Rotation, tileRow, boardTile.Tile.Treasure)
+	}
+
+	return fmt.Errorf("unsupported tile shape : %v", boardTile.Tile.Shape)
 }
 
 func (d boardDrawer) DrawTo(w io.Writer, board *model.Board) (err error) {
 	for _, line := range board.Tiles {
 		for tileRow := 0; tileRow < TileHeigth; tileRow++ {
 			for _, boardTile := range line {
-				var err error = nil
-				if tileRow != TreasureRow {
-					err = d.drawTileRow(w, boardTile, tileRow)
-				} else {
-					err = d.drawTileRowWithTreasure(w, boardTile)
-				}
-
-				if err != nil {
+				if err := d.drawTileRow(w, boardTile, tileRow); err != nil {
 					return err
 				}
 			}
