@@ -9,36 +9,15 @@ import (
 	"github.com/marmelab/labyrinth/internal/model"
 )
 
-const (
-	BoardMargin = 4
-)
+type gameUi struct {
+	gui  *gocui.Gui
+	loop *gameLoop
 
-type Button int
-
-const (
-	TopButton Button = iota
-	RightButton
-	BottomButton
-	LeftButton
-)
-
-type RotationType int
-
-const (
-	RotateClockWise RotationType = iota
-	RotateAntiClockWise
-)
-
-type GuiHandler func(gui *gocui.Gui, view *gocui.View) error
-
-type gameLoop struct {
 	boardDrawer BoardDrawer
 	state       *model.Board
-
-	gui *gocui.Gui
 }
 
-func (g gameLoop) drawButton(name, text string, topLeftX, topLeftY, bottomRightX, bottomRightY int, handler GuiHandler) error {
+func (g gameUi) drawButton(name, text string, topLeftX, topLeftY, bottomRightX, bottomRightY int, handler GuiHandler) error {
 	button, err := g.gui.SetView(name, topLeftX, topLeftY, bottomRightX, bottomRightY, 0)
 	if err != nil {
 		if err != gocui.ErrUnknownView {
@@ -58,7 +37,7 @@ func (g gameLoop) drawButton(name, text string, topLeftX, topLeftY, bottomRightX
 	return nil
 }
 
-func (g gameLoop) drawBoard(tileCount, boardSize int) error {
+func (g gameUi) drawBoard(tileCount, boardSize int) error {
 	boardView, err := g.gui.SetView("board", BoardMargin, BoardMargin, boardSize+BoardMargin, boardSize+BoardMargin, 0)
 	if err != nil {
 		if err != gocui.ErrUnknownView {
@@ -78,7 +57,7 @@ func (g gameLoop) drawBoard(tileCount, boardSize int) error {
 	return nil
 }
 
-func (g gameLoop) drawTiles(tileCount int) error {
+func (g gameUi) drawTiles(tileCount int) error {
 	for line := 0; line < tileCount; line++ {
 		for row := 0; row < tileCount; row++ {
 			var (
@@ -106,7 +85,7 @@ func (g gameLoop) drawTiles(tileCount int) error {
 	return nil
 }
 
-func (g gameLoop) drawBoardActions(tileCount, boardSize int) error {
+func (g gameUi) drawBoardActions(tileCount, boardSize int) error {
 	for buttonIndex := 1; buttonIndex < tileCount; buttonIndex += 2 {
 		{
 			var (
@@ -117,7 +96,7 @@ func (g gameLoop) drawBoardActions(tileCount, boardSize int) error {
 				bottomRightY = topLeftY + TileOuterSize
 			)
 
-			if err := g.drawButton(name, "\n ↓", topLeftX, topLeftY, bottomRightX, bottomRightY, g.insertTile(TopButton, buttonIndex)); err != nil {
+			if err := g.drawButton(name, "\n\n ↓", topLeftX, topLeftY, bottomRightX, bottomRightY, g.loop.insertTile(TopButton, buttonIndex)); err != nil {
 				return err
 			}
 		}
@@ -127,11 +106,11 @@ func (g gameLoop) drawBoardActions(tileCount, boardSize int) error {
 				name         = fmt.Sprintf("button-right-%d", buttonIndex)
 				topLeftX     = BoardMargin + (boardSize + 1)
 				topLeftY     = BoardMargin + (TileOuterSize * buttonIndex) + 1
-				bottomRightX = topLeftX + TileSize
+				bottomRightX = topLeftX + TileOuterSize
 				bottomRightY = topLeftY + TileOuterSize
 			)
 
-			if err := g.drawButton(name, "\n←", topLeftX, topLeftY, bottomRightX, bottomRightY, g.insertTile(RightButton, buttonIndex)); err != nil {
+			if err := g.drawButton(name, "\n←", topLeftX, topLeftY, bottomRightX, bottomRightY, g.loop.insertTile(RightButton, buttonIndex)); err != nil {
 				return err
 			}
 		}
@@ -145,7 +124,7 @@ func (g gameLoop) drawBoardActions(tileCount, boardSize int) error {
 				bottomRightY = topLeftY + TileOuterSize
 			)
 
-			if err := g.drawButton(name, " ↑", topLeftX, topLeftY, bottomRightX, bottomRightY, g.insertTile(BottomButton, buttonIndex)); err != nil {
+			if err := g.drawButton(name, " ↑", topLeftX, topLeftY, bottomRightX, bottomRightY, g.loop.insertTile(BottomButton, buttonIndex)); err != nil {
 				return err
 			}
 		}
@@ -155,11 +134,11 @@ func (g gameLoop) drawBoardActions(tileCount, boardSize int) error {
 				name         = fmt.Sprintf("button-left-%d", buttonIndex)
 				topLeftX     = 0
 				topLeftY     = BoardMargin + (TileOuterSize * buttonIndex) + 1
-				bottomRightX = topLeftX + TileSize
+				bottomRightX = topLeftX + TileOuterSize
 				bottomRightY = topLeftY + TileOuterSize
 			)
 
-			if err := g.drawButton(name, "\n→", topLeftX, topLeftY, bottomRightX, bottomRightY, g.insertTile(LeftButton, buttonIndex)); err != nil {
+			if err := g.drawButton(name, "\n  →", topLeftX, topLeftY, bottomRightX, bottomRightY, g.loop.insertTile(LeftButton, buttonIndex)); err != nil {
 				return err
 			}
 		}
@@ -168,7 +147,7 @@ func (g gameLoop) drawBoardActions(tileCount, boardSize int) error {
 	return nil
 }
 
-func (g gameLoop) drawRemainingTile(boardSize, boardOffset int) error {
+func (g gameUi) drawRemainingTile(boardSize, boardOffset int) error {
 
 	var (
 		topLeftX     = BoardMargin
@@ -192,7 +171,7 @@ func (g gameLoop) drawRemainingTile(boardSize, boardOffset int) error {
 			bottomRightY = topLeftY + TileOuterSize
 		)
 
-		if err := g.drawButton(name, "\n ↶", topLeftX, topLeftY, bottomRightX, bottomRightY, g.rotateRemainingTile(RotateAntiClockWise)); err != nil {
+		if err := g.drawButton(name, "\n ↶", topLeftX, topLeftY, bottomRightX, bottomRightY, g.loop.rotateRemainingTile(RotateAntiClockWise)); err != nil {
 			return err
 		}
 	}
@@ -233,7 +212,7 @@ func (g gameLoop) drawRemainingTile(boardSize, boardOffset int) error {
 			bottomRightY = topLeftY + TileOuterSize
 		)
 
-		if err := g.drawButton(name, "\n ↷", topLeftX, topLeftY, bottomRightX, bottomRightY, g.rotateRemainingTile(RotateClockWise)); err != nil {
+		if err := g.drawButton(name, "\n ↷", topLeftX, topLeftY, bottomRightX, bottomRightY, g.loop.rotateRemainingTile(RotateClockWise)); err != nil {
 			return err
 		}
 	}
@@ -241,7 +220,7 @@ func (g gameLoop) drawRemainingTile(boardSize, boardOffset int) error {
 	return nil
 }
 
-func (g gameLoop) layout(gui *gocui.Gui) error {
+func (g gameUi) layout(gui *gocui.Gui) error {
 	var (
 		tileCount   = g.state.Size()
 		boardSize   = tileCount*TileOuterSize + TileBorderSize + 1
@@ -261,69 +240,4 @@ func (g gameLoop) layout(gui *gocui.Gui) error {
 	}
 
 	return nil
-}
-
-func (g gameLoop) insertTile(button Button, buttonIndex int) GuiHandler {
-	return func(gui *gocui.Gui, view *gocui.View) error {
-		switch button {
-		case TopButton:
-			return g.state.InsertTileTopAt(buttonIndex)
-		case RightButton:
-			return g.state.InsertTileRightAt(buttonIndex)
-		case BottomButton:
-			return g.state.InsertTileBottomAt(buttonIndex)
-		case LeftButton:
-			return g.state.InsertTileLeftAt(buttonIndex)
-		}
-		return nil
-	}
-}
-
-func (g gameLoop) rotateRemainingTile(rotationType RotationType) GuiHandler {
-	return func(gui *gocui.Gui, view *gocui.View) error {
-		switch rotationType {
-		case RotateClockWise:
-			g.state.RotateRemainingTileClockwise()
-		case RotateAntiClockWise:
-			g.state.RotateRemainingTileAntiClockwise()
-		}
-		return nil
-	}
-}
-
-func (g gameLoop) quit(gui *gocui.Gui, v *gocui.View) error {
-	return gocui.ErrQuit
-}
-
-func (g *gameLoop) Run() error {
-	gui, err := gocui.NewGui(gocui.OutputNormal, true)
-	if err != nil {
-		return err
-	}
-	defer gui.Close()
-	g.gui = gui
-
-	gui.SetManagerFunc(g.layout)
-
-	gui.Cursor = true
-	gui.Mouse = true
-
-	if err := gui.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, g.quit); err != nil {
-		return errors.Join(errors.New("failed to set exit key"), err)
-	}
-
-	if err := gui.MainLoop(); err != nil && err != gocui.ErrQuit {
-		return errors.Join(errors.New("failed to start main loop"), err)
-	}
-
-	return nil
-}
-
-// GameLoop runs the labyrinth game with the provided initial state.
-func GameLoop(initialState *model.Board) error {
-	return (&gameLoop{
-		boardDrawer: NewBoardDrawer(),
-		state:       initialState,
-		gui:         nil,
-	}).Run()
 }

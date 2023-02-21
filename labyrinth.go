@@ -13,7 +13,7 @@ func main() {
 		log.Fatalf("Failed to initialize board: %v.", err)
 	}
 
-	if err := presentation.GameLoop(board); err != nil {
+	if err := presentation.RunGameLoop(board); err != nil {
 		log.Fatalf("Failed to run main loop: %v.", err)
 	}
 }
