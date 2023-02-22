@@ -189,6 +189,14 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 	currentPlayer := b.CurrentPlayer()
 	currentPlayer.Line = line
 	currentPlayer.Row = row
+
+	currentTile := b.Tiles[line][row]
+	if currentTile.Tile.Treasure == currentPlayer.Hand[0] {
+		currentPlayer.Hand = currentPlayer.Hand[1:]
+		currentPlayer.Score = currentPlayer.Score + 1
+		currentTile.Tile.Treasure = NoTreasure
+	}
+
 	b.State = GameStatePlaceTile
 	return nil
 }

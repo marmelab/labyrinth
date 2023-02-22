@@ -301,6 +301,7 @@ func (g gameUi) drawCurrentPlayer(boardOffset int) error {
 		}
 	}
 
+	currentPlayerBox.Clear()
 	currentPlayer := g.board.CurrentPlayer()
 	fmt.Fprintf(currentPlayerBox, `
 Current player: %10s
@@ -319,7 +320,6 @@ func (g gameUi) drawScores(boardOffset int) error {
 		bottomRightX = topLeftX + 27
 		bottomRightY = topLeftY + 2*len(g.board.Players) + 4
 	)
-
 	scoreBox, err := g.gui.SetView("score-box", topLeftX, topLeftY, bottomRightX, bottomRightY, 0)
 	if err != nil {
 		if err != gocui.ErrUnknownView {
@@ -327,6 +327,7 @@ func (g gameUi) drawScores(boardOffset int) error {
 		}
 	}
 
+	scoreBox.Clear()
 	fmt.Fprintf(scoreBox, `
 Scores:
 `)
