@@ -65,6 +65,13 @@ func (b *Board) InsertTileTopAt(row int) error {
 	var current = b.RemainingTile
 	for line := 0; line < b.Size(); line++ {
 		b.Tiles[line][row], current = current, b.Tiles[line][row]
+
+	}
+
+	for _, player := range b.Players {
+		if player.Row == row {
+			player.Line = (player.Line + 1) % b.Size()
+		}
 	}
 
 	b.RemainingTile = current
@@ -82,6 +89,15 @@ func (b *Board) InsertTileRightAt(line int) error {
 		b.Tiles[line][row], current = current, b.Tiles[line][row]
 	}
 
+	for _, player := range b.Players {
+		if player.Line == line {
+			player.Row = player.Row - 1
+			if player.Row < 0 {
+				player.Row = b.Size() - 1
+			}
+		}
+	}
+
 	b.RemainingTile = current
 	b.State = GameStateMovePawn
 	return nil
@@ -97,6 +113,15 @@ func (b *Board) InsertTileBottomAt(row int) error {
 		b.Tiles[line][row], current = current, b.Tiles[line][row]
 	}
 
+	for _, player := range b.Players {
+		if player.Row == row {
+			player.Line = player.Line - 1
+			if player.Line < 0 {
+				player.Line = b.Size() - 1
+			}
+		}
+	}
+
 	b.RemainingTile = current
 	b.State = GameStateMovePawn
 	return nil
@@ -110,6 +135,12 @@ func (b *Board) InsertTileLeftAt(line int) error {
 	var current = b.RemainingTile
 	for row := 0; row < b.Size(); row++ {
 		b.Tiles[line][row], current = current, b.Tiles[line][row]
+	}
+
+	for _, player := range b.Players {
+		if player.Line == line {
+			player.Row = (player.Row + 1) % b.Size()
+		}
 	}
 
 	b.RemainingTile = current
