@@ -16,6 +16,9 @@ var (
 	ErrMarshalFailure = errors.New("failed to marshal/unmarshal board")
 )
 
+// BoardSaveFn is a function to save a board without relying on the save ID.
+type BoardSaveFn func() (err error)
+
 // BoardStore is in charge of storing board state.
 type BoardStore interface {
 
@@ -24,6 +27,11 @@ type BoardStore interface {
 
 	// Save the board.
 	Save(id string, board *model.Board) (err error)
+
+	// Get board using its ID, or create a new one if save does not exist yet.
+	// This function also returns a save function that provide an  easy way to
+	// store the save without knowing the save ID.
+	Get(id string) (board *model.Board, saveBoard BoardSaveFn, err error)
 }
 
 // fileBoardStore is a board store that uses a file store
@@ -64,10 +72,39 @@ func (s fileBoardStore) Save(id string, board *model.Board) error {
 	return nil
 }
 
+func (s fileBoardStore) Get(id string) (*model.Board, BoardSaveFn, error) {
+	board, err := s.Load(id)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			log.Printf("Failed to load board: %v", err)
+			return nil, nil, err
+		}
+
+		board, err = model.NewBoard(7)
+		if err != nil {
+			log.Printf("Failed to create board: %v", err)
+			return nil, nil, err
+		}
+	}
+
+	if err := s.Save(id, board); err != nil {
+		log.Printf("Failed to save board: %v", err)
+		return nil, nil, err
+	}
+
+	return board, func() error {
+		return s.Save(id, board)
+	}, nil
+}
+
 // NewFileBoardStore returns a file-backed board store with the given root
 // directory path.
-func NewFileBoardStore(rootDirectory string) BoardStore {
+func NewFileBoardStore(rootDirectory string) (BoardStore, error) {
+	if err := os.MkdirAll(rootDirectory, 0755); err != nil {
+		return nil, err
+	}
+
 	return fileBoardStore{
 		rootDirectory: rootDirectory,
-	}
+	}, nil
 }

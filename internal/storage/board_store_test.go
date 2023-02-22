@@ -80,4 +80,53 @@ func TestFileBoardStore(t *testing.T) {
 			assert.Equal(t, board, savedBoard)
 		})
 	})
+
+	t.Run("Get()", func(t *testing.T) {
+
+		t.Run("Should create a new board if it does not exist", func(t *testing.T) {
+			var (
+				testSaveId   = "_default"
+				testSavePath = store.filePath(testSaveId)
+			)
+
+			t.Cleanup(func() {
+				os.Remove(testSavePath)
+			})
+
+			// Get
+			board, _, err := store.Get(testSaveId)
+			assert.Nil(t, err)
+			assert.Nil(t, store.Save(testSaveId, board))
+
+			// Load and test
+			stateJson, err := os.ReadFile(testSavePath)
+			assert.Nil(t, err)
+
+			savedBoard := new(model.Board)
+			json.Unmarshal(stateJson, savedBoard)
+
+			assert.Equal(t, board, savedBoard)
+		})
+
+		t.Run("Should retrieve an existing board", func(t *testing.T) {
+			var (
+				testSaveId   = "test-full"
+				testSavePath = store.filePath(testSaveId)
+			)
+
+			// Save
+			board, _, err := store.Get(testSaveId)
+			assert.Nil(t, err)
+			assert.Nil(t, store.Save(testSaveId, board))
+
+			// Load and test
+			stateJson, err := os.ReadFile(testSavePath)
+			assert.Nil(t, err)
+
+			savedBoard := new(model.Board)
+			json.Unmarshal(stateJson, savedBoard)
+
+			assert.Equal(t, board, savedBoard)
+		})
+	})
 }

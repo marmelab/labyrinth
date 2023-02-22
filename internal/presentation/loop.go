@@ -5,6 +5,7 @@ import (
 
 	"github.com/awesome-gocui/gocui"
 	"github.com/marmelab/labyrinth/internal/model"
+	"github.com/marmelab/labyrinth/internal/storage"
 )
 
 const (
@@ -31,7 +32,9 @@ type GuiHandler func(gui *gocui.Gui, view *gocui.View) error
 
 type gameLoop struct {
 	boardDrawer BoardDrawer
-	state       *model.Board
+
+	state     *model.Board
+	saveBoard storage.BoardSaveFn
 
 	gui *gocui.Gui
 }
@@ -40,15 +43,24 @@ func (g gameLoop) insertTile(button Button, buttonIndex int) GuiHandler {
 	return func(gui *gocui.Gui, view *gocui.View) error {
 		switch button {
 		case TopButton:
-			return g.state.InsertTileTopAt(buttonIndex)
+			if err := g.state.InsertTileTopAt(buttonIndex); err != nil {
+				return err
+			}
 		case RightButton:
-			return g.state.InsertTileRightAt(buttonIndex)
+			if err := g.state.InsertTileRightAt(buttonIndex); err != nil {
+				return err
+			}
 		case BottomButton:
-			return g.state.InsertTileBottomAt(buttonIndex)
+			if err := g.state.InsertTileBottomAt(buttonIndex); err != nil {
+				return err
+			}
 		case LeftButton:
-			return g.state.InsertTileLeftAt(buttonIndex)
+			if err := g.state.InsertTileLeftAt(buttonIndex); err != nil {
+				return err
+			}
 		}
-		return nil
+
+		return g.saveBoard()
 	}
 }
 
@@ -60,7 +72,7 @@ func (g gameLoop) rotateRemainingTile(rotationType RotationType) GuiHandler {
 		case RotateAntiClockWise:
 			g.state.RotateRemainingTileAntiClockwise()
 		}
-		return nil
+		return g.saveBoard()
 	}
 }
 
@@ -101,10 +113,11 @@ func (g *gameLoop) Run() error {
 }
 
 // RunGameLoop runs the labyrinth game with the provided initial state.
-func RunGameLoop(initialState *model.Board) error {
+func RunGameLoop(initialState *model.Board, saveBoard storage.BoardSaveFn) error {
 	return (&gameLoop{
 		boardDrawer: NewBoardDrawer(),
 		state:       initialState,
+		saveBoard:   saveBoard,
 		gui:         nil,
 	}).Run()
 }
