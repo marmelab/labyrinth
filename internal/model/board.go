@@ -179,11 +179,6 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 		return ErrInvalidAction
 	}
 
-	currentPlayer := b.CurrentPlayer()
-	if currentPlayer.Line == line && currentPlayer.Row == row {
-		return ErrInvalidAction
-	}
-
 	if line >= b.Size() {
 		return ErrInvalidAction
 	}
@@ -192,6 +187,7 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 		return ErrInvalidAction
 	}
 
+	currentPlayer := b.CurrentPlayer()
 	currentPlayer.Line = line
 	currentPlayer.Row = row
 	b.State = GameStatePlaceTile

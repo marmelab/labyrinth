@@ -486,7 +486,7 @@ func TestBoard(t *testing.T) {
 			assert.Equal(t, ErrInvalidAction, err)
 		})
 
-		t.Run("Should return an error if player is moved on the same tile", func(t *testing.T) {
+		t.Run("Should allow to move on the same tile", func(t *testing.T) {
 			board := &Board{
 				Tiles: make([][]*BoardTile, 3),
 				Players: []*Player{
@@ -500,7 +500,9 @@ func TestBoard(t *testing.T) {
 			}
 
 			err := board.MoveCurrentPlayerTo(0, 0)
-			assert.Equal(t, ErrInvalidAction, err)
+			assert.Nil(t, err)
+			assert.Equal(t, 0, board.Players[0].Line)
+			assert.Equal(t, 0, board.Players[0].Row)
 		})
 
 		t.Run("Should return an error if line is not valid", func(t *testing.T) {

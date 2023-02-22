@@ -64,8 +64,8 @@ func (g gameUi) drawInsertTileButton(name, text string, topLeftX, topLeftY, bott
 	}
 
 	if g.board.State == model.GameStatePlaceTile {
-		button.BgColor = g.backgroundColor()
-		button.FgColor = g.foregroundColor()
+		button.BgColor = gocui.ColorMagenta
+		button.FgColor = gocui.ColorWhite
 	} else {
 		button.BgColor = gocui.ColorDefault
 		button.FgColor = gocui.ColorDefault
@@ -80,8 +80,8 @@ func (g gameUi) drawRotateTileButton(name, text string, topLeftX, topLeftY, bott
 		return err
 	}
 
-	button.BgColor = g.backgroundColor()
-	button.FgColor = g.foregroundColor()
+	button.BgColor = gocui.ColorMagenta
+	button.FgColor = gocui.ColorWhite
 
 	return nil
 }
@@ -139,11 +139,11 @@ func (g gameUi) drawTiles(tileCount int) error {
 				tileView.BgColor = g.backgroundColor()
 				tileView.FgColor = g.foregroundColor()
 			} else if g.board.State == model.GameStateMovePawn {
+				tileView.BgColor = gocui.ColorMagenta
+				tileView.FgColor = gocui.ColorWhite
+			} else {
 				tileView.BgColor = gocui.ColorWhite
 				tileView.FgColor = gocui.ColorBlack
-			} else {
-				tileView.BgColor = gocui.ColorDefault
-				tileView.FgColor = gocui.ColorDefault
 			}
 		}
 	}
@@ -216,7 +216,7 @@ func (g gameUi) drawRemainingTile(boardSize, boardOffset int) error {
 
 	var (
 		topLeftX     = BoardMargin
-		topLeftY     = BoardMargin + boardOffset
+		topLeftY     = BoardMargin + boardOffset + 1
 		bottomRightX = topLeftX + boardSize
 		bottomRightY = topLeftY + 8
 	)
