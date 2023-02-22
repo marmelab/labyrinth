@@ -50,7 +50,9 @@ func (d boardDrawer) writeTile(buffer, tile [][]rune, line, row int) {
 	}
 }
 
-func (d boardDrawer) formatITile(rotation model.Rotation, tre rune) [][]rune {
+func (d boardDrawer) formatITile(rotation model.Rotation, treasure model.Treasure) [][]rune {
+	tre := rune(treasure)
+
 	switch rotation {
 	case model.Rotation0, model.Rotation180:
 		return [][]rune{
@@ -67,7 +69,9 @@ func (d boardDrawer) formatITile(rotation model.Rotation, tre rune) [][]rune {
 	}
 }
 
-func (d boardDrawer) formatTTile(rotation model.Rotation, tre rune) [][]rune {
+func (d boardDrawer) formatTTile(rotation model.Rotation, treasure model.Treasure) [][]rune {
+	tre := rune(treasure)
+
 	switch rotation {
 	case model.Rotation0:
 		return [][]rune{
@@ -96,7 +100,9 @@ func (d boardDrawer) formatTTile(rotation model.Rotation, tre rune) [][]rune {
 	}
 }
 
-func (d boardDrawer) formatVTile(rotation model.Rotation, tre rune) [][]rune {
+func (d boardDrawer) formatVTile(rotation model.Rotation, treasure model.Treasure) [][]rune {
+	tre := rune(treasure)
+
 	switch rotation {
 	case model.Rotation0:
 		return [][]rune{

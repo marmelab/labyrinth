@@ -23,10 +23,10 @@ var (
 type Board struct {
 
 	// Tiles are the tiles that are placed on a board.
-	Tiles [][]*BoardTile
+	Tiles [][]*BoardTile `json:"tiles"`
 
 	// RemainingTile is the tile that was not placed on the board.
-	RemainingTile *BoardTile
+	RemainingTile *BoardTile `json:"remainingTile"`
 }
 
 func (b *Board) InsertTileTopAt(row int) error {
@@ -120,10 +120,10 @@ func (b Board) Size() int {
 type BoardTile struct {
 
 	// Tile is the underlying tile.
-	Tile *Tile
+	Tile *Tile `json:"tile"`
 
 	// Rotation is the tile rotation.
-	Rotation Rotation
+	Rotation Rotation `json:"rotation"`
 }
 
 // Rotation represents a tile rotation on a board.
@@ -153,12 +153,12 @@ func generateTiles(size int) (tiles []*Tile, treasureCount int) {
 		if i < tShapedThreshold {
 			tiles = append(tiles, &Tile{
 				Shape:    ShapeT,
-				Treasure: 'A' + rune(i),
+				Treasure: 'A' + Treasure(i),
 			})
 		} else if i < vShapedWithTreasureCount {
 			tiles = append(tiles, &Tile{
 				Shape:    ShapeV,
-				Treasure: 'A' + rune(i),
+				Treasure: 'A' + Treasure(i),
 			})
 		} else if i < iShapedThreshold {
 			tiles = append(tiles, &Tile{

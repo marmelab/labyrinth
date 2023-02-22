@@ -96,7 +96,7 @@ func (g gameUi) drawBoardActions(tileCount, boardSize int) error {
 				bottomRightY = topLeftY + TileOuterSize
 			)
 
-			if err := g.drawButton(name, "\n\n ↓", topLeftX, topLeftY, bottomRightX, bottomRightY, g.loop.insertTile(TopButton, buttonIndex)); err != nil {
+			if err := g.drawButton(name, "\n ↓", topLeftX, topLeftY, bottomRightX, bottomRightY, g.loop.insertTile(TopButton, buttonIndex)); err != nil {
 				return err
 			}
 		}
@@ -110,7 +110,7 @@ func (g gameUi) drawBoardActions(tileCount, boardSize int) error {
 				bottomRightY = topLeftY + TileOuterSize
 			)
 
-			if err := g.drawButton(name, "\n←", topLeftX, topLeftY, bottomRightX, bottomRightY, g.loop.insertTile(RightButton, buttonIndex)); err != nil {
+			if err := g.drawButton(name, "\n ←", topLeftX, topLeftY, bottomRightX, bottomRightY, g.loop.insertTile(RightButton, buttonIndex)); err != nil {
 				return err
 			}
 		}
@@ -124,7 +124,7 @@ func (g gameUi) drawBoardActions(tileCount, boardSize int) error {
 				bottomRightY = topLeftY + TileOuterSize
 			)
 
-			if err := g.drawButton(name, " ↑", topLeftX, topLeftY, bottomRightX, bottomRightY, g.loop.insertTile(BottomButton, buttonIndex)); err != nil {
+			if err := g.drawButton(name, "\n ↑", topLeftX, topLeftY, bottomRightX, bottomRightY, g.loop.insertTile(BottomButton, buttonIndex)); err != nil {
 				return err
 			}
 		}
@@ -138,7 +138,7 @@ func (g gameUi) drawBoardActions(tileCount, boardSize int) error {
 				bottomRightY = topLeftY + TileOuterSize
 			)
 
-			if err := g.drawButton(name, "\n  →", topLeftX, topLeftY, bottomRightX, bottomRightY, g.loop.insertTile(LeftButton, buttonIndex)); err != nil {
+			if err := g.drawButton(name, "\n →", topLeftX, topLeftY, bottomRightX, bottomRightY, g.loop.insertTile(LeftButton, buttonIndex)); err != nil {
 				return err
 			}
 		}

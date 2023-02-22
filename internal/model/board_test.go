@@ -103,11 +103,11 @@ func TestBoard(t *testing.T) {
 			assert.Nil(t, err)
 
 			assert.Equal(t, ShapeV, board.Tiles[1][row].Tile.Shape)
-			assert.Equal(t, 'B', board.Tiles[1][row].Tile.Treasure)
+			assert.Equal(t, Treasure('B'), board.Tiles[1][row].Tile.Treasure)
 			assert.Equal(t, Rotation270, board.Tiles[1][row].Rotation)
 
 			assert.Equal(t, ShapeV, board.Tiles[2][row].Tile.Shape)
-			assert.Equal(t, 'C', board.Tiles[2][row].Tile.Treasure)
+			assert.Equal(t, Treasure('C'), board.Tiles[2][row].Tile.Treasure)
 			assert.Equal(t, Rotation90, board.Tiles[2][row].Rotation)
 		})
 
@@ -119,7 +119,7 @@ func TestBoard(t *testing.T) {
 			assert.Nil(t, err)
 
 			assert.Equal(t, ShapeT, board.Tiles[0][row].Tile.Shape)
-			assert.Equal(t, 'E', board.Tiles[0][row].Tile.Treasure)
+			assert.Equal(t, Treasure('E'), board.Tiles[0][row].Tile.Treasure)
 			assert.Equal(t, Rotation180, board.Tiles[0][row].Rotation)
 		})
 
@@ -130,7 +130,7 @@ func TestBoard(t *testing.T) {
 			assert.Nil(t, err)
 
 			assert.Equal(t, ShapeV, board.RemainingTile.Tile.Shape)
-			assert.Equal(t, 'D', board.RemainingTile.Tile.Treasure)
+			assert.Equal(t, Treasure('D'), board.RemainingTile.Tile.Treasure)
 			assert.Equal(t, Rotation90, board.RemainingTile.Rotation)
 		})
 	})
@@ -151,7 +151,7 @@ func TestBoard(t *testing.T) {
 			assert.Nil(t, err)
 
 			assert.Equal(t, ShapeV, board.Tiles[line][0].Tile.Shape)
-			assert.Equal(t, 'C', board.Tiles[line][0].Tile.Treasure)
+			assert.Equal(t, Treasure('C'), board.Tiles[line][0].Tile.Treasure)
 			assert.Equal(t, Rotation90, board.Tiles[line][0].Rotation)
 
 			assert.Equal(t, ShapeI, board.Tiles[line][1].Tile.Shape)
@@ -167,7 +167,7 @@ func TestBoard(t *testing.T) {
 			assert.Nil(t, err)
 
 			assert.Equal(t, ShapeT, board.Tiles[line][2].Tile.Shape)
-			assert.Equal(t, 'E', board.Tiles[line][2].Tile.Treasure)
+			assert.Equal(t, Treasure('E'), board.Tiles[line][2].Tile.Treasure)
 			assert.Equal(t, Rotation180, board.Tiles[line][2].Rotation)
 		})
 
@@ -199,11 +199,11 @@ func TestBoard(t *testing.T) {
 			assert.Nil(t, err)
 
 			assert.Equal(t, ShapeV, board.Tiles[0][row].Tile.Shape)
-			assert.Equal(t, 'C', board.Tiles[0][row].Tile.Treasure)
+			assert.Equal(t, Treasure('C'), board.Tiles[0][row].Tile.Treasure)
 			assert.Equal(t, Rotation90, board.Tiles[0][row].Rotation)
 
 			assert.Equal(t, ShapeV, board.Tiles[1][row].Tile.Shape)
-			assert.Equal(t, 'D', board.Tiles[1][row].Tile.Treasure)
+			assert.Equal(t, Treasure('D'), board.Tiles[1][row].Tile.Treasure)
 			assert.Equal(t, Rotation90, board.Tiles[1][row].Rotation)
 
 		})
@@ -216,7 +216,7 @@ func TestBoard(t *testing.T) {
 			assert.Nil(t, err)
 
 			assert.Equal(t, ShapeT, board.Tiles[2][row].Tile.Shape)
-			assert.Equal(t, 'E', board.Tiles[2][row].Tile.Treasure)
+			assert.Equal(t, Treasure('E'), board.Tiles[2][row].Tile.Treasure)
 			assert.Equal(t, Rotation180, board.Tiles[2][row].Rotation)
 		})
 
@@ -227,7 +227,7 @@ func TestBoard(t *testing.T) {
 			assert.Nil(t, err)
 
 			assert.Equal(t, ShapeV, board.RemainingTile.Tile.Shape)
-			assert.Equal(t, 'B', board.RemainingTile.Tile.Treasure)
+			assert.Equal(t, Treasure('B'), board.RemainingTile.Tile.Treasure)
 			assert.Equal(t, Rotation270, board.RemainingTile.Rotation)
 		})
 	})
@@ -252,7 +252,7 @@ func TestBoard(t *testing.T) {
 			assert.Equal(t, Rotation90, board.Tiles[line][1].Rotation)
 
 			assert.Equal(t, ShapeV, board.Tiles[line][2].Tile.Shape)
-			assert.Equal(t, 'C', board.Tiles[line][2].Tile.Treasure)
+			assert.Equal(t, Treasure('C'), board.Tiles[line][2].Tile.Treasure)
 			assert.Equal(t, Rotation90, board.Tiles[line][2].Rotation)
 
 		})
@@ -265,7 +265,7 @@ func TestBoard(t *testing.T) {
 			assert.Nil(t, err)
 
 			assert.Equal(t, ShapeT, board.Tiles[line][0].Tile.Shape)
-			assert.Equal(t, 'E', board.Tiles[line][0].Tile.Treasure)
+			assert.Equal(t, Treasure('E'), board.Tiles[line][0].Tile.Treasure)
 			assert.Equal(t, Rotation180, board.Tiles[line][0].Rotation)
 		})
 
@@ -387,10 +387,10 @@ func TestGenerateTiles(t *testing.T) {
 			for i := 0; i < 4; i++ {
 				assert.Equal(t, ShapeT, tiles[i].Shape)
 			}
-			assert.Equal(t, 'A', tiles[0].Treasure)
-			assert.Equal(t, 'B', tiles[1].Treasure)
-			assert.Equal(t, 'C', tiles[2].Treasure)
-			assert.Equal(t, 'D', tiles[3].Treasure)
+			assert.Equal(t, Treasure('A'), tiles[0].Treasure)
+			assert.Equal(t, Treasure('B'), tiles[1].Treasure)
+			assert.Equal(t, Treasure('C'), tiles[2].Treasure)
+			assert.Equal(t, Treasure('D'), tiles[3].Treasure)
 		}
 		{
 			tiles, _ := generateTiles(7)
@@ -406,8 +406,8 @@ func TestGenerateTiles(t *testing.T) {
 			for i := 4; i < 6; i++ {
 				assert.Equal(t, ShapeV, tiles[i].Shape)
 			}
-			assert.Equal(t, 'E', tiles[4].Treasure)
-			assert.Equal(t, 'F', tiles[5].Treasure)
+			assert.Equal(t, Treasure('E'), tiles[4].Treasure)
+			assert.Equal(t, Treasure('F'), tiles[5].Treasure)
 		}
 		{
 			tiles, _ := generateTiles(7)
