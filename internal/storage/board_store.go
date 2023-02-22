@@ -93,6 +93,10 @@ func (s fileBoardStore) Get(id string) (*model.Board, BoardSaveFn, error) {
 	}
 
 	return board, func() error {
+		if board.State == model.GameStateEnd {
+			os.Remove(s.filePath(id))
+			return nil
+		}
 		return s.Save(id, board)
 	}, nil
 }
