@@ -16,6 +16,7 @@ or
 go run .
 ```
 
+Note: You can use the `Noto Color Emoji` font to have an almost square display.
 
 ## Test
 
