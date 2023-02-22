@@ -227,6 +227,9 @@ const (
 	Rotation270 Rotation = 270
 )
 
+// generate tiles generates tile list for the given board size.
+// It will only generate size*size - 3 cards, since the tiles on each corner is
+// predefined (V shape).
 func generateTiles(size int) (tiles []*Tile, treasureCount int) {
 	var (
 		tileCount = size*size + 1
@@ -305,6 +308,8 @@ func NewBoard(size int) (*Board, error) {
 		State: GameStatePlaceTile,
 	}
 
+	// The tile index is required here to track placed tiles on the board.
+	// This is due to the fact that each corner has a predefined V-shaped tile.
 	tileIndex := 0
 	for line := 0; line < size; line++ {
 		board.Tiles[line] = make([]*BoardTile, size)
