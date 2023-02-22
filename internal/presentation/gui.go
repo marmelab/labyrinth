@@ -375,6 +375,5 @@ func (g gameUi) layout(gui *gocui.Gui) error {
 	if err := g.drawScores(boardOffset); err != nil {
 		return err
 	}
-
 	return nil
 }
