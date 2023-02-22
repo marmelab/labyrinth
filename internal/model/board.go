@@ -234,7 +234,7 @@ const (
 	Rotation270 Rotation = 270
 )
 
-// generate tiles generates tile list for the given board size.
+// generateTiles generates tile list for the given board size.
 // It will only generate size*size - 3 cards, since the tiles on each corner is
 // predefined (fixed V-shaped).
 func generateTiles(size int) (tiles []*Tile, treasures []Treasure) {
