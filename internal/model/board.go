@@ -17,6 +17,16 @@ const (
 
 var (
 	randomGenerator = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	ErrEvenRow       = errors.New("row must be odd")
+	ErrInvalidAction = errors.New("this action is not allowed in this state")
+)
+
+type GameState int
+
+const (
+	GameStatePlaceTile GameState = iota
+	GameStateMovePawn
 )
 
 // Board represents the game board.
@@ -27,11 +37,29 @@ type Board struct {
 
 	// RemainingTile is the tile that was not placed on the board.
 	RemainingTile *BoardTile `json:"remainingTile"`
+
+	// Players holds the players that are part of the game.
+	Players []*Player `json:"players"`
+
+	// GameState is the current game state
+	State GameState `json:"gameState"`
+}
+
+func (b Board) tryPlaceTile(index int) error {
+	if b.State != GameStatePlaceTile {
+		return ErrInvalidAction
+	}
+
+	if (index & 1) != 1 {
+		return ErrEvenRow
+	}
+
+	return nil
 }
 
 func (b *Board) InsertTileTopAt(row int) error {
-	if (row & 1) != 1 {
-		return errors.New("row must be odd")
+	if err := b.tryPlaceTile(row); err != nil {
+		return err
 	}
 
 	var current = b.RemainingTile
@@ -40,12 +68,13 @@ func (b *Board) InsertTileTopAt(row int) error {
 	}
 
 	b.RemainingTile = current
+	b.State = GameStateMovePawn
 	return nil
 }
 
 func (b *Board) InsertTileRightAt(line int) error {
-	if (line & 1) != 1 {
-		return errors.New("row must be odd")
+	if err := b.tryPlaceTile(line); err != nil {
+		return err
 	}
 
 	var current = b.RemainingTile
@@ -54,12 +83,13 @@ func (b *Board) InsertTileRightAt(line int) error {
 	}
 
 	b.RemainingTile = current
+	b.State = GameStateMovePawn
 	return nil
 }
 
 func (b *Board) InsertTileBottomAt(row int) error {
-	if (row & 1) != 1 {
-		return errors.New("row must be odd")
+	if err := b.tryPlaceTile(row); err != nil {
+		return err
 	}
 
 	var current = b.RemainingTile
@@ -68,12 +98,13 @@ func (b *Board) InsertTileBottomAt(row int) error {
 	}
 
 	b.RemainingTile = current
+	b.State = GameStateMovePawn
 	return nil
 }
 
 func (b *Board) InsertTileLeftAt(line int) error {
-	if (line & 1) != 1 {
-		return errors.New("row must be odd")
+	if err := b.tryPlaceTile(line); err != nil {
+		return err
 	}
 
 	var current = b.RemainingTile
@@ -82,6 +113,7 @@ func (b *Board) InsertTileLeftAt(line int) error {
 	}
 
 	b.RemainingTile = current
+	b.State = GameStateMovePawn
 	return nil
 }
 
@@ -109,6 +141,35 @@ func (b *Board) RotateRemainingTileAntiClockwise() {
 	case Rotation270:
 		b.RemainingTile.Rotation = Rotation180
 	}
+}
+
+func (b *Board) MoveCurrentPlayerTo(line, row int) error {
+	if b.State != GameStateMovePawn {
+		return ErrInvalidAction
+	}
+
+	currentPlayer := b.CurrentPlayer()
+	if currentPlayer.Line == line && currentPlayer.Row == row {
+		return ErrInvalidAction
+	}
+
+	if line >= b.Size() {
+		return ErrInvalidAction
+	}
+
+	if row >= b.Size() {
+		return ErrInvalidAction
+	}
+
+	currentPlayer.Line = line
+	currentPlayer.Row = row
+	b.State = GameStatePlaceTile
+	return nil
+}
+
+// CurrentPlayer returns the current player.
+func (b Board) CurrentPlayer() *Player {
+	return b.Players[0]
 }
 
 // Size returns the board size in tiles.
@@ -207,6 +268,14 @@ func NewBoard(size int) (*Board, error) {
 
 	board := &Board{
 		Tiles: make([][]*BoardTile, size),
+		Players: []*Player{
+			{
+				Color: ColorBlue,
+				Line:  0,
+				Row:   0,
+			},
+		},
+		State: GameStatePlaceTile,
 	}
 
 	tileIndex := 0

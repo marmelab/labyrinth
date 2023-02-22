@@ -82,6 +82,13 @@ func NewTestBoard() *Board {
 			},
 			Rotation: Rotation180,
 		},
+		Players: []*Player{
+			{
+				Color: ColorBlue,
+				Line:  0,
+				Row:   0,
+			},
+		},
 	}
 }
 
@@ -91,7 +98,14 @@ func TestBoard(t *testing.T) {
 		t.Run("Should fail if row is not odd", func(t *testing.T) {
 			err := NewTestBoard().InsertTileTopAt(0)
 			assert.NotNil(t, err)
-			assert.Equal(t, "row must be odd", err.Error())
+			assert.Equal(t, ErrEvenRow, err)
+		})
+
+		t.Run("Should fail if state is not in move tile", func(t *testing.T) {
+			board := &Board{State: GameStateMovePawn}
+			err := board.InsertTileTopAt(1)
+			assert.NotNil(t, err)
+			assert.Equal(t, ErrInvalidAction, err)
 		})
 
 		t.Run("Should slide all tiles bottom at inserted row", func(t *testing.T) {
@@ -133,13 +147,28 @@ func TestBoard(t *testing.T) {
 			assert.Equal(t, Treasure('D'), board.RemainingTile.Tile.Treasure)
 			assert.Equal(t, Rotation90, board.RemainingTile.Rotation)
 		})
+
+		t.Run("Should set game state to MovePawn", func(t *testing.T) {
+			board := NewTestBoard()
+
+			err := board.InsertTileTopAt(1)
+			assert.Nil(t, err)
+			assert.Equal(t, GameStateMovePawn, board.State)
+		})
 	})
 
 	t.Run("InsertTileRightAt()", func(t *testing.T) {
 		t.Run("Should fail if row is not odd", func(t *testing.T) {
 			err := NewTestBoard().InsertTileRightAt(0)
 			assert.NotNil(t, err)
-			assert.Equal(t, "row must be odd", err.Error())
+			assert.Equal(t, ErrEvenRow, err)
+		})
+
+		t.Run("Should fail if state is not in move tile", func(t *testing.T) {
+			board := &Board{State: GameStateMovePawn}
+			err := board.InsertTileRightAt(1)
+			assert.NotNil(t, err)
+			assert.Equal(t, ErrInvalidAction, err)
 		})
 
 		t.Run("Should slide all tiles bottom at inserted row", func(t *testing.T) {
@@ -181,13 +210,28 @@ func TestBoard(t *testing.T) {
 			assert.Equal(t, NoTreasure, board.RemainingTile.Tile.Treasure)
 			assert.Equal(t, Rotation90, board.RemainingTile.Rotation)
 		})
+
+		t.Run("Should set game state to MovePawn", func(t *testing.T) {
+			board := NewTestBoard()
+
+			err := board.InsertTileRightAt(1)
+			assert.Nil(t, err)
+			assert.Equal(t, GameStateMovePawn, board.State)
+		})
 	})
 
 	t.Run("InsertTileBottomAt()", func(t *testing.T) {
 		t.Run("Should fail if row is not odd", func(t *testing.T) {
 			err := NewTestBoard().InsertTileBottomAt(0)
 			assert.NotNil(t, err)
-			assert.Equal(t, "row must be odd", err.Error())
+			assert.Equal(t, ErrEvenRow, err)
+		})
+
+		t.Run("Should fail if state is not in move tile", func(t *testing.T) {
+			board := &Board{State: GameStateMovePawn}
+			err := board.InsertTileBottomAt(1)
+			assert.NotNil(t, err)
+			assert.Equal(t, ErrInvalidAction, err)
 		})
 
 		t.Run("Should slide all tiles bottom at inserted row", func(t *testing.T) {
@@ -230,13 +274,28 @@ func TestBoard(t *testing.T) {
 			assert.Equal(t, Treasure('B'), board.RemainingTile.Tile.Treasure)
 			assert.Equal(t, Rotation270, board.RemainingTile.Rotation)
 		})
+
+		t.Run("Should set game state to MovePawn", func(t *testing.T) {
+			board := NewTestBoard()
+
+			err := board.InsertTileBottomAt(1)
+			assert.Nil(t, err)
+			assert.Equal(t, GameStateMovePawn, board.State)
+		})
 	})
 
 	t.Run("InsertTileLeftAt()", func(t *testing.T) {
 		t.Run("Should fail if row is not odd", func(t *testing.T) {
 			err := NewTestBoard().InsertTileLeftAt(0)
 			assert.NotNil(t, err)
-			assert.Equal(t, "row must be odd", err.Error())
+			assert.Equal(t, ErrEvenRow, err)
+		})
+
+		t.Run("Should fail if state is not in move tile", func(t *testing.T) {
+			board := &Board{State: GameStateMovePawn}
+			err := board.InsertTileLeftAt(1)
+			assert.NotNil(t, err)
+			assert.Equal(t, ErrInvalidAction, err)
 		})
 
 		t.Run("Should slide all tiles bottom at inserted row", func(t *testing.T) {
@@ -278,6 +337,14 @@ func TestBoard(t *testing.T) {
 			assert.Equal(t, ShapeI, board.RemainingTile.Tile.Shape)
 			assert.Equal(t, NoTreasure, board.RemainingTile.Tile.Treasure)
 			assert.Equal(t, Rotation180, board.RemainingTile.Rotation)
+		})
+
+		t.Run("Should set game state to MovePawn", func(t *testing.T) {
+			board := NewTestBoard()
+
+			err := board.InsertTileLeftAt(1)
+			assert.Nil(t, err)
+			assert.Equal(t, GameStateMovePawn, board.State)
 		})
 	})
 
@@ -325,6 +392,127 @@ func TestBoard(t *testing.T) {
 		})
 	})
 
+	t.Run("MoveCurrentPlayerTo()", func(t *testing.T) {
+		t.Run("Should return an error if state is not move player", func(t *testing.T) {
+			board := &Board{
+				Tiles: make([][]*BoardTile, 3),
+				Players: []*Player{
+					{
+						Color: ColorBlue,
+						Line:  0,
+						Row:   0,
+					},
+				},
+				State: GameStatePlaceTile,
+			}
+
+			err := board.MoveCurrentPlayerTo(1, 1)
+			assert.Equal(t, ErrInvalidAction, err)
+		})
+
+		t.Run("Should return an error if player is moved on the same tile", func(t *testing.T) {
+			board := &Board{
+				Tiles: make([][]*BoardTile, 3),
+				Players: []*Player{
+					{
+						Color: ColorBlue,
+						Line:  0,
+						Row:   0,
+					},
+				},
+				State: GameStateMovePawn,
+			}
+
+			err := board.MoveCurrentPlayerTo(0, 0)
+			assert.Equal(t, ErrInvalidAction, err)
+		})
+
+		t.Run("Should return an error if line is not valid", func(t *testing.T) {
+			board := &Board{
+				Tiles: make([][]*BoardTile, 3),
+				Players: []*Player{
+					{
+						Color: ColorBlue,
+						Line:  0,
+						Row:   0,
+					},
+				},
+				State: GameStateMovePawn,
+			}
+
+			err := board.MoveCurrentPlayerTo(4, 1)
+			assert.Equal(t, ErrInvalidAction, err)
+		})
+
+		t.Run("Should return an error if row is not valid", func(t *testing.T) {
+			board := &Board{
+				Tiles: make([][]*BoardTile, 3),
+				Players: []*Player{
+					{
+						Color: ColorBlue,
+						Line:  0,
+						Row:   0,
+					},
+				},
+				State: GameStateMovePawn,
+			}
+
+			err := board.MoveCurrentPlayerTo(1, 4)
+			assert.Equal(t, ErrInvalidAction, err)
+		})
+
+		t.Run("Should set player position", func(t *testing.T) {
+			board := &Board{
+				Tiles: make([][]*BoardTile, 3),
+				Players: []*Player{
+					{
+						Color: ColorBlue,
+						Line:  0,
+						Row:   0,
+					},
+				},
+				State: GameStateMovePawn,
+			}
+
+			err := board.MoveCurrentPlayerTo(1, 2)
+			assert.Nil(t, err)
+			assert.Equal(t, 1, board.Players[0].Line)
+			assert.Equal(t, 2, board.Players[0].Row)
+		})
+
+		t.Run("Should set game state", func(t *testing.T) {
+			board := &Board{
+				Tiles: make([][]*BoardTile, 3),
+				Players: []*Player{
+					{
+						Color: ColorBlue,
+						Line:  0,
+						Row:   0,
+					},
+				},
+				State: GameStateMovePawn,
+			}
+
+			err := board.MoveCurrentPlayerTo(1, 2)
+			assert.Nil(t, err)
+			assert.Equal(t, GameStatePlaceTile, board.State)
+		})
+	})
+
+	t.Run("CurrentPlayer()", func(t *testing.T) {
+		t.Run("Should return the current player", func(t *testing.T) {
+			bluePlayer := &Player{
+				Color: ColorBlue,
+				Line:  0,
+				Row:   0,
+			}
+			board := &Board{
+				Players: []*Player{bluePlayer},
+			}
+			assert.Equal(t, bluePlayer, board.CurrentPlayer())
+		})
+	})
+
 	t.Run("Size()", func(t *testing.T) {
 		t.Run("Should return board size", func(t *testing.T) {
 			board := &Board{
@@ -362,6 +550,16 @@ func TestNewBoard(t *testing.T) {
 					assert.NotNil(t, boardTile.Tile)
 				}
 			}
+		}
+	})
+
+	t.Run("Should initialize players", func(t *testing.T) {
+		{
+			board, _ := NewBoard(3)
+			assert.Equal(t, 1, len(board.Players))
+			assert.Equal(t, ColorBlue, board.Players[0].Color)
+			assert.Equal(t, 0, board.Players[0].Line)
+			assert.Equal(t, 0, board.Players[0].Row)
 		}
 	})
 
