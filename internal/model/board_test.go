@@ -376,9 +376,9 @@ func TestNewBoard(t *testing.T) {
 }
 
 func TestGenerateTiles(t *testing.T) {
-	t.Run("Should generate n**2 + 1 tiles", func(t *testing.T) {
+	t.Run("Should generate n**2 -3 tiles", func(t *testing.T) {
 		tiles, _ := generateTiles(3)
-		assert.Equal(t, 10, len(tiles))
+		assert.Equal(t, 6, len(tiles))
 	})
 
 	t.Run("Should generate about 36% of T shaped tiles", func(t *testing.T) {
@@ -403,7 +403,7 @@ func TestGenerateTiles(t *testing.T) {
 	t.Run("Should generate about 18% of V shaped tiles with treasure", func(t *testing.T) {
 		{
 			tiles, _ := generateTiles(3)
-			for i := 4; i < 6; i++ {
+			for i := 4; i < 5; i++ {
 				assert.Equal(t, ShapeV, tiles[i].Shape)
 			}
 			assert.Equal(t, Treasure('E'), tiles[4].Treasure)
@@ -419,13 +419,6 @@ func TestGenerateTiles(t *testing.T) {
 
 	t.Run("Should generate about 26% of I shaped tiles", func(t *testing.T) {
 		{
-			tiles, _ := generateTiles(3)
-			for i := 6; i < 9; i++ {
-				assert.Equal(t, ShapeI, tiles[i].Shape)
-				assert.Equal(t, NoTreasure, tiles[i].Treasure)
-			}
-		}
-		{
 			tiles, _ := generateTiles(7)
 			for i := 27; i < 40; i++ {
 				assert.Equal(t, ShapeI, tiles[i].Shape)
@@ -436,15 +429,8 @@ func TestGenerateTiles(t *testing.T) {
 
 	t.Run("Should generate about 18% of V shaped tiles without treasure", func(t *testing.T) {
 		{
-			tiles, _ := generateTiles(3)
-			for i := 9; i < 10; i++ {
-				assert.Equal(t, ShapeV, tiles[i].Shape)
-				assert.Equal(t, NoTreasure, tiles[i].Treasure)
-			}
-		}
-		{
 			tiles, _ := generateTiles(7)
-			for i := 40; i < 50; i++ {
+			for i := 40; i < 46; i++ {
 				assert.Equal(t, ShapeV, tiles[i].Shape)
 				assert.Equal(t, NoTreasure, tiles[i].Treasure)
 			}

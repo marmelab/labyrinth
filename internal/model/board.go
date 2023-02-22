@@ -141,15 +141,18 @@ const (
 
 func generateTiles(size int) (tiles []*Tile, treasureCount int) {
 	var (
-		tileCount                = size*size + 1
+		tileCount = size*size + 1
+
+		// We need to generate 4 less tiles as the corners are V tiles
+		generatedTiles           = tileCount - 4
 		tShapedThreshold         = int(math.Round(TShapedPercentage * float64(tileCount)))
 		vShapedWithTreasureCount = tShapedThreshold + int(math.Round(VShapedWithTreasurePercentage*float64(tileCount)))
 		iShapedThreshold         = vShapedWithTreasureCount + int(math.Round(IShapedPercentage*float64(tileCount)))
 	)
 
-	tiles = make([]*Tile, 0, tileCount)
+	tiles = make([]*Tile, 0, generatedTiles)
 
-	for i := 0; i < tileCount; i++ {
+	for i := 0; i < generatedTiles; i++ {
 		if i < tShapedThreshold {
 			tiles = append(tiles, &Tile{
 				Shape:    ShapeT,
@@ -206,12 +209,49 @@ func NewBoard(size int) (*Board, error) {
 		Tiles: make([][]*BoardTile, size),
 	}
 
-	for i := 0; i < size; i++ {
-		board.Tiles[i] = make([]*BoardTile, size)
-		for j := 0; j < size; j++ {
-			board.Tiles[i][j] = &BoardTile{
-				Tile:     tiles[(size*i)+j],
-				Rotation: randomRotation(),
+	tileIndex := 0
+	for line := 0; line < size; line++ {
+		board.Tiles[line] = make([]*BoardTile, size)
+
+		for row := 0; row < size; row++ {
+			if line == 0 && row == 0 {
+				board.Tiles[line][row] = &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeV,
+						Treasure: NoTreasure,
+					},
+					Rotation: Rotation270,
+				}
+			} else if line == 0 && row == size-1 {
+				board.Tiles[line][row] = &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeV,
+						Treasure: NoTreasure,
+					},
+					Rotation: Rotation0,
+				}
+			} else if line == size-1 && row == 0 {
+				board.Tiles[line][row] = &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeV,
+						Treasure: NoTreasure,
+					},
+					Rotation: Rotation180,
+				}
+			} else if line == size-1 && row == size-1 {
+				board.Tiles[line][row] = &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeV,
+						Treasure: NoTreasure,
+					},
+					Rotation: Rotation90,
+				}
+			} else {
+				board.Tiles[line][row] = &BoardTile{
+					Tile:     tiles[tileIndex],
+					Rotation: randomRotation(),
+				}
+				tileIndex++
 			}
 		}
 	}
