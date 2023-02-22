@@ -306,7 +306,7 @@ func (g gameUi) drawCurrentPlayer(boardOffset int) error {
 	if g.board.State == model.GameStateEnd {
 		fmt.Fprintf(currentPlayerBox, `
 
-         GAME END
+         GAME OVER
 `)
 		return nil
 	}
