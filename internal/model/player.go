@@ -20,4 +20,23 @@ type Player struct {
 
 	// Row is the current player row.
 	Row int `json:"row"`
+
+	// Player hand
+	Hand []Treasure `json:"hand"`
+
+	// Player score
+	Score int `json:"score"`
+}
+
+func (p Player) Name() string {
+	switch p.Color {
+	case ColorBlue:
+		return "Blue"
+	case ColorGreen:
+		return "Green"
+	case ColorRed:
+		return "Red"
+	default:
+		return "Yellow"
+	}
 }

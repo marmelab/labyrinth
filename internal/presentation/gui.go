@@ -285,6 +285,32 @@ func (g gameUi) drawRemainingTile(boardSize, boardOffset int) error {
 	return nil
 }
 
+func (g gameUi) drawCurrentPlayer(boardOffset int) error {
+
+	var (
+		topLeftX     = BoardMargin + boardOffset + 1
+		topLeftY     = BoardMargin
+		bottomRightX = topLeftX + 27
+		bottomRightY = topLeftY + 6
+	)
+
+	currentPlayerBox, err := g.gui.SetView("current-player-box", topLeftX, topLeftY, bottomRightX, bottomRightY, 0)
+	if err != nil {
+		if err != gocui.ErrUnknownView {
+			return errors.Join(errors.New("failed to initialize current player box"), err)
+		}
+	}
+
+	currentPlayer := g.board.CurrentPlayer()
+	fmt.Fprintf(currentPlayerBox, `
+Current player: %10s
+
+Target: %18s
+`, currentPlayer.Name(), string(currentPlayer.Hand[0]))
+
+	return nil
+}
+
 func (g gameUi) layout(gui *gocui.Gui) error {
 	var (
 		tileCount   = g.board.Size()
@@ -301,6 +327,10 @@ func (g gameUi) layout(gui *gocui.Gui) error {
 	}
 
 	if err := g.drawRemainingTile(boardSize, boardOffset); err != nil {
+		return err
+	}
+
+	if err := g.drawCurrentPlayer(boardOffset); err != nil {
 		return err
 	}
 
