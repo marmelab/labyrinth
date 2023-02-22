@@ -2,19 +2,18 @@ package main
 
 import (
 	"log"
-	"os"
 
 	"github.com/marmelab/labyrinth/internal/model"
 	"github.com/marmelab/labyrinth/internal/presentation"
 )
 
 func main() {
-	board, err := model.NewBoard(3)
+	board, err := model.NewBoard(7)
 	if err != nil {
 		log.Fatalf("Failed to initialize board: %v.", err)
 	}
 
-	drawer := presentation.NewBoardDrawer()
-
-	drawer.DrawTo(os.Stdout, board)
+	if err := presentation.RunGameLoop(board); err != nil {
+		log.Fatalf("Failed to run main loop: %v.", err)
+	}
 }

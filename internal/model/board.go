@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"math/rand"
@@ -26,6 +27,93 @@ type Board struct {
 
 	// RemainingTile is the tile that was not placed on the board.
 	RemainingTile *BoardTile
+}
+
+func (b *Board) InsertTileTopAt(row int) error {
+	if (row & 1) != 1 {
+		return errors.New("row must be odd")
+	}
+
+	var current = b.RemainingTile
+	for line := 0; line < b.Size(); line++ {
+		b.Tiles[line][row], current = current, b.Tiles[line][row]
+	}
+
+	b.RemainingTile = current
+	return nil
+}
+
+func (b *Board) InsertTileRightAt(line int) error {
+	if (line & 1) != 1 {
+		return errors.New("row must be odd")
+	}
+
+	var current = b.RemainingTile
+	for row := b.Size() - 1; row >= 0; row-- {
+		b.Tiles[line][row], current = current, b.Tiles[line][row]
+	}
+
+	b.RemainingTile = current
+	return nil
+}
+
+func (b *Board) InsertTileBottomAt(row int) error {
+	if (row & 1) != 1 {
+		return errors.New("row must be odd")
+	}
+
+	var current = b.RemainingTile
+	for line := b.Size() - 1; line >= 0; line-- {
+		b.Tiles[line][row], current = current, b.Tiles[line][row]
+	}
+
+	b.RemainingTile = current
+	return nil
+}
+
+func (b *Board) InsertTileLeftAt(line int) error {
+	if (line & 1) != 1 {
+		return errors.New("row must be odd")
+	}
+
+	var current = b.RemainingTile
+	for row := 0; row < b.Size(); row++ {
+		b.Tiles[line][row], current = current, b.Tiles[line][row]
+	}
+
+	b.RemainingTile = current
+	return nil
+}
+
+func (b *Board) RotateRemainingTileClockwise() {
+	switch b.RemainingTile.Rotation {
+	case Rotation0:
+		b.RemainingTile.Rotation = Rotation90
+	case Rotation90:
+		b.RemainingTile.Rotation = Rotation180
+	case Rotation180:
+		b.RemainingTile.Rotation = Rotation270
+	case Rotation270:
+		b.RemainingTile.Rotation = Rotation0
+	}
+}
+
+func (b *Board) RotateRemainingTileAntiClockwise() {
+	switch b.RemainingTile.Rotation {
+	case Rotation0:
+		b.RemainingTile.Rotation = Rotation270
+	case Rotation90:
+		b.RemainingTile.Rotation = Rotation0
+	case Rotation180:
+		b.RemainingTile.Rotation = Rotation90
+	case Rotation270:
+		b.RemainingTile.Rotation = Rotation180
+	}
+}
+
+// Size returns the board size in tiles.
+func (b Board) Size() int {
+	return len(b.Tiles)
 }
 
 // BoardTile represents a tile that is placed on a board with a given rotation.

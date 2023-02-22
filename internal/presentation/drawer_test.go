@@ -16,269 +16,207 @@ func TestBoardDrawer(t *testing.T) {
 		// I-shaped til
 		{
 			writer := new(strings.Builder)
-			drawer.DrawTo(writer, &model.Board{
-				Tiles: [][]*model.BoardTile{
-					{
-						{
-							Tile: &model.Tile{
-								Shape:    model.ShapeI,
-								Treasure: model.NoTreasure,
-							},
-							Rotation: model.Rotation0,
-						},
-					},
+			drawer.DrawBoardTileTo(writer, &model.BoardTile{
+				Tile: &model.Tile{
+					Shape:    model.ShapeI,
+					Treasure: model.NoTreasure,
 				},
+				Rotation: model.Rotation0,
 			})
 
 			assert.Equal(t, `
 ───
-...
+ · 
 ───
 `[1:], writer.String())
 		}
 
 		{
 			writer := new(strings.Builder)
-			drawer.DrawTo(writer, &model.Board{
-				Tiles: [][]*model.BoardTile{
-					{
-						{
-							Tile: &model.Tile{
-								Shape:    model.ShapeI,
-								Treasure: model.NoTreasure,
-							},
-							Rotation: model.Rotation90},
-					},
+			drawer.DrawBoardTileTo(writer, &model.BoardTile{
+				Tile: &model.Tile{
+					Shape:    model.ShapeI,
+					Treasure: model.NoTreasure,
 				},
+				Rotation: model.Rotation90,
 			})
 
 			assert.Equal(t, `
-│.│
-│.│
-│.│
+│ │
+│·│
+│ │
 `[1:], writer.String())
 		}
 
 		{
 			writer := new(strings.Builder)
-			drawer.DrawTo(writer, &model.Board{
-				Tiles: [][]*model.BoardTile{
-					{
-						{
-							Tile: &model.Tile{
-								Shape:    model.ShapeI,
-								Treasure: model.NoTreasure,
-							},
-							Rotation: model.Rotation180},
-					},
+			drawer.DrawBoardTileTo(writer, &model.BoardTile{
+				Tile: &model.Tile{
+					Shape:    model.ShapeI,
+					Treasure: model.NoTreasure,
 				},
+				Rotation: model.Rotation180,
 			})
 
 			assert.Equal(t, `
 ───
-...
+ · 
 ───
 `[1:], writer.String())
 		}
 
 		{
 			writer := new(strings.Builder)
-			drawer.DrawTo(writer, &model.Board{
-				Tiles: [][]*model.BoardTile{
-					{
-						{
-							Tile: &model.Tile{
-								Shape:    model.ShapeI,
-								Treasure: model.NoTreasure,
-							},
-							Rotation: model.Rotation270},
-					},
+			drawer.DrawBoardTileTo(writer, &model.BoardTile{
+				Tile: &model.Tile{
+					Shape:    model.ShapeI,
+					Treasure: model.NoTreasure,
 				},
+				Rotation: model.Rotation270,
 			})
 
 			assert.Equal(t, `
-│.│
-│.│
-│.│
+│ │
+│·│
+│ │
 `[1:], writer.String())
 		}
 
 		// T-shaped til
 		{
 			writer := new(strings.Builder)
-			drawer.DrawTo(writer, &model.Board{
-				Tiles: [][]*model.BoardTile{
-					{
-						{
-							Tile: &model.Tile{
-								Shape:    model.ShapeT,
-								Treasure: 'A',
-							},
-							Rotation: model.Rotation0},
-					},
+			drawer.DrawBoardTileTo(writer, &model.BoardTile{
+				Tile: &model.Tile{
+					Shape:    model.ShapeT,
+					Treasure: 'A',
 				},
+				Rotation: model.Rotation0,
 			})
 
 			assert.Equal(t, `
-┘.└
-.A.
+┘ └
+ A 
 ───
 `[1:], writer.String())
 		}
 
 		{
 			writer := new(strings.Builder)
-			drawer.DrawTo(writer, &model.Board{
-				Tiles: [][]*model.BoardTile{
-					{
-						{
-							Tile: &model.Tile{
-								Shape:    model.ShapeT,
-								Treasure: 'B',
-							},
-							Rotation: model.Rotation90},
-					},
+			drawer.DrawBoardTileTo(writer, &model.BoardTile{
+				Tile: &model.Tile{
+					Shape:    model.ShapeT,
+					Treasure: 'B',
 				},
+				Rotation: model.Rotation90,
 			})
 
 			assert.Equal(t, `
-│.└
-│B.
-│.┌
+│ └
+│B 
+│ ┌
 `[1:], writer.String())
 		}
 
 		{
 			writer := new(strings.Builder)
-			drawer.DrawTo(writer, &model.Board{
-				Tiles: [][]*model.BoardTile{
-					{
-						{
-							Tile: &model.Tile{
-								Shape:    model.ShapeT,
-								Treasure: 'C',
-							},
-							Rotation: model.Rotation180,
-						},
-					},
+			drawer.DrawBoardTileTo(writer, &model.BoardTile{
+				Tile: &model.Tile{
+					Shape:    model.ShapeT,
+					Treasure: 'C',
 				},
+				Rotation: model.Rotation180,
 			})
 
 			assert.Equal(t, `
 ───
-.C.
-┐.┌
+ C 
+┐ ┌
 `[1:], writer.String())
 		}
 
 		{
 			writer := new(strings.Builder)
-			drawer.DrawTo(writer, &model.Board{
-				Tiles: [][]*model.BoardTile{
-					{
-						{
-							Tile: &model.Tile{
-								Shape:    model.ShapeT,
-								Treasure: 'D',
-							},
-							Rotation: model.Rotation270},
-					},
+			drawer.DrawBoardTileTo(writer, &model.BoardTile{
+				Tile: &model.Tile{
+					Shape:    model.ShapeT,
+					Treasure: 'D',
 				},
+				Rotation: model.Rotation270,
 			})
 
 			assert.Equal(t, `
-┘.│
-.D│
-┐.│
+┘ │
+ D│
+┐ │
 `[1:], writer.String())
 		}
 
 		// V-shaped til
 		{
 			writer := new(strings.Builder)
-			drawer.DrawTo(writer, &model.Board{
-				Tiles: [][]*model.BoardTile{
-					{
-						{
-							Tile: &model.Tile{
-								Shape:    model.ShapeV,
-								Treasure: 'A',
-							},
-							Rotation: model.Rotation0},
-					},
+			drawer.DrawBoardTileTo(writer, &model.BoardTile{
+				Tile: &model.Tile{
+					Shape:    model.ShapeV,
+					Treasure: 'A',
 				},
+				Rotation: model.Rotation0,
 			})
 
 			assert.Equal(t, `
 ──┐
-.A│
-┐.│
+ A│
+┐ │
 `[1:], writer.String())
 		}
 
 		{
 			writer := new(strings.Builder)
-			drawer.DrawTo(writer, &model.Board{
-				Tiles: [][]*model.BoardTile{
-					{
-						{
-							Tile: &model.Tile{
-								Shape:    model.ShapeV,
-								Treasure: 'B',
-							},
-							Rotation: model.Rotation90},
-					},
+			drawer.DrawBoardTileTo(writer, &model.BoardTile{
+				Tile: &model.Tile{
+					Shape:    model.ShapeV,
+					Treasure: 'B',
 				},
+				Rotation: model.Rotation90,
 			})
 
 			assert.Equal(t, `
-┘.│
-.B│
+┘ │
+ B│
 ──┘
 `[1:], writer.String())
 		}
 
 		{
 			writer := new(strings.Builder)
-			drawer.DrawTo(writer, &model.Board{
-				Tiles: [][]*model.BoardTile{
-					{
-						{
-							Tile: &model.Tile{
-								Shape:    model.ShapeV,
-								Treasure: model.NoTreasure,
-							},
-							Rotation: model.Rotation180},
-					},
+			drawer.DrawBoardTileTo(writer, &model.BoardTile{
+				Tile: &model.Tile{
+					Shape:    model.ShapeV,
+					Treasure: model.NoTreasure,
 				},
+				Rotation: model.Rotation180,
 			})
 
 			assert.Equal(t, `
-│.└
-│..
+│ └
+│· 
 └──
 `[1:], writer.String())
 		}
 
 		{
 			writer := new(strings.Builder)
-			drawer.DrawTo(writer, &model.Board{
-				Tiles: [][]*model.BoardTile{
-					{
-						{
-							Tile: &model.Tile{
-								Shape:    model.ShapeV,
-								Treasure: model.NoTreasure,
-							},
-							Rotation: model.Rotation270},
-					},
+			drawer.DrawBoardTileTo(writer, &model.BoardTile{
+				Tile: &model.Tile{
+					Shape:    model.ShapeV,
+					Treasure: model.NoTreasure,
 				},
+				Rotation: model.Rotation270,
 			})
 
 			assert.Equal(t, `
 ┌──
-│..
-│.┌
+│· 
+│ ┌
 `[1:], writer.String())
 		}
 	})
@@ -359,14 +297,14 @@ func TestBoardDrawer(t *testing.T) {
 
 		assert.Equal(t, `
 ───┌─────
-...│B..A.
-───│.┌┐.┌
-│.│┘.│───
-│.│.C│...
-│.│──┘───
-│.│┘.│───
-│.│.D│...
-│.│──┘───
+ · │B  A 
+───│ ┌┐ ┌
+│ │┘ │───
+│·│ C│ · 
+│ │──┘───
+│ │┘ │───
+│·│ D│ · 
+│ │──┘───
 `[1:], writer.String())
 	})
 }
