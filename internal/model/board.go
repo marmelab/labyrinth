@@ -105,6 +105,32 @@ func (t TileExit) ExitCoordinate(line, row int) *Coordinate {
 
 type TileExits []TileExit
 
+type ShapeRotationExit map[Rotation]TileExits
+type ShapeExit map[Shape]ShapeRotationExit
+
+var (
+	shapeExitMap = ShapeExit{
+		ShapeI: {
+			Rotation0:   {TileExitRight, TileExitLeft},
+			Rotation90:  {TileExitTop, TileExitBottom},
+			Rotation180: {TileExitRight, TileExitLeft},
+			Rotation270: {TileExitTop, TileExitBottom},
+		},
+		ShapeT: {
+			Rotation0:   {TileExitTop, TileExitRight, TileExitLeft},
+			Rotation90:  {TileExitTop, TileExitRight, TileExitBottom},
+			Rotation180: {TileExitRight, TileExitBottom, TileExitLeft},
+			Rotation270: {TileExitTop, TileExitBottom, TileExitLeft},
+		},
+		ShapeV: {
+			Rotation0:   {TileExitBottom, TileExitLeft},
+			Rotation90:  {TileExitTop, TileExitLeft},
+			Rotation180: {TileExitTop, TileExitRight},
+			Rotation270: {TileExitRight, TileExitBottom},
+		},
+	}
+)
+
 func (t TileExits) Contains(target TileExit) bool {
 	for _, exit := range t {
 		if exit == target {
@@ -411,51 +437,9 @@ type BoardTile struct {
 	Rotation Rotation `json:"rotation"`
 }
 
-func (bt BoardTile) iShapedExits() TileExits {
-	switch bt.Rotation {
-	case Rotation0, Rotation180:
-		return TileExits{TileExitRight, TileExitLeft}
-	default:
-		return TileExits{TileExitTop, TileExitBottom}
-	}
-}
-
-func (bt BoardTile) tShapedExits() TileExits {
-	switch bt.Rotation {
-	case Rotation0:
-		return TileExits{TileExitTop, TileExitRight, TileExitLeft}
-	case Rotation90:
-		return TileExits{TileExitTop, TileExitRight, TileExitBottom}
-	case Rotation180:
-		return TileExits{TileExitRight, TileExitBottom, TileExitLeft}
-	default:
-		return TileExits{TileExitTop, TileExitBottom, TileExitLeft}
-	}
-}
-
-func (bt BoardTile) vShapedExits() TileExits {
-	switch bt.Rotation {
-	case Rotation0:
-		return TileExits{TileExitBottom, TileExitLeft}
-	case Rotation90:
-		return TileExits{TileExitTop, TileExitLeft}
-	case Rotation180:
-		return TileExits{TileExitTop, TileExitRight}
-	default:
-		return TileExits{TileExitRight, TileExitBottom}
-	}
-}
-
 // Exists return sthe possible exits for that tile as a bitmask.
 func (bt BoardTile) Exits() TileExits {
-	switch bt.Tile.Shape {
-	case ShapeI:
-		return bt.iShapedExits()
-	case ShapeT:
-		return bt.tShapedExits()
-	default:
-		return bt.vShapedExits()
-	}
+	return shapeExitMap[bt.Tile.Shape][bt.Rotation]
 }
 
 // Rotation represents a tile rotation on a board.
