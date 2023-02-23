@@ -41,6 +41,9 @@ type gameLoop struct {
 
 func (g gameLoop) insertTile(button Button, buttonIndex int) GuiHandler {
 	return func(gui *gocui.Gui, view *gocui.View) error {
+		// We need to swallow this error case here, otherwise the program
+		// will stop due to the library.
+		// TODO: provide a clear error message to the UI.
 		if g.board.State != model.GameStatePlaceTile {
 			return nil
 		}
@@ -83,6 +86,9 @@ func (g gameLoop) rotateRemainingTile(rotationType RotationType) GuiHandler {
 func (g gameLoop) moveCurrentPlayerTo(line, row int) GuiHandler {
 	return func(gui *gocui.Gui, view *gocui.View) error {
 		if err := g.board.MoveCurrentPlayerTo(line, row); err != nil {
+			// We need to swallow this error case here, otherwise the program
+			// will stop due to the library.
+			// TODO: provide a clear error message to the UI.
 			if err != model.ErrInvalidAction {
 				return err
 			}

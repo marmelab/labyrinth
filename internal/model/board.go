@@ -45,7 +45,7 @@ type Board struct {
 	State GameState `json:"gameState"`
 }
 
-func (b Board) tryPlaceTile(index int) error {
+func (b Board) validatePlaceTile(index int) error {
 	if b.State != GameStatePlaceTile {
 		return ErrInvalidAction
 	}
@@ -58,7 +58,7 @@ func (b Board) tryPlaceTile(index int) error {
 }
 
 func (b *Board) InsertTileTopAt(row int) error {
-	if err := b.tryPlaceTile(row); err != nil {
+	if err := b.validatePlaceTile(row); err != nil {
 		return err
 	}
 
@@ -80,7 +80,7 @@ func (b *Board) InsertTileTopAt(row int) error {
 }
 
 func (b *Board) InsertTileRightAt(line int) error {
-	if err := b.tryPlaceTile(line); err != nil {
+	if err := b.validatePlaceTile(line); err != nil {
 		return err
 	}
 
@@ -104,7 +104,7 @@ func (b *Board) InsertTileRightAt(line int) error {
 }
 
 func (b *Board) InsertTileBottomAt(row int) error {
-	if err := b.tryPlaceTile(row); err != nil {
+	if err := b.validatePlaceTile(row); err != nil {
 		return err
 	}
 
@@ -128,7 +128,7 @@ func (b *Board) InsertTileBottomAt(row int) error {
 }
 
 func (b *Board) InsertTileLeftAt(line int) error {
-	if err := b.tryPlaceTile(line); err != nil {
+	if err := b.validatePlaceTile(line); err != nil {
 		return err
 	}
 
@@ -229,7 +229,7 @@ const (
 
 // generate tiles generates tile list for the given board size.
 // It will only generate size*size - 3 cards, since the tiles on each corner is
-// predefined (V shape).
+// predefined (fixed V-shaped).
 func generateTiles(size int) (tiles []*Tile, treasureCount int) {
 	var (
 		tileCount = size*size + 1
@@ -309,7 +309,8 @@ func NewBoard(size int) (*Board, error) {
 	}
 
 	// The tile index is required here to track placed tiles on the board.
-	// This is due to the fact that each corner has a predefined V-shaped tile.
+	// This is due to the fact that each corner has a predefined V-shaped fixed
+	// tile.
 	tileIndex := 0
 	for line := 0; line < size; line++ {
 		board.Tiles[line] = make([]*BoardTile, size)
