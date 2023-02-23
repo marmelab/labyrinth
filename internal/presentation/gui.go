@@ -302,6 +302,15 @@ func (g gameUi) drawCurrentPlayer(boardOffset int) error {
 	}
 
 	currentPlayerBox.Clear()
+
+	if g.board.State == model.GameStateEnd {
+		fmt.Fprintf(currentPlayerBox, `
+
+         GAME OVER
+`)
+		return nil
+	}
+
 	currentPlayer := g.board.CurrentPlayer()
 	fmt.Fprintf(currentPlayerBox, `
 Current player: %10s

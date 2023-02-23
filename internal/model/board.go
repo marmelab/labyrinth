@@ -26,6 +26,7 @@ type GameState int
 const (
 	GameStatePlaceTile GameState = iota
 	GameStateMovePawn
+	GameStateEnd
 )
 
 // Board represents the game board.
@@ -197,7 +198,11 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 		currentTile.Tile.Treasure = NoTreasure
 	}
 
-	b.State = GameStatePlaceTile
+	if len(currentPlayer.Targets) == 0 {
+		b.State = GameStateEnd
+	} else {
+		b.State = GameStatePlaceTile
+	}
 	return nil
 }
 

@@ -591,6 +591,17 @@ func TestBoard(t *testing.T) {
 			assert.Nil(t, err)
 			assert.Equal(t, NoTreasure, board.Tiles[0][1].Tile.Treasure)
 		})
+
+		t.Run("Should set to game end if player has an empty hand", func(t *testing.T) {
+			board := NewTestBoard()
+			board.Players[0].Targets = []Treasure{'B'}
+			{
+				board.State = GameStateMovePawn
+				err := board.MoveCurrentPlayerTo(0, 1)
+				assert.Nil(t, err)
+				assert.Equal(t, GameStateEnd, board.State)
+			}
+		})
 	})
 
 	t.Run("CurrentPlayer()", func(t *testing.T) {
