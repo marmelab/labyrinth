@@ -739,6 +739,226 @@ func TestBoard(t *testing.T) {
 	})
 }
 
+func TestBoardTile(t *testing.T) {
+
+	t.Run("Exits()", func(t *testing.T) {
+		t.Run("Should return exists for I-shaped tiles", func(t *testing.T) {
+			{
+				var (
+					boardTile = &BoardTile{
+						Tile: &Tile{
+							Shape: ShapeI,
+						},
+						Rotation: Rotation0,
+					}
+					exits = boardTile.Exits()
+				)
+
+				assert.True(t, (exits&TileExitRight) > 0)
+				assert.True(t, (exits&TileExitLeft) > 0)
+			}
+
+			{
+				var (
+					boardTile = &BoardTile{
+						Tile: &Tile{
+							Shape: ShapeI,
+						},
+						Rotation: Rotation90,
+					}
+					exits = boardTile.Exits()
+				)
+
+				assert.True(t, (exits&TileExitTop) > 0)
+				assert.True(t, (exits&TileExitBottom) > 0)
+			}
+
+			{
+				var (
+					boardTile = &BoardTile{
+						Tile: &Tile{
+							Shape: ShapeI,
+						},
+						Rotation: Rotation180,
+					}
+					exits = boardTile.Exits()
+				)
+
+				assert.True(t, (exits&TileExitRight) > 0)
+				assert.True(t, (exits&TileExitLeft) > 0)
+
+				assert.True(t, (exits&TileExitTop) == 0)
+				assert.True(t, (exits&TileExitBottom) == 0)
+			}
+
+			{
+				var (
+					boardTile = &BoardTile{
+						Tile: &Tile{
+							Shape: ShapeI,
+						},
+						Rotation: Rotation270,
+					}
+					exits = boardTile.Exits()
+				)
+
+				assert.True(t, (exits&TileExitTop) > 0)
+				assert.True(t, (exits&TileExitBottom) > 0)
+
+				assert.True(t, (exits&TileExitRight) == 0)
+				assert.True(t, (exits&TileExitLeft) == 0)
+			}
+		})
+
+		t.Run("Should return exists for T-shaped tiles", func(t *testing.T) {
+			{
+				var (
+					boardTile = &BoardTile{
+						Tile: &Tile{
+							Shape: ShapeT,
+						},
+						Rotation: Rotation0,
+					}
+					exits = boardTile.Exits()
+				)
+
+				assert.True(t, (exits&TileExitTop) > 0)
+				assert.True(t, (exits&TileExitRight) > 0)
+				assert.True(t, (exits&TileExitLeft) > 0)
+
+				assert.True(t, (exits&TileExitBottom) == 0)
+			}
+
+			{
+				var (
+					boardTile = &BoardTile{
+						Tile: &Tile{
+							Shape: ShapeT,
+						},
+						Rotation: Rotation90,
+					}
+					exits = boardTile.Exits()
+				)
+
+				assert.True(t, (exits&TileExitTop) > 0)
+				assert.True(t, (exits&TileExitRight) > 0)
+				assert.True(t, (exits&TileExitBottom) > 0)
+
+				assert.True(t, (exits&TileExitLeft) == 0)
+			}
+
+			{
+				var (
+					boardTile = &BoardTile{
+						Tile: &Tile{
+							Shape: ShapeT,
+						},
+						Rotation: Rotation180,
+					}
+					exits = boardTile.Exits()
+				)
+
+				assert.True(t, (exits&TileExitRight) > 0)
+				assert.True(t, (exits&TileExitBottom) > 0)
+				assert.True(t, (exits&TileExitLeft) > 0)
+
+				assert.True(t, (exits&TileExitTop) == 0)
+			}
+
+			{
+				var (
+					boardTile = &BoardTile{
+						Tile: &Tile{
+							Shape: ShapeT,
+						},
+						Rotation: Rotation270,
+					}
+					exits = boardTile.Exits()
+				)
+
+				assert.True(t, (exits&TileExitTop) > 0)
+				assert.True(t, (exits&TileExitBottom) > 0)
+				assert.True(t, (exits&TileExitLeft) > 0)
+
+				assert.True(t, (exits&TileExitRight) == 0)
+			}
+		})
+		t.Run("Should return exists for V-shaped tiles", func(t *testing.T) {
+			{
+				var (
+					boardTile = &BoardTile{
+						Tile: &Tile{
+							Shape: ShapeV,
+						},
+						Rotation: Rotation0,
+					}
+					exits = boardTile.Exits()
+				)
+
+				assert.True(t, (exits&TileExitLeft) > 0)
+				assert.True(t, (exits&TileExitBottom) > 0)
+
+				assert.True(t, (exits&TileExitTop) == 0)
+				assert.True(t, (exits&TileExitRight) == 0)
+			}
+
+			{
+				var (
+					boardTile = &BoardTile{
+						Tile: &Tile{
+							Shape: ShapeV,
+						},
+						Rotation: Rotation90,
+					}
+					exits = boardTile.Exits()
+				)
+
+				assert.True(t, (exits&TileExitTop) > 0)
+				assert.True(t, (exits&TileExitLeft) > 0)
+
+				assert.True(t, (exits&TileExitRight) == 0)
+				assert.True(t, (exits&TileExitBottom) == 0)
+			}
+
+			{
+				var (
+					boardTile = &BoardTile{
+						Tile: &Tile{
+							Shape: ShapeV,
+						},
+						Rotation: Rotation180,
+					}
+					exits = boardTile.Exits()
+				)
+
+				assert.True(t, (exits&TileExitTop) > 0)
+				assert.True(t, (exits&TileExitRight) > 0)
+
+				assert.True(t, (exits&TileExitBottom) == 0)
+				assert.True(t, (exits&TileExitLeft) == 0)
+			}
+
+			{
+				var (
+					boardTile = &BoardTile{
+						Tile: &Tile{
+							Shape: ShapeV,
+						},
+						Rotation: Rotation270,
+					}
+					exits = boardTile.Exits()
+				)
+
+				assert.True(t, (exits&TileExitRight) > 0)
+				assert.True(t, (exits&TileExitBottom) > 0)
+
+				assert.True(t, (exits&TileExitTop) == 0)
+				assert.True(t, (exits&TileExitLeft) == 0)
+			}
+		})
+	})
+}
+
 func TestNewBoard(t *testing.T) {
 	t.Run("Should return an error if size is even.", func(t *testing.T) {
 		board, err := NewBoard(2, 1)

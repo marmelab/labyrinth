@@ -59,6 +59,16 @@ var (
 	remainingPlayers = []int{0, 1, 2, 3}
 )
 
+// TileExit represents the possible exits that are available for the tile.
+type TileExit int
+
+const (
+	TileExitTop TileExit = 1 << (iota + 1)
+	TileExitRight
+	TileExitBottom
+	TileExitLeft
+)
+
 // Board represents the game board.
 type Board struct {
 
@@ -277,6 +287,54 @@ type BoardTile struct {
 
 	// Rotation is the tile rotation.
 	Rotation Rotation `json:"rotation"`
+}
+
+func (bt BoardTile) iShapedExits() TileExit {
+	switch bt.Rotation {
+	case Rotation0, Rotation180:
+		return TileExitRight | TileExitLeft
+	default:
+		return TileExitTop | TileExitBottom
+	}
+}
+
+func (bt BoardTile) tShapedExits() TileExit {
+	switch bt.Rotation {
+	case Rotation0:
+		return TileExitTop | TileExitRight | TileExitLeft
+	case Rotation90:
+		return TileExitTop | TileExitRight | TileExitBottom
+	case Rotation180:
+		return TileExitRight | TileExitBottom | TileExitLeft
+	default:
+		return TileExitTop | TileExitBottom | TileExitLeft
+	}
+}
+
+func (bt BoardTile) vShapedExits() TileExit {
+	switch bt.Rotation {
+	case Rotation0:
+		return TileExitBottom | TileExitLeft
+	case Rotation90:
+		return TileExitTop | TileExitLeft
+	case Rotation180:
+		return TileExitTop | TileExitRight
+	default:
+		return TileExitRight | TileExitBottom
+	}
+}
+
+// Exists return sthe possible exits for that tile as a bitmask.
+func (bt BoardTile) Exits() TileExit {
+
+	switch bt.Tile.Shape {
+	case ShapeI:
+		return bt.iShapedExits()
+	case ShapeT:
+		return bt.tShapedExits()
+	default:
+		return bt.vShapedExits()
+	}
 }
 
 // Rotation represents a tile rotation on a board.
