@@ -594,7 +594,7 @@ func TestBoard(t *testing.T) {
 
 		t.Run("Should set to game end if player has an empty hand", func(t *testing.T) {
 			board := NewTestBoard()
-			board.Players[0].Hand = []Treasure{'B'}
+			board.Players[0].Targets = []Treasure{'B'}
 			{
 				board.State = GameStateMovePawn
 				err := board.MoveCurrentPlayerTo(0, 1)

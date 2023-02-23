@@ -198,7 +198,7 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 		currentTile.Tile.Treasure = NoTreasure
 	}
 
-	if len(currentPlayer.Hand) == 0 {
+	if len(currentPlayer.Targets) == 0 {
 		b.State = GameStateEnd
 	} else {
 		b.State = GameStatePlaceTile
