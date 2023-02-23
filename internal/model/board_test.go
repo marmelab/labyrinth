@@ -754,49 +754,40 @@ func TestBoard(t *testing.T) {
 				RemainingPlayers:     []int{0, 1},
 				RemainingPlayerIndex: 0,
 			}
-			assert.Equal(t, bluePlayer, board.CurrentPlayer())
+			assert.Equal(t, bluePlayer, board.GetCurrentPlayer())
 
 			board.RemainingPlayerIndex = 1
-			assert.Equal(t, greenPlayer, board.CurrentPlayer())
+			assert.Equal(t, greenPlayer, board.GetCurrentPlayer())
 		})
 	})
 
 	t.Run("getAccessibleNeighbors()", func(t *testing.T) {
 		t.Run("Should return all accessible neighbors for a tile", func(t *testing.T) {
+			tests := []struct {
+				line     int
+				row      int
+				expected Coordinates
+			}{
+				{0, 0, Coordinates{}},
+				{0, 2, Coordinates{
+					{0, 1},
+				}},
+				{2, 0, Coordinates{
+					{1, 0},
+				}},
+				{1, 0, Coordinates{
+					{2, 0},
+				}},
+				{2, 1, Coordinates{
+					{1, 1},
+					{2, 2},
+				}},
+			}
+
 			board := NewTestBoard()
-			{
-				neighbors := board.getAccessibleNeighbors(0, 0)
-				assert.Equal(t, 0, len(neighbors))
-			}
-
-			{
-				neighbors := board.getAccessibleNeighbors(0, 2)
-				assert.Equal(t, 1, len(neighbors))
-				assert.Equal(t, 0, neighbors[0].Line)
-				assert.Equal(t, 1, neighbors[0].Row)
-			}
-
-			{
-				neighbors := board.getAccessibleNeighbors(2, 0)
-				assert.Equal(t, 1, len(neighbors))
-				assert.Equal(t, 1, neighbors[0].Line)
-				assert.Equal(t, 0, neighbors[0].Row)
-			}
-
-			{
-				neighbors := board.getAccessibleNeighbors(1, 0)
-				assert.Equal(t, 1, len(neighbors))
-				assert.Equal(t, 2, neighbors[0].Line)
-				assert.Equal(t, 0, neighbors[0].Row)
-			}
-
-			{
-				neighbors := board.getAccessibleNeighbors(2, 1)
-				assert.Equal(t, 2, len(neighbors))
-				assert.Equal(t, 1, neighbors[0].Line)
-				assert.Equal(t, 1, neighbors[0].Row)
-				assert.Equal(t, 2, neighbors[1].Line)
-				assert.Equal(t, 2, neighbors[1].Row)
+			for _, test := range tests {
+				neighbors := board.getAccessibleNeighbors(test.line, test.row)
+				assert.Equal(t, test.expected, neighbors)
 			}
 		})
 	})
@@ -844,47 +835,10 @@ func TestBoard(t *testing.T) {
 			board := &Board{
 				Tiles: make([][]*BoardTile, 3),
 			}
-			assert.Equal(t, 3, board.Size())
+			assert.Equal(t, 3, board.GetSize())
 		})
 	})
 }
-
-func TestBoardTile(t *testing.T) {
-
-	t.Run("Exits()", func(t *testing.T) {
-		t.Run("Should return exists for ", func(t *testing.T) {
-			tests := []struct {
-				shape    Shape
-				rotation Rotation
-				exits    TileExits
-			}{
-				{ShapeI, Rotation0, TileExits{TileExitRight, TileExitLeft}},
-				{ShapeI, Rotation90, TileExits{TileExitTop, TileExitBottom}},
-				{ShapeI, Rotation180, TileExits{TileExitRight, TileExitLeft}},
-				{ShapeI, Rotation270, TileExits{TileExitTop, TileExitBottom}},
-				{ShapeT, Rotation0, TileExits{TileExitTop, TileExitRight, TileExitLeft}},
-				{ShapeT, Rotation90, TileExits{TileExitTop, TileExitRight, TileExitBottom}},
-				{ShapeT, Rotation180, TileExits{TileExitRight, TileExitBottom, TileExitLeft}},
-				{ShapeT, Rotation270, TileExits{TileExitTop, TileExitBottom, TileExitLeft}},
-				{ShapeV, Rotation0, TileExits{TileExitBottom, TileExitLeft}},
-				{ShapeV, Rotation90, TileExits{TileExitTop, TileExitLeft}},
-				{ShapeV, Rotation180, TileExits{TileExitTop, TileExitRight}},
-				{ShapeV, Rotation270, TileExits{TileExitRight, TileExitBottom}},
-			}
-
-			for _, test := range tests {
-				boardTile := &BoardTile{
-					Tile: &Tile{
-						Shape: test.shape,
-					},
-					Rotation: test.rotation,
-				}
-				assert.Equal(t, test.exits, boardTile.Exits())
-			}
-		})
-	})
-}
-
 func TestNewBoard(t *testing.T) {
 	t.Run("Should return an error if size is even.", func(t *testing.T) {
 		board, err := NewBoard(2, 1)

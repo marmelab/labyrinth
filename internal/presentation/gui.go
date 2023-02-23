@@ -18,7 +18,7 @@ type gameUi struct {
 }
 
 func (g gameUi) backgroundColor() gocui.Attribute {
-	switch g.board.CurrentPlayer().Color {
+	switch g.board.GetCurrentPlayer().Color {
 	case model.ColorBlue:
 		return gocui.ColorBlue
 	case model.ColorGreen:
@@ -31,7 +31,7 @@ func (g gameUi) backgroundColor() gocui.Attribute {
 }
 
 func (g gameUi) foregroundColor() gocui.Attribute {
-	switch g.board.CurrentPlayer().Color {
+	switch g.board.GetCurrentPlayer().Color {
 	case model.ColorBlue, model.ColorGreen, model.ColorRed:
 		return gocui.ColorWhite
 	default:
@@ -139,7 +139,7 @@ func (g gameUi) drawTiles(tileCount int) error {
 			}
 
 			var (
-				currentPlayer = g.board.CurrentPlayer()
+				currentPlayer = g.board.GetCurrentPlayer()
 				targets       = currentPlayer.Targets
 			)
 
@@ -324,7 +324,7 @@ func (g gameUi) drawCurrentPlayer(boardOffset int) error {
 		return nil
 	}
 
-	currentPlayer := g.board.CurrentPlayer()
+	currentPlayer := g.board.GetCurrentPlayer()
 	fmt.Fprintf(currentPlayerBox, `
 Current player: %10s
 
@@ -364,7 +364,7 @@ Scores:
 
 func (g gameUi) layout(gui *gocui.Gui) error {
 	var (
-		tileCount   = g.board.Size()
+		tileCount   = g.board.GetSize()
 		boardSize   = tileCount*TileOuterSize + TileBorderSize + 1
 		boardOffset = boardSize + TileOuterSize + 1
 	)

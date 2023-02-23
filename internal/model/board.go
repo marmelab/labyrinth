@@ -67,79 +67,6 @@ var (
 	remainingPlayers = []int{0, 1, 2, 3}
 )
 
-// TileExit represents the possible exits that are available for the tile.
-type TileExit int
-
-const (
-	TileExitTop TileExit = iota
-	TileExitRight
-	TileExitBottom
-	TileExitLeft
-)
-
-func (t TileExit) Opposite() TileExit {
-	switch t {
-	case TileExitTop:
-		return TileExitBottom
-	case TileExitRight:
-		return TileExitLeft
-	case TileExitBottom:
-		return TileExitTop
-	default:
-		return TileExitRight
-	}
-}
-
-func (t TileExit) ExitCoordinate(line, row int) *Coordinate {
-	switch t {
-	case TileExitTop:
-		return &Coordinate{Line: line - 1, Row: row}
-	case TileExitRight:
-		return &Coordinate{Line: line, Row: row + 1}
-	case TileExitBottom:
-		return &Coordinate{Line: line + 1, Row: row}
-	default:
-		return &Coordinate{Line: line, Row: row - 1}
-	}
-}
-
-type TileExits []TileExit
-
-type ShapeRotationExit map[Rotation]TileExits
-type ShapeExit map[Shape]ShapeRotationExit
-
-var (
-	shapeExitMap = ShapeExit{
-		ShapeI: {
-			Rotation0:   {TileExitRight, TileExitLeft},
-			Rotation90:  {TileExitTop, TileExitBottom},
-			Rotation180: {TileExitRight, TileExitLeft},
-			Rotation270: {TileExitTop, TileExitBottom},
-		},
-		ShapeT: {
-			Rotation0:   {TileExitTop, TileExitRight, TileExitLeft},
-			Rotation90:  {TileExitTop, TileExitRight, TileExitBottom},
-			Rotation180: {TileExitRight, TileExitBottom, TileExitLeft},
-			Rotation270: {TileExitTop, TileExitBottom, TileExitLeft},
-		},
-		ShapeV: {
-			Rotation0:   {TileExitBottom, TileExitLeft},
-			Rotation90:  {TileExitTop, TileExitLeft},
-			Rotation180: {TileExitTop, TileExitRight},
-			Rotation270: {TileExitRight, TileExitBottom},
-		},
-	}
-)
-
-func (t TileExits) Contains(target TileExit) bool {
-	for _, exit := range t {
-		if exit == target {
-			return true
-		}
-	}
-	return false
-}
-
 // Coordinate is a coordinate on the board.
 type Coordinate struct {
 	Line int `json:"line"`
@@ -201,14 +128,14 @@ func (b *Board) InsertTileTopAt(row int) error {
 	}
 
 	var current = b.RemainingTile
-	for line := 0; line < b.Size(); line++ {
+	for line := 0; line < b.GetSize(); line++ {
 		b.Tiles[line][row], current = current, b.Tiles[line][row]
 
 	}
 
 	for _, player := range b.Players {
 		if player.Position.Row == row {
-			player.Position.Line = (player.Position.Line + 1) % b.Size()
+			player.Position.Line = (player.Position.Line + 1) % b.GetSize()
 		}
 	}
 
@@ -223,7 +150,7 @@ func (b *Board) InsertTileRightAt(line int) error {
 	}
 
 	var current = b.RemainingTile
-	for row := b.Size() - 1; row >= 0; row-- {
+	for row := b.GetSize() - 1; row >= 0; row-- {
 		b.Tiles[line][row], current = current, b.Tiles[line][row]
 	}
 
@@ -231,7 +158,7 @@ func (b *Board) InsertTileRightAt(line int) error {
 		if player.Position.Line == line {
 			player.Position.Row = player.Position.Row - 1
 			if player.Position.Row < 0 {
-				player.Position.Row = b.Size() - 1
+				player.Position.Row = b.GetSize() - 1
 			}
 		}
 	}
@@ -247,7 +174,7 @@ func (b *Board) InsertTileBottomAt(row int) error {
 	}
 
 	var current = b.RemainingTile
-	for line := b.Size() - 1; line >= 0; line-- {
+	for line := b.GetSize() - 1; line >= 0; line-- {
 		b.Tiles[line][row], current = current, b.Tiles[line][row]
 	}
 
@@ -255,7 +182,7 @@ func (b *Board) InsertTileBottomAt(row int) error {
 		if player.Position.Row == row {
 			player.Position.Line = player.Position.Line - 1
 			if player.Position.Line < 0 {
-				player.Position.Line = b.Size() - 1
+				player.Position.Line = b.GetSize() - 1
 			}
 		}
 	}
@@ -271,13 +198,13 @@ func (b *Board) InsertTileLeftAt(line int) error {
 	}
 
 	var current = b.RemainingTile
-	for row := 0; row < b.Size(); row++ {
+	for row := 0; row < b.GetSize(); row++ {
 		b.Tiles[line][row], current = current, b.Tiles[line][row]
 	}
 
 	for _, player := range b.Players {
 		if player.Position.Line == line {
-			player.Position.Row = (player.Position.Row + 1) % b.Size()
+			player.Position.Row = (player.Position.Row + 1) % b.GetSize()
 		}
 	}
 
@@ -317,11 +244,11 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 		return ErrInvalidAction
 	}
 
-	if line >= b.Size() {
+	if line >= b.GetSize() {
 		return ErrInvalidAction
 	}
 
-	if row >= b.Size() {
+	if row >= b.GetSize() {
 		return ErrInvalidAction
 	}
 
@@ -329,7 +256,7 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 		return ErrInvalidAction
 	}
 
-	currentPlayer := b.CurrentPlayer()
+	currentPlayer := b.GetCurrentPlayer()
 	currentPlayer.Position.Line = line
 	currentPlayer.Position.Row = row
 
@@ -364,8 +291,8 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 	return nil
 }
 
-// CurrentPlayer returns the current player.
-func (b Board) CurrentPlayer() *Player {
+// GetCurrentPlayer returns the current player.
+func (b Board) GetCurrentPlayer() *Player {
 	return b.Players[b.RemainingPlayers[b.RemainingPlayerIndex]]
 }
 
@@ -373,8 +300,8 @@ func (b Board) CurrentPlayer() *Player {
 func (b Board) getAccessibleNeighbors(line, row int) Coordinates {
 	var (
 		coordinates = make(Coordinates, 0, 4)
-		lastIndex   = b.Size() - 1
-		exits       = b.Tiles[line][row].Exits()
+		lastIndex   = b.GetSize() - 1
+		exits       = b.Tiles[line][row].GetExits()
 	)
 
 	for _, exit := range exits {
@@ -385,7 +312,7 @@ func (b Board) getAccessibleNeighbors(line, row int) Coordinates {
 		}
 
 		targetTile := b.Tiles[exitTarget.Line][exitTarget.Row]
-		if !targetTile.Exits().Contains(exit.Opposite()) {
+		if !targetTile.GetExits().Contains(exit.Opposite()) {
 			continue
 		}
 
@@ -419,41 +346,13 @@ func (b Board) getAccessibleTilesForCoordinate(coordinate *Coordinate) Coordinat
 // GetAccessibleTiles returns the tiles that are accessible by the current
 // player.
 func (b Board) GetAccessibleTiles() Coordinates {
-	return b.getAccessibleTilesForCoordinate(b.CurrentPlayer().Position)
+	return b.getAccessibleTilesForCoordinate(b.GetCurrentPlayer().Position)
 }
 
-// Size returns the board size in tiles.
-func (b Board) Size() int {
+// GetSize returns the board size in tiles.
+func (b Board) GetSize() int {
 	return len(b.Tiles)
 }
-
-// BoardTile represents a tile that is placed on a board with a given rotation.
-type BoardTile struct {
-
-	// Tile is the underlying tile.
-	Tile *Tile `json:"tile"`
-
-	// Rotation is the tile rotation.
-	Rotation Rotation `json:"rotation"`
-}
-
-// Exists return sthe possible exits for that tile as a bitmask.
-func (bt BoardTile) Exits() TileExits {
-	return shapeExitMap[bt.Tile.Shape][bt.Rotation]
-}
-
-// Rotation represents a tile rotation on a board.
-type Rotation int
-
-const (
-	Rotation0 Rotation = 0
-
-	Rotation90 Rotation = 90
-
-	Rotation180 Rotation = 180
-
-	Rotation270 Rotation = 270
-)
 
 // generateTiles generates tile list for the given board size.
 // It will only generate size*size - 3 cards, since the tiles on each corner is
