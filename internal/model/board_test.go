@@ -603,6 +603,7 @@ func TestBoard(t *testing.T) {
 
 		t.Run("Should set to game end if only one player remains", func(t *testing.T) {
 			board := NewTestBoard()
+			board.RemainingPlayers = []int{0}
 			board.Players[0].Targets = []Treasure{'B'}
 			{
 				board.State = GameStateMovePawn

@@ -206,6 +206,7 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 	}
 
 	if len(currentPlayer.Targets) == 0 {
+
 		// This removes the current player from the remaining player array
 		b.RemainingPlayers = append(
 			b.RemainingPlayers[:b.RemainingPlayerIndex],
@@ -219,7 +220,8 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 		b.RemainingPlayerIndex = (b.RemainingPlayerIndex + 1) % len(b.RemainingPlayers)
 	}
 
-	if len(b.RemainingPlayers) <= 1 {
+	// TODO: Do not force last player to end the game.
+	if len(b.RemainingPlayers) == 0 {
 		b.State = GameStateEnd
 	} else {
 		b.State = GameStatePlaceTile
@@ -323,7 +325,8 @@ func randomRotation() Rotation {
 }
 
 // NewBoard returns a board for the given size.
-// The size param MUST be an odd number.
+// The size param MUST be either 3 or 7.
+// The player count must be between 1 and 4 included.
 func NewBoard(size, playerCount int) (*Board, error) {
 	if size != 3 && size != 7 {
 		return nil, fmt.Errorf("the board size must be either 3 or 7, got: %d", size)
