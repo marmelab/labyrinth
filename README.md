@@ -7,14 +7,16 @@ To run this program, you will need `go` installed. You can download it from [htt
 You can run the program using either
 
 ```sh
-make run
+make SAVE_ID=<save-id> run
 ```
 
 or
 
 ```sh
-go run .
+go run labyrinth.go -s <save-id>
 ```
+
+Note: To start a new game, just pick a new save id
 
 Note: You can use the `Noto Color Emoji` font to have an almost square display.
 
@@ -32,3 +34,11 @@ or
 go test -race ./...
 ```
 
+
+## Clean saves
+
+You can clean existing saves using the following command:
+
+```sh
+make clean
+```

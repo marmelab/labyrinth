@@ -76,5 +76,12 @@
             "treasure": "E"
         },
         "rotation": 180
-    }
+    },
+    "players": [
+        {
+            "color": 0,
+            "line": 0,
+            "row": 0
+        }
+    ]
 }

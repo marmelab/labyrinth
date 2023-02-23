@@ -17,6 +17,16 @@ const (
 
 var (
 	randomGenerator = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	ErrEvenRow       = errors.New("row must be odd")
+	ErrInvalidAction = errors.New("this action is not allowed in this state")
+)
+
+type GameState int
+
+const (
+	GameStatePlaceTile GameState = iota
+	GameStateMovePawn
 )
 
 // Board represents the game board.
@@ -27,25 +37,51 @@ type Board struct {
 
 	// RemainingTile is the tile that was not placed on the board.
 	RemainingTile *BoardTile `json:"remainingTile"`
+
+	// Players holds the players that are part of the game.
+	Players []*Player `json:"players"`
+
+	// GameState is the current game state
+	State GameState `json:"gameState"`
+}
+
+func (b Board) validatePlaceTile(index int) error {
+	if b.State != GameStatePlaceTile {
+		return ErrInvalidAction
+	}
+
+	if (index & 1) != 1 {
+		return ErrEvenRow
+	}
+
+	return nil
 }
 
 func (b *Board) InsertTileTopAt(row int) error {
-	if (row & 1) != 1 {
-		return errors.New("row must be odd")
+	if err := b.validatePlaceTile(row); err != nil {
+		return err
 	}
 
 	var current = b.RemainingTile
 	for line := 0; line < b.Size(); line++ {
 		b.Tiles[line][row], current = current, b.Tiles[line][row]
+
+	}
+
+	for _, player := range b.Players {
+		if player.Row == row {
+			player.Line = (player.Line + 1) % b.Size()
+		}
 	}
 
 	b.RemainingTile = current
+	b.State = GameStateMovePawn
 	return nil
 }
 
 func (b *Board) InsertTileRightAt(line int) error {
-	if (line & 1) != 1 {
-		return errors.New("row must be odd")
+	if err := b.validatePlaceTile(line); err != nil {
+		return err
 	}
 
 	var current = b.RemainingTile
@@ -53,13 +89,23 @@ func (b *Board) InsertTileRightAt(line int) error {
 		b.Tiles[line][row], current = current, b.Tiles[line][row]
 	}
 
+	for _, player := range b.Players {
+		if player.Line == line {
+			player.Row = player.Row - 1
+			if player.Row < 0 {
+				player.Row = b.Size() - 1
+			}
+		}
+	}
+
 	b.RemainingTile = current
+	b.State = GameStateMovePawn
 	return nil
 }
 
 func (b *Board) InsertTileBottomAt(row int) error {
-	if (row & 1) != 1 {
-		return errors.New("row must be odd")
+	if err := b.validatePlaceTile(row); err != nil {
+		return err
 	}
 
 	var current = b.RemainingTile
@@ -67,13 +113,23 @@ func (b *Board) InsertTileBottomAt(row int) error {
 		b.Tiles[line][row], current = current, b.Tiles[line][row]
 	}
 
+	for _, player := range b.Players {
+		if player.Row == row {
+			player.Line = player.Line - 1
+			if player.Line < 0 {
+				player.Line = b.Size() - 1
+			}
+		}
+	}
+
 	b.RemainingTile = current
+	b.State = GameStateMovePawn
 	return nil
 }
 
 func (b *Board) InsertTileLeftAt(line int) error {
-	if (line & 1) != 1 {
-		return errors.New("row must be odd")
+	if err := b.validatePlaceTile(line); err != nil {
+		return err
 	}
 
 	var current = b.RemainingTile
@@ -81,7 +137,14 @@ func (b *Board) InsertTileLeftAt(line int) error {
 		b.Tiles[line][row], current = current, b.Tiles[line][row]
 	}
 
+	for _, player := range b.Players {
+		if player.Line == line {
+			player.Row = (player.Row + 1) % b.Size()
+		}
+	}
+
 	b.RemainingTile = current
+	b.State = GameStateMovePawn
 	return nil
 }
 
@@ -109,6 +172,31 @@ func (b *Board) RotateRemainingTileAntiClockwise() {
 	case Rotation270:
 		b.RemainingTile.Rotation = Rotation180
 	}
+}
+
+func (b *Board) MoveCurrentPlayerTo(line, row int) error {
+	if b.State != GameStateMovePawn {
+		return ErrInvalidAction
+	}
+
+	if line >= b.Size() {
+		return ErrInvalidAction
+	}
+
+	if row >= b.Size() {
+		return ErrInvalidAction
+	}
+
+	currentPlayer := b.CurrentPlayer()
+	currentPlayer.Line = line
+	currentPlayer.Row = row
+	b.State = GameStatePlaceTile
+	return nil
+}
+
+// CurrentPlayer returns the current player.
+func (b Board) CurrentPlayer() *Player {
+	return b.Players[0]
 }
 
 // Size returns the board size in tiles.
@@ -139,17 +227,23 @@ const (
 	Rotation270 Rotation = 270
 )
 
+// generate tiles generates tile list for the given board size.
+// It will only generate size*size - 3 cards, since the tiles on each corner is
+// predefined (fixed V-shaped).
 func generateTiles(size int) (tiles []*Tile, treasureCount int) {
 	var (
-		tileCount                = size*size + 1
+		tileCount = size*size + 1
+
+		// We need to generate 4 less tiles as the corners are V tiles
+		generatedTiles           = tileCount - 4
 		tShapedThreshold         = int(math.Round(TShapedPercentage * float64(tileCount)))
 		vShapedWithTreasureCount = tShapedThreshold + int(math.Round(VShapedWithTreasurePercentage*float64(tileCount)))
 		iShapedThreshold         = vShapedWithTreasureCount + int(math.Round(IShapedPercentage*float64(tileCount)))
 	)
 
-	tiles = make([]*Tile, 0, tileCount)
+	tiles = make([]*Tile, 0, generatedTiles)
 
-	for i := 0; i < tileCount; i++ {
+	for i := 0; i < generatedTiles; i++ {
 		if i < tShapedThreshold {
 			tiles = append(tiles, &Tile{
 				Shape:    ShapeT,
@@ -204,14 +298,62 @@ func NewBoard(size int) (*Board, error) {
 
 	board := &Board{
 		Tiles: make([][]*BoardTile, size),
+		Players: []*Player{
+			{
+				Color: ColorBlue,
+				Line:  0,
+				Row:   0,
+			},
+		},
+		State: GameStatePlaceTile,
 	}
 
-	for i := 0; i < size; i++ {
-		board.Tiles[i] = make([]*BoardTile, size)
-		for j := 0; j < size; j++ {
-			board.Tiles[i][j] = &BoardTile{
-				Tile:     tiles[(size*i)+j],
-				Rotation: randomRotation(),
+	// The tile index is required here to track placed tiles on the board.
+	// This is due to the fact that each corner has a predefined V-shaped fixed
+	// tile.
+	tileIndex := 0
+	for line := 0; line < size; line++ {
+		board.Tiles[line] = make([]*BoardTile, size)
+
+		for row := 0; row < size; row++ {
+			if line == 0 && row == 0 {
+				board.Tiles[line][row] = &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeV,
+						Treasure: NoTreasure,
+					},
+					Rotation: Rotation270,
+				}
+			} else if line == 0 && row == size-1 {
+				board.Tiles[line][row] = &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeV,
+						Treasure: NoTreasure,
+					},
+					Rotation: Rotation0,
+				}
+			} else if line == size-1 && row == 0 {
+				board.Tiles[line][row] = &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeV,
+						Treasure: NoTreasure,
+					},
+					Rotation: Rotation180,
+				}
+			} else if line == size-1 && row == size-1 {
+				board.Tiles[line][row] = &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeV,
+						Treasure: NoTreasure,
+					},
+					Rotation: Rotation90,
+				}
+			} else {
+				board.Tiles[line][row] = &BoardTile{
+					Tile:     tiles[tileIndex],
+					Rotation: randomRotation(),
+				}
+				tileIndex++
 			}
 		}
 	}

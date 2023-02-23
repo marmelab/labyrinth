@@ -33,7 +33,7 @@ type GuiHandler func(gui *gocui.Gui, view *gocui.View) error
 type gameLoop struct {
 	boardDrawer BoardDrawer
 
-	state     *model.Board
+	board     *model.Board
 	saveBoard storage.BoardSaveFn
 
 	gui *gocui.Gui
@@ -41,21 +41,28 @@ type gameLoop struct {
 
 func (g gameLoop) insertTile(button Button, buttonIndex int) GuiHandler {
 	return func(gui *gocui.Gui, view *gocui.View) error {
+		// We need to swallow this error case here, otherwise the program
+		// will stop due to the library.
+		// TODO: provide a clear error message to the UI.
+		if g.board.State != model.GameStatePlaceTile {
+			return nil
+		}
+
 		switch button {
 		case TopButton:
-			if err := g.state.InsertTileTopAt(buttonIndex); err != nil {
+			if err := g.board.InsertTileTopAt(buttonIndex); err != nil {
 				return err
 			}
 		case RightButton:
-			if err := g.state.InsertTileRightAt(buttonIndex); err != nil {
+			if err := g.board.InsertTileRightAt(buttonIndex); err != nil {
 				return err
 			}
 		case BottomButton:
-			if err := g.state.InsertTileBottomAt(buttonIndex); err != nil {
+			if err := g.board.InsertTileBottomAt(buttonIndex); err != nil {
 				return err
 			}
 		case LeftButton:
-			if err := g.state.InsertTileLeftAt(buttonIndex); err != nil {
+			if err := g.board.InsertTileLeftAt(buttonIndex); err != nil {
 				return err
 			}
 		}
@@ -68,9 +75,23 @@ func (g gameLoop) rotateRemainingTile(rotationType RotationType) GuiHandler {
 	return func(gui *gocui.Gui, view *gocui.View) error {
 		switch rotationType {
 		case RotateClockWise:
-			g.state.RotateRemainingTileClockwise()
+			g.board.RotateRemainingTileClockwise()
 		case RotateAntiClockWise:
-			g.state.RotateRemainingTileAntiClockwise()
+			g.board.RotateRemainingTileAntiClockwise()
+		}
+		return g.saveBoard()
+	}
+}
+
+func (g gameLoop) moveCurrentPlayerTo(line, row int) GuiHandler {
+	return func(gui *gocui.Gui, view *gocui.View) error {
+		if err := g.board.MoveCurrentPlayerTo(line, row); err != nil {
+			// We need to swallow this error case here, otherwise the program
+			// will stop due to the library.
+			// TODO: provide a clear error message to the UI.
+			if err != model.ErrInvalidAction {
+				return err
+			}
 		}
 		return g.saveBoard()
 	}
@@ -93,7 +114,7 @@ func (g *gameLoop) Run() error {
 		loop: g,
 
 		boardDrawer: g.boardDrawer,
-		state:       g.state,
+		board:       g.board,
 	}
 
 	gui.SetManagerFunc(gameUi.layout)
@@ -116,7 +137,7 @@ func (g *gameLoop) Run() error {
 func RunGameLoop(initialState *model.Board, saveBoard storage.BoardSaveFn) error {
 	return (&gameLoop{
 		boardDrawer: NewBoardDrawer(),
-		state:       initialState,
+		board:       initialState,
 		saveBoard:   saveBoard,
 		gui:         nil,
 	}).Run()
