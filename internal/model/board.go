@@ -71,11 +71,48 @@ var (
 type TileExit int
 
 const (
-	TileExitTop TileExit = 1 << (iota + 1)
+	TileExitTop TileExit = iota
 	TileExitRight
 	TileExitBottom
 	TileExitLeft
 )
+
+func (t TileExit) Opposite() TileExit {
+	switch t {
+	case TileExitTop:
+		return TileExitBottom
+	case TileExitRight:
+		return TileExitLeft
+	case TileExitBottom:
+		return TileExitTop
+	default:
+		return TileExitRight
+	}
+}
+
+func (t TileExit) ExitCoordinate(line, row int) *Coordinate {
+	switch t {
+	case TileExitTop:
+		return &Coordinate{Line: line - 1, Row: row}
+	case TileExitRight:
+		return &Coordinate{Line: line, Row: row + 1}
+	case TileExitBottom:
+		return &Coordinate{Line: line + 1, Row: row}
+	default:
+		return &Coordinate{Line: line, Row: row - 1}
+	}
+}
+
+type TileExits []TileExit
+
+func (t TileExits) Contains(target TileExit) bool {
+	for _, exit := range t {
+		if exit == target {
+			return true
+		}
+	}
+	return false
+}
 
 // Coordinate is a coordinate on the board.
 type Coordinate struct {
@@ -314,44 +351,19 @@ func (b Board) getAccessibleNeighbors(line, row int) Coordinates {
 		exits       = b.Tiles[line][row].Exits()
 	)
 
-	if line > 0 && (exits&TileExitTop) > 0 {
-		topTileExits := b.Tiles[line-1][row].Exits()
-		if (topTileExits & TileExitBottom) > 0 {
-			coordinates = append(coordinates, &Coordinate{
-				Line: line - 1,
-				Row:  row,
-			})
-		}
-	}
+	for _, exit := range exits {
+		exitTarget := exit.ExitCoordinate(line, row)
 
-	if row < lastIndex && (exits&TileExitRight) > 0 {
-		rightTileExits := b.Tiles[line][row+1].Exits()
-		if (rightTileExits & TileExitLeft) > 0 {
-			coordinates = append(coordinates, &Coordinate{
-				Line: line,
-				Row:  row + 1,
-			})
+		if exitTarget.Line < 0 || exitTarget.Line > lastIndex || exitTarget.Row < 0 || exitTarget.Row > lastIndex {
+			continue
 		}
-	}
 
-	if line < lastIndex && (exits&TileExitBottom) > 0 {
-		bottomTileExits := b.Tiles[line+1][row].Exits()
-		if (bottomTileExits & TileExitTop) > 0 {
-			coordinates = append(coordinates, &Coordinate{
-				Line: line + 1,
-				Row:  row,
-			})
+		targetTile := b.Tiles[exitTarget.Line][exitTarget.Row]
+		if !targetTile.Exits().Contains(exit.Opposite()) {
+			continue
 		}
-	}
 
-	if row > 0 && (exits&TileExitLeft) > 0 {
-		leftTileExits := b.Tiles[line][row-1].Exits()
-		if (leftTileExits & TileExitRight) > 0 {
-			coordinates = append(coordinates, &Coordinate{
-				Line: line,
-				Row:  row - 1,
-			})
-		}
+		coordinates = append(coordinates, exitTarget)
 	}
 
 	return coordinates
@@ -399,44 +411,43 @@ type BoardTile struct {
 	Rotation Rotation `json:"rotation"`
 }
 
-func (bt BoardTile) iShapedExits() TileExit {
+func (bt BoardTile) iShapedExits() TileExits {
 	switch bt.Rotation {
 	case Rotation0, Rotation180:
-		return TileExitRight | TileExitLeft
+		return TileExits{TileExitRight, TileExitLeft}
 	default:
-		return TileExitTop | TileExitBottom
+		return TileExits{TileExitTop, TileExitBottom}
 	}
 }
 
-func (bt BoardTile) tShapedExits() TileExit {
+func (bt BoardTile) tShapedExits() TileExits {
 	switch bt.Rotation {
 	case Rotation0:
-		return TileExitTop | TileExitRight | TileExitLeft
+		return TileExits{TileExitTop, TileExitRight, TileExitLeft}
 	case Rotation90:
-		return TileExitTop | TileExitRight | TileExitBottom
+		return TileExits{TileExitTop, TileExitRight, TileExitBottom}
 	case Rotation180:
-		return TileExitRight | TileExitBottom | TileExitLeft
+		return TileExits{TileExitRight, TileExitBottom, TileExitLeft}
 	default:
-		return TileExitTop | TileExitBottom | TileExitLeft
+		return TileExits{TileExitTop, TileExitBottom, TileExitLeft}
 	}
 }
 
-func (bt BoardTile) vShapedExits() TileExit {
+func (bt BoardTile) vShapedExits() TileExits {
 	switch bt.Rotation {
 	case Rotation0:
-		return TileExitBottom | TileExitLeft
+		return TileExits{TileExitBottom, TileExitLeft}
 	case Rotation90:
-		return TileExitTop | TileExitLeft
+		return TileExits{TileExitTop, TileExitLeft}
 	case Rotation180:
-		return TileExitTop | TileExitRight
+		return TileExits{TileExitTop, TileExitRight}
 	default:
-		return TileExitRight | TileExitBottom
+		return TileExits{TileExitRight, TileExitBottom}
 	}
 }
 
 // Exists return sthe possible exits for that tile as a bitmask.
-func (bt BoardTile) Exits() TileExit {
-
+func (bt BoardTile) Exits() TileExits {
 	switch bt.Tile.Shape {
 	case ShapeI:
 		return bt.iShapedExits()

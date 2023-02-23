@@ -852,218 +852,34 @@ func TestBoard(t *testing.T) {
 func TestBoardTile(t *testing.T) {
 
 	t.Run("Exits()", func(t *testing.T) {
-		t.Run("Should return exists for I-shaped tiles", func(t *testing.T) {
-			{
-				var (
-					boardTile = &BoardTile{
-						Tile: &Tile{
-							Shape: ShapeI,
-						},
-						Rotation: Rotation0,
-					}
-					exits = boardTile.Exits()
-				)
-
-				assert.True(t, (exits&TileExitRight) > 0)
-				assert.True(t, (exits&TileExitLeft) > 0)
+		t.Run("Should return exists for ", func(t *testing.T) {
+			tests := []struct {
+				shape    Shape
+				rotation Rotation
+				exits    TileExits
+			}{
+				{ShapeI, Rotation0, TileExits{TileExitRight, TileExitLeft}},
+				{ShapeI, Rotation90, TileExits{TileExitTop, TileExitBottom}},
+				{ShapeI, Rotation180, TileExits{TileExitRight, TileExitLeft}},
+				{ShapeI, Rotation270, TileExits{TileExitTop, TileExitBottom}},
+				{ShapeT, Rotation0, TileExits{TileExitTop, TileExitRight, TileExitLeft}},
+				{ShapeT, Rotation90, TileExits{TileExitTop, TileExitRight, TileExitBottom}},
+				{ShapeT, Rotation180, TileExits{TileExitRight, TileExitBottom, TileExitLeft}},
+				{ShapeT, Rotation270, TileExits{TileExitTop, TileExitBottom, TileExitLeft}},
+				{ShapeV, Rotation0, TileExits{TileExitBottom, TileExitLeft}},
+				{ShapeV, Rotation90, TileExits{TileExitTop, TileExitLeft}},
+				{ShapeV, Rotation180, TileExits{TileExitTop, TileExitRight}},
+				{ShapeV, Rotation270, TileExits{TileExitRight, TileExitBottom}},
 			}
 
-			{
-				var (
-					boardTile = &BoardTile{
-						Tile: &Tile{
-							Shape: ShapeI,
-						},
-						Rotation: Rotation90,
-					}
-					exits = boardTile.Exits()
-				)
-
-				assert.True(t, (exits&TileExitTop) > 0)
-				assert.True(t, (exits&TileExitBottom) > 0)
-			}
-
-			{
-				var (
-					boardTile = &BoardTile{
-						Tile: &Tile{
-							Shape: ShapeI,
-						},
-						Rotation: Rotation180,
-					}
-					exits = boardTile.Exits()
-				)
-
-				assert.True(t, (exits&TileExitRight) > 0)
-				assert.True(t, (exits&TileExitLeft) > 0)
-
-				assert.True(t, (exits&TileExitTop) == 0)
-				assert.True(t, (exits&TileExitBottom) == 0)
-			}
-
-			{
-				var (
-					boardTile = &BoardTile{
-						Tile: &Tile{
-							Shape: ShapeI,
-						},
-						Rotation: Rotation270,
-					}
-					exits = boardTile.Exits()
-				)
-
-				assert.True(t, (exits&TileExitTop) > 0)
-				assert.True(t, (exits&TileExitBottom) > 0)
-
-				assert.True(t, (exits&TileExitRight) == 0)
-				assert.True(t, (exits&TileExitLeft) == 0)
-			}
-		})
-
-		t.Run("Should return exists for T-shaped tiles", func(t *testing.T) {
-			{
-				var (
-					boardTile = &BoardTile{
-						Tile: &Tile{
-							Shape: ShapeT,
-						},
-						Rotation: Rotation0,
-					}
-					exits = boardTile.Exits()
-				)
-
-				assert.True(t, (exits&TileExitTop) > 0)
-				assert.True(t, (exits&TileExitRight) > 0)
-				assert.True(t, (exits&TileExitLeft) > 0)
-
-				assert.True(t, (exits&TileExitBottom) == 0)
-			}
-
-			{
-				var (
-					boardTile = &BoardTile{
-						Tile: &Tile{
-							Shape: ShapeT,
-						},
-						Rotation: Rotation90,
-					}
-					exits = boardTile.Exits()
-				)
-
-				assert.True(t, (exits&TileExitTop) > 0)
-				assert.True(t, (exits&TileExitRight) > 0)
-				assert.True(t, (exits&TileExitBottom) > 0)
-
-				assert.True(t, (exits&TileExitLeft) == 0)
-			}
-
-			{
-				var (
-					boardTile = &BoardTile{
-						Tile: &Tile{
-							Shape: ShapeT,
-						},
-						Rotation: Rotation180,
-					}
-					exits = boardTile.Exits()
-				)
-
-				assert.True(t, (exits&TileExitRight) > 0)
-				assert.True(t, (exits&TileExitBottom) > 0)
-				assert.True(t, (exits&TileExitLeft) > 0)
-
-				assert.True(t, (exits&TileExitTop) == 0)
-			}
-
-			{
-				var (
-					boardTile = &BoardTile{
-						Tile: &Tile{
-							Shape: ShapeT,
-						},
-						Rotation: Rotation270,
-					}
-					exits = boardTile.Exits()
-				)
-
-				assert.True(t, (exits&TileExitTop) > 0)
-				assert.True(t, (exits&TileExitBottom) > 0)
-				assert.True(t, (exits&TileExitLeft) > 0)
-
-				assert.True(t, (exits&TileExitRight) == 0)
-			}
-		})
-		t.Run("Should return exists for V-shaped tiles", func(t *testing.T) {
-			{
-				var (
-					boardTile = &BoardTile{
-						Tile: &Tile{
-							Shape: ShapeV,
-						},
-						Rotation: Rotation0,
-					}
-					exits = boardTile.Exits()
-				)
-
-				assert.True(t, (exits&TileExitLeft) > 0)
-				assert.True(t, (exits&TileExitBottom) > 0)
-
-				assert.True(t, (exits&TileExitTop) == 0)
-				assert.True(t, (exits&TileExitRight) == 0)
-			}
-
-			{
-				var (
-					boardTile = &BoardTile{
-						Tile: &Tile{
-							Shape: ShapeV,
-						},
-						Rotation: Rotation90,
-					}
-					exits = boardTile.Exits()
-				)
-
-				assert.True(t, (exits&TileExitTop) > 0)
-				assert.True(t, (exits&TileExitLeft) > 0)
-
-				assert.True(t, (exits&TileExitRight) == 0)
-				assert.True(t, (exits&TileExitBottom) == 0)
-			}
-
-			{
-				var (
-					boardTile = &BoardTile{
-						Tile: &Tile{
-							Shape: ShapeV,
-						},
-						Rotation: Rotation180,
-					}
-					exits = boardTile.Exits()
-				)
-
-				assert.True(t, (exits&TileExitTop) > 0)
-				assert.True(t, (exits&TileExitRight) > 0)
-
-				assert.True(t, (exits&TileExitBottom) == 0)
-				assert.True(t, (exits&TileExitLeft) == 0)
-			}
-
-			{
-				var (
-					boardTile = &BoardTile{
-						Tile: &Tile{
-							Shape: ShapeV,
-						},
-						Rotation: Rotation270,
-					}
-					exits = boardTile.Exits()
-				)
-
-				assert.True(t, (exits&TileExitRight) > 0)
-				assert.True(t, (exits&TileExitBottom) > 0)
-
-				assert.True(t, (exits&TileExitTop) == 0)
-				assert.True(t, (exits&TileExitLeft) == 0)
+			for _, test := range tests {
+				boardTile := &BoardTile{
+					Tile: &Tile{
+						Shape: test.shape,
+					},
+					Rotation: test.rotation,
+				}
+				assert.Equal(t, test.exits, boardTile.Exits())
 			}
 		})
 	})
@@ -1084,23 +900,8 @@ func TestNewBoard(t *testing.T) {
 			assert.Equal(t, "the number of players must be between 1 and 4 included, got: 0", err.Error())
 		}
 
-		{
-			_, err := NewBoard(3, 1)
-			assert.Nil(t, err)
-		}
-
-		{
-			_, err := NewBoard(3, 2)
-			assert.Nil(t, err)
-		}
-
-		{
-			_, err := NewBoard(3, 3)
-			assert.Nil(t, err)
-		}
-
-		{
-			_, err := NewBoard(3, 4)
+		for playerCount := 1; playerCount <= 4; playerCount++ {
+			_, err := NewBoard(3, playerCount)
 			assert.Nil(t, err)
 		}
 
