@@ -40,10 +40,10 @@ func NewTestBoard() *Board {
 					Rotation: Rotation90,
 				}, {
 					Tile: &Tile{
-						Shape:    ShapeV,
+						Shape:    ShapeT,
 						Treasure: 'C',
 					},
-					Rotation: Rotation90,
+					Rotation: Rotation270,
 				}, {
 					Tile: &Tile{
 						Shape:    ShapeI,
@@ -62,10 +62,10 @@ func NewTestBoard() *Board {
 					Rotation: Rotation90,
 				}, {
 					Tile: &Tile{
-						Shape:    ShapeV,
+						Shape:    ShapeT,
 						Treasure: 'D',
 					},
-					Rotation: Rotation180,
+					Rotation: Rotation0,
 				}, {
 					Tile: &Tile{
 						Shape:    ShapeI,
@@ -164,9 +164,9 @@ func TestBoard(t *testing.T) {
 			assert.Equal(t, Treasure('B'), board.Tiles[1][row].Tile.Treasure)
 			assert.Equal(t, Rotation270, board.Tiles[1][row].Rotation)
 
-			assert.Equal(t, ShapeV, board.Tiles[2][row].Tile.Shape)
+			assert.Equal(t, ShapeT, board.Tiles[2][row].Tile.Shape)
 			assert.Equal(t, Treasure('C'), board.Tiles[2][row].Tile.Treasure)
-			assert.Equal(t, Rotation90, board.Tiles[2][row].Rotation)
+			assert.Equal(t, Rotation270, board.Tiles[2][row].Rotation)
 		})
 
 		t.Run("Should insert remaining tile in first line for the given index", func(t *testing.T) {
@@ -187,9 +187,9 @@ func TestBoard(t *testing.T) {
 			err := board.InsertTileTopAt(1)
 			assert.Nil(t, err)
 
-			assert.Equal(t, ShapeV, board.RemainingTile.Tile.Shape)
+			assert.Equal(t, ShapeT, board.RemainingTile.Tile.Shape)
 			assert.Equal(t, Treasure('D'), board.RemainingTile.Tile.Treasure)
-			assert.Equal(t, Rotation180, board.RemainingTile.Rotation)
+			assert.Equal(t, Rotation0, board.RemainingTile.Rotation)
 		})
 
 		t.Run("Should set game state to MovePawn", func(t *testing.T) {
@@ -242,9 +242,9 @@ func TestBoard(t *testing.T) {
 			err := board.InsertTileRightAt(line)
 			assert.Nil(t, err)
 
-			assert.Equal(t, ShapeV, board.Tiles[line][0].Tile.Shape)
+			assert.Equal(t, ShapeT, board.Tiles[line][0].Tile.Shape)
 			assert.Equal(t, Treasure('C'), board.Tiles[line][0].Tile.Treasure)
-			assert.Equal(t, Rotation90, board.Tiles[line][0].Rotation)
+			assert.Equal(t, Rotation270, board.Tiles[line][0].Rotation)
 
 			assert.Equal(t, ShapeI, board.Tiles[line][1].Tile.Shape)
 			assert.Equal(t, NoTreasure, board.Tiles[line][1].Tile.Treasure)
@@ -324,13 +324,13 @@ func TestBoard(t *testing.T) {
 			err := board.InsertTileBottomAt(row)
 			assert.Nil(t, err)
 
-			assert.Equal(t, ShapeV, board.Tiles[0][row].Tile.Shape)
+			assert.Equal(t, ShapeT, board.Tiles[0][row].Tile.Shape)
 			assert.Equal(t, Treasure('C'), board.Tiles[0][row].Tile.Treasure)
-			assert.Equal(t, Rotation90, board.Tiles[0][row].Rotation)
+			assert.Equal(t, Rotation270, board.Tiles[0][row].Rotation)
 
-			assert.Equal(t, ShapeV, board.Tiles[1][row].Tile.Shape)
+			assert.Equal(t, ShapeT, board.Tiles[1][row].Tile.Shape)
 			assert.Equal(t, Treasure('D'), board.Tiles[1][row].Tile.Treasure)
-			assert.Equal(t, Rotation180, board.Tiles[1][row].Rotation)
+			assert.Equal(t, Rotation0, board.Tiles[1][row].Rotation)
 
 		})
 
@@ -411,10 +411,9 @@ func TestBoard(t *testing.T) {
 			assert.Equal(t, NoTreasure, board.Tiles[line][1].Tile.Treasure)
 			assert.Equal(t, Rotation90, board.Tiles[line][1].Rotation)
 
-			assert.Equal(t, ShapeV, board.Tiles[line][2].Tile.Shape)
+			assert.Equal(t, ShapeT, board.Tiles[line][2].Tile.Shape)
 			assert.Equal(t, Treasure('C'), board.Tiles[line][2].Tile.Treasure)
-			assert.Equal(t, Rotation90, board.Tiles[line][2].Rotation)
-
+			assert.Equal(t, Rotation270, board.Tiles[line][2].Rotation)
 		})
 
 		t.Run("Should insert remaining tile in the last row for the given index", func(t *testing.T) {
@@ -524,10 +523,10 @@ func TestBoard(t *testing.T) {
 			board := NewTestBoard()
 			board.State = GameStateMovePawn
 
-			err := board.MoveCurrentPlayerTo(0, 0)
+			err := board.MoveCurrentPlayerTo(1, 1)
 			assert.Nil(t, err)
-			assert.Equal(t, 0, board.Players[0].Position.Line)
-			assert.Equal(t, 0, board.Players[0].Position.Row)
+			assert.Equal(t, 1, board.Players[0].Position.Line)
+			assert.Equal(t, 1, board.Players[0].Position.Row)
 		})
 
 		t.Run("Should return an error if line is not valid", func(t *testing.T) {
@@ -561,9 +560,9 @@ func TestBoard(t *testing.T) {
 			board := NewTestBoard()
 			board.State = GameStateMovePawn
 
-			err := board.MoveCurrentPlayerTo(1, 2)
+			err := board.MoveCurrentPlayerTo(0, 2)
 			assert.Nil(t, err)
-			assert.Equal(t, 1, board.Players[0].Position.Line)
+			assert.Equal(t, 0, board.Players[0].Position.Line)
 			assert.Equal(t, 2, board.Players[0].Position.Row)
 		})
 
@@ -571,7 +570,7 @@ func TestBoard(t *testing.T) {
 			board := NewTestBoard()
 			board.State = GameStateMovePawn
 
-			err := board.MoveCurrentPlayerTo(1, 2)
+			err := board.MoveCurrentPlayerTo(1, 1)
 			assert.Nil(t, err)
 			assert.Equal(t, GameStatePlaceTile, board.State)
 		})
@@ -580,7 +579,7 @@ func TestBoard(t *testing.T) {
 			board := NewTestBoard()
 			board.State = GameStateMovePawn
 
-			err := board.MoveCurrentPlayerTo(0, 0)
+			err := board.MoveCurrentPlayerTo(1, 1)
 			assert.Nil(t, err)
 			assert.Equal(t, 0, board.Players[0].Score)
 		})
@@ -598,7 +597,7 @@ func TestBoard(t *testing.T) {
 			board := NewTestBoard()
 			board.State = GameStateMovePawn
 
-			err := board.MoveCurrentPlayerTo(0, 0)
+			err := board.MoveCurrentPlayerTo(1, 1)
 			assert.Nil(t, err)
 			assert.Equal(t, Treasure('B'), board.Players[0].Targets[0])
 		})
@@ -616,7 +615,7 @@ func TestBoard(t *testing.T) {
 			board := NewTestBoard()
 			board.State = GameStateMovePawn
 
-			err := board.MoveCurrentPlayerTo(0, 0)
+			err := board.MoveCurrentPlayerTo(1, 1)
 			assert.Nil(t, err)
 			assert.Equal(t, Treasure('B'), board.Tiles[0][1].Tile.Treasure)
 		})
@@ -648,7 +647,7 @@ func TestBoard(t *testing.T) {
 			{
 				// Blue
 				board.State = GameStateMovePawn
-				err := board.MoveCurrentPlayerTo(1, 2)
+				err := board.MoveCurrentPlayerTo(1, 1)
 				assert.Nil(t, err)
 				assert.Equal(t, 1, board.RemainingPlayerIndex)
 			}
@@ -656,7 +655,7 @@ func TestBoard(t *testing.T) {
 			{
 				// Green
 				board.State = GameStateMovePawn
-				err := board.MoveCurrentPlayerTo(1, 2)
+				err := board.MoveCurrentPlayerTo(0, 2)
 				assert.Nil(t, err)
 				assert.Equal(t, 0, board.RemainingPlayerIndex)
 			}
@@ -699,7 +698,7 @@ func TestBoard(t *testing.T) {
 					{
 						// Blue
 						board.State = GameStateMovePawn
-						err := board.MoveCurrentPlayerTo(1, 2)
+						err := board.MoveCurrentPlayerTo(2, 1)
 						assert.Nil(t, err)
 					}
 
@@ -793,9 +792,11 @@ func TestBoard(t *testing.T) {
 
 			{
 				neighbors := board.getAccessibleNeighbors(2, 1)
-				assert.Equal(t, 1, len(neighbors))
-				assert.Equal(t, 2, neighbors[0].Line)
-				assert.Equal(t, 2, neighbors[0].Row)
+				assert.Equal(t, 2, len(neighbors))
+				assert.Equal(t, 1, neighbors[0].Line)
+				assert.Equal(t, 1, neighbors[0].Row)
+				assert.Equal(t, 2, neighbors[1].Line)
+				assert.Equal(t, 2, neighbors[1].Row)
 			}
 		})
 	})
@@ -805,13 +806,17 @@ func TestBoard(t *testing.T) {
 			board := NewTestBoard()
 
 			tiles := board.getAccessibleTilesForCoordinate(&Coordinate{0, 2})
-			assert.Equal(t, 3, len(tiles))
+			assert.Equal(t, 5, len(tiles))
 			assert.Equal(t, 0, tiles[0].Line)
 			assert.Equal(t, 2, tiles[0].Row)
 			assert.Equal(t, 0, tiles[1].Line)
 			assert.Equal(t, 1, tiles[1].Row)
 			assert.Equal(t, 1, tiles[2].Line)
 			assert.Equal(t, 1, tiles[2].Row)
+			assert.Equal(t, 2, tiles[3].Line)
+			assert.Equal(t, 1, tiles[3].Row)
+			assert.Equal(t, 2, tiles[4].Line)
+			assert.Equal(t, 2, tiles[4].Row)
 		})
 	})
 
@@ -820,13 +825,17 @@ func TestBoard(t *testing.T) {
 			board := NewTestBoard()
 
 			tiles := board.GetAccessibleTiles()
-			assert.Equal(t, 3, len(tiles))
+			assert.Equal(t, 5, len(tiles))
 			assert.Equal(t, 1, tiles[0].Line)
 			assert.Equal(t, 1, tiles[0].Row)
 			assert.Equal(t, 0, tiles[1].Line)
 			assert.Equal(t, 1, tiles[1].Row)
-			assert.Equal(t, 0, tiles[2].Line)
-			assert.Equal(t, 2, tiles[2].Row)
+			assert.Equal(t, 2, tiles[2].Line)
+			assert.Equal(t, 1, tiles[2].Row)
+			assert.Equal(t, 0, tiles[3].Line)
+			assert.Equal(t, 2, tiles[3].Row)
+			assert.Equal(t, 2, tiles[4].Line)
+			assert.Equal(t, 2, tiles[4].Row)
 		})
 	})
 

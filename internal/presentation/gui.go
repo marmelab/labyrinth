@@ -107,6 +107,8 @@ func (g gameUi) drawBoard(tileCount, boardSize int) error {
 }
 
 func (g gameUi) drawTiles(tileCount int) error {
+	accessibleTiles := g.board.GetAccessibleTiles()
+
 	for line := 0; line < tileCount; line++ {
 		for row := 0; row < tileCount; row++ {
 			var (
@@ -147,7 +149,9 @@ func (g gameUi) drawTiles(tileCount int) error {
 			} else if len(targets) > 0 && targets[0] == currentTile.Tile.Treasure {
 				tileView.BgColor = gocui.ColorCyan
 				tileView.FgColor = gocui.ColorBlack
-			} else if g.board.State == model.GameStateMovePawn {
+			} else if g.board.State == model.GameStateMovePawn &&
+				accessibleTiles.Contains(&model.Coordinate{Line: line, Row: row}) {
+
 				tileView.BgColor = gocui.ColorMagenta
 				tileView.FgColor = gocui.ColorWhite
 			} else {

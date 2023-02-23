@@ -137,8 +137,10 @@ func (g *gameLoop) Run() error {
 func RunGameLoop(initialState *model.Board, saveBoard storage.BoardSaveFn) error {
 	return (&gameLoop{
 		boardDrawer: NewBoardDrawer(),
-		board:       initialState,
-		saveBoard:   saveBoard,
-		gui:         nil,
+
+		board:     initialState,
+		saveBoard: saveBoard,
+
+		gui: nil,
 	}).Run()
 }

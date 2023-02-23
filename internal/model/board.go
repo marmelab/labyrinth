@@ -262,6 +262,10 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 		return ErrInvalidAction
 	}
 
+	if !b.GetAccessibleTiles().Contains(&Coordinate{line, row}) {
+		return ErrInvalidAction
+	}
+
 	currentPlayer := b.CurrentPlayer()
 	currentPlayer.Position.Line = line
 	currentPlayer.Position.Row = row
