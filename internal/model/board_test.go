@@ -113,6 +113,29 @@ func NewTestBoard() *Board {
 	}
 }
 
+func TestCoordinates(t *testing.T) {
+	t.Run("Contains()", func(t *testing.T) {
+		t.Run("Should return true if the target coordinate is present in the array", func(t *testing.T) {
+			coordinates := Coordinates{
+				&Coordinate{0, 0},
+				&Coordinate{0, 1},
+			}
+
+			assert.True(t, coordinates.Contains(&Coordinate{0, 0}))
+		})
+
+		t.Run("Should return false if the target coordinate is not present in the array", func(t *testing.T) {
+			coordinates := Coordinates{
+				&Coordinate{0, 0},
+				&Coordinate{0, 1},
+			}
+
+			assert.False(t, coordinates.Contains(&Coordinate{1, 1}))
+		})
+
+	})
+}
+
 func TestBoard(t *testing.T) {
 
 	t.Run("InsertTileTopAt()", func(t *testing.T) {
@@ -739,7 +762,7 @@ func TestBoard(t *testing.T) {
 		})
 	})
 
-	t.Run("getAccessibleNeighbors", func(t *testing.T) {
+	t.Run("getAccessibleNeighbors()", func(t *testing.T) {
 		t.Run("Should return all accessible neighbors for a tile", func(t *testing.T) {
 			board := NewTestBoard()
 			{
@@ -774,6 +797,36 @@ func TestBoard(t *testing.T) {
 				assert.Equal(t, 2, neighbors[0].Line)
 				assert.Equal(t, 2, neighbors[0].Row)
 			}
+		})
+	})
+
+	t.Run("getAccessibleTilesForCoordinate()", func(t *testing.T) {
+		t.Run("Should return all accessible tiles from given coordinate", func(t *testing.T) {
+			board := NewTestBoard()
+
+			tiles := board.getAccessibleTilesForCoordinate(&Coordinate{0, 2})
+			assert.Equal(t, 3, len(tiles))
+			assert.Equal(t, 0, tiles[0].Line)
+			assert.Equal(t, 2, tiles[0].Row)
+			assert.Equal(t, 0, tiles[1].Line)
+			assert.Equal(t, 1, tiles[1].Row)
+			assert.Equal(t, 1, tiles[2].Line)
+			assert.Equal(t, 1, tiles[2].Row)
+		})
+	})
+
+	t.Run("GetAccessibleTiles()", func(t *testing.T) {
+		t.Run("Should return all accessible tiles from given player", func(t *testing.T) {
+			board := NewTestBoard()
+
+			tiles := board.GetAccessibleTiles()
+			assert.Equal(t, 3, len(tiles))
+			assert.Equal(t, 1, tiles[0].Line)
+			assert.Equal(t, 1, tiles[0].Row)
+			assert.Equal(t, 0, tiles[1].Line)
+			assert.Equal(t, 1, tiles[1].Row)
+			assert.Equal(t, 0, tiles[2].Line)
+			assert.Equal(t, 2, tiles[2].Row)
 		})
 	})
 

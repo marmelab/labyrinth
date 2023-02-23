@@ -86,6 +86,17 @@ type Coordinate struct {
 // Coordinates is set of cordinates.
 type Coordinates []*Coordinate
 
+// Contans returns whether the given Coordinate is present in the coordinate
+// array.
+func (c Coordinates) Contains(target *Coordinate) bool {
+	for _, coordinate := range c {
+		if coordinate.Line == target.Line && coordinate.Row == target.Row {
+			return true
+		}
+	}
+	return false
+}
+
 // Board represents the game board.
 type Board struct {
 
@@ -340,6 +351,33 @@ func (b Board) getAccessibleNeighbors(line, row int) Coordinates {
 	}
 
 	return coordinates
+}
+
+// getAccessibleTilesForCoordinate returns the available tiles from the given coordinates.
+func (b Board) getAccessibleTilesForCoordinate(coordinate *Coordinate) Coordinates {
+	var (
+		results = make(Coordinates, 0)
+		queue   = append(make(Coordinates, 0), coordinate)
+	)
+
+	for len(queue) > 0 {
+		currentTile := queue[0]
+		queue = queue[1:]
+		if results.Contains(currentTile) {
+			continue
+		}
+
+		results = append(results, currentTile)
+		queue = append(queue, b.getAccessibleNeighbors(currentTile.Line, currentTile.Row)...)
+	}
+
+	return results
+}
+
+// GetAccessibleTiles returns the tiles that are accessible by the current
+// player.
+func (b Board) GetAccessibleTiles() Coordinates {
+	return b.getAccessibleTilesForCoordinate(b.CurrentPlayer().Position)
 }
 
 // Size returns the board size in tiles.
