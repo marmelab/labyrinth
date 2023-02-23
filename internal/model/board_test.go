@@ -632,7 +632,7 @@ func TestNewBoard(t *testing.T) {
 	t.Run("Should return an error if size is even.", func(t *testing.T) {
 		board, err := NewBoard(2, 1)
 		assert.NotNil(t, err)
-		assert.Equal(t, "size must be an odd number, got: 2", err.Error())
+		assert.Equal(t, "the board size must be either 3 or 7, got: 2", err.Error())
 		assert.Nil(t, board)
 	})
 
@@ -699,6 +699,7 @@ func TestNewBoard(t *testing.T) {
 			assert.Equal(t, ColorBlue, board.Players[0].Color)
 			assert.Equal(t, 0, board.Players[0].Line)
 			assert.Equal(t, 0, board.Players[0].Row)
+			assert.Equal(t, 0, board.Players[0].Row)
 		}
 
 		{
@@ -747,6 +748,59 @@ func TestNewBoard(t *testing.T) {
 			assert.Equal(t, ColorYellow, board.Players[3].Color)
 			assert.Equal(t, 2, board.Players[3].Line)
 			assert.Equal(t, 0, board.Players[3].Row)
+		}
+	})
+	t.Run("Should initialize player targets", func(t *testing.T) {
+		{
+			board, _ := NewBoard(3, 1)
+			assert.Equal(t, 5, len(board.Players[0].Targets))
+		}
+
+		{
+			board, _ := NewBoard(7, 1)
+			assert.Equal(t, 24, len(board.Players[0].Targets))
+		}
+
+		{
+			board, _ := NewBoard(3, 2)
+			assert.Equal(t, 2, len(board.Players[0].Targets))
+			assert.Equal(t, 2, len(board.Players[1].Targets))
+		}
+
+		{
+			board, _ := NewBoard(7, 2)
+			assert.Equal(t, 12, len(board.Players[0].Targets))
+			assert.Equal(t, 12, len(board.Players[1].Targets))
+		}
+
+		{
+			board, _ := NewBoard(3, 3)
+			assert.Equal(t, 1, len(board.Players[0].Targets))
+			assert.Equal(t, 1, len(board.Players[1].Targets))
+			assert.Equal(t, 1, len(board.Players[2].Targets))
+		}
+
+		{
+			board, _ := NewBoard(7, 3)
+			assert.Equal(t, 8, len(board.Players[0].Targets))
+			assert.Equal(t, 8, len(board.Players[1].Targets))
+			assert.Equal(t, 8, len(board.Players[2].Targets))
+		}
+
+		{
+			board, _ := NewBoard(3, 4)
+			assert.Equal(t, 1, len(board.Players[0].Targets))
+			assert.Equal(t, 1, len(board.Players[1].Targets))
+			assert.Equal(t, 1, len(board.Players[2].Targets))
+			assert.Equal(t, 1, len(board.Players[3].Targets))
+		}
+
+		{
+			board, _ := NewBoard(7, 4)
+			assert.Equal(t, 6, len(board.Players[0].Targets))
+			assert.Equal(t, 6, len(board.Players[1].Targets))
+			assert.Equal(t, 6, len(board.Players[2].Targets))
+			assert.Equal(t, 6, len(board.Players[3].Targets))
 		}
 	})
 

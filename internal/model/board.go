@@ -304,15 +304,20 @@ func randomRotation() Rotation {
 // NewBoard returns a board for the given size.
 // The size param MUST be an odd number.
 func NewBoard(size, playerCount int) (*Board, error) {
-	if (size & 1) != 1 {
-		return nil, fmt.Errorf("size must be an odd number, got: %d", size)
+	if size != 3 && size != 7 {
+		return nil, fmt.Errorf("the board size must be either 3 or 7, got: %d", size)
 	}
 
 	if playerCount < 1 || playerCount > 4 {
 		return nil, fmt.Errorf("the number of players must be between 1 and 4 included, got: %d", playerCount)
 	}
 
-	tiles, treasures := generateTiles(size)
+	var (
+		tiles, treasures = generateTiles(size)
+		treasureCount    = len(treasures)
+		targetPerPlayer  = treasureCount / playerCount
+		treasureOffset   = 0
+	)
 
 	randomGenerator.Shuffle(len(tiles), func(i, j int) {
 		tiles[i], tiles[j] = tiles[j], tiles[i]
@@ -332,18 +337,20 @@ func NewBoard(size, playerCount int) (*Board, error) {
 		Color:   ColorBlue,
 		Line:    0,
 		Row:     0,
-		Targets: treasures,
+		Targets: treasures[treasureOffset : treasureOffset+targetPerPlayer],
 		Score:   0,
 	})
+	treasureOffset += targetPerPlayer
 
 	if playerCount >= 2 {
 		board.Players = append(board.Players, &Player{
 			Color:   ColorGreen,
 			Line:    size - 1,
 			Row:     size - 1,
-			Targets: treasures,
+			Targets: treasures[treasureOffset : treasureOffset+targetPerPlayer],
 			Score:   0,
 		})
+		treasureOffset += targetPerPlayer
 	}
 
 	if playerCount >= 3 {
@@ -351,9 +358,10 @@ func NewBoard(size, playerCount int) (*Board, error) {
 			Color:   ColorRed,
 			Line:    0,
 			Row:     size - 1,
-			Targets: treasures,
+			Targets: treasures[treasureOffset : treasureOffset+targetPerPlayer],
 			Score:   0,
 		})
+		treasureOffset += targetPerPlayer
 	}
 
 	if playerCount >= 4 {
@@ -361,7 +369,7 @@ func NewBoard(size, playerCount int) (*Board, error) {
 			Color:   ColorYellow,
 			Line:    size - 1,
 			Row:     0,
-			Targets: treasures,
+			Targets: treasures[treasureOffset : treasureOffset+targetPerPlayer],
 			Score:   0,
 		})
 	}
