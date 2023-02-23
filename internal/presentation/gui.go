@@ -225,12 +225,16 @@ func (g gameUi) drawBoardActions(tileCount, boardSize int) error {
 	return nil
 }
 
-func (g gameUi) drawRemainingTile(boardSize, boardOffset int) error {
+func (g gameUi) drawRemainingTile(leftOffset int) error {
+	var (
+		boardSize   = 7*TileOuterSize + TileBorderSize + 1
+		boardOffset = boardSize + TileOuterSize + 1
+	)
 
 	var (
-		topLeftX     = BoardMargin
-		topLeftY     = BoardMargin + boardOffset + 1
-		bottomRightX = topLeftX + boardSize
+		topLeftX     = leftOffset + BoardMargin + 1
+		topLeftY     = boardOffset - 3
+		bottomRightX = topLeftX + 27
 		bottomRightY = topLeftY + 8
 	)
 
@@ -243,7 +247,7 @@ func (g gameUi) drawRemainingTile(boardSize, boardOffset int) error {
 	{
 		var (
 			name         = "button-rotate-anticlockwise"
-			topLeftX     = topLeftX + 5
+			topLeftX     = topLeftX + 3
 			topLeftY     = topLeftY + 2
 			bottomRightX = topLeftX + TileOuterSize
 			bottomRightY = topLeftY + TileOuterSize
@@ -256,7 +260,7 @@ func (g gameUi) drawRemainingTile(boardSize, boardOffset int) error {
 
 	{
 		var (
-			topLeftX     = topLeftX + 13
+			topLeftX     = topLeftX + 11
 			topLeftY     = topLeftY + 2
 			bottomRightX = topLeftX + 4
 			bottomRightY = topLeftY + TileOuterSize
@@ -284,7 +288,7 @@ func (g gameUi) drawRemainingTile(boardSize, boardOffset int) error {
 	{
 		var (
 			name         = "button-rotate-clockwise"
-			topLeftX     = topLeftX + 21
+			topLeftX     = topLeftX + 19
 			topLeftY     = topLeftY + 2
 			bottomRightX = topLeftX + 4
 			bottomRightY = topLeftY + TileOuterSize
@@ -377,7 +381,7 @@ func (g gameUi) layout(gui *gocui.Gui) error {
 		return err
 	}
 
-	if err := g.drawRemainingTile(boardSize, boardOffset); err != nil {
+	if err := g.drawRemainingTile(boardOffset); err != nil {
 		return err
 	}
 

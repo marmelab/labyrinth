@@ -6,6 +6,8 @@ import (
 	"math"
 	"math/rand"
 	"time"
+
+	"github.com/RyanCarrier/dijkstra"
 )
 
 const (
@@ -291,8 +293,10 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 	return nil
 }
 
-// GetCurrentPlayer returns the current player.
 func (b Board) GetCurrentPlayer() *Player {
+	if len(b.RemainingPlayers) == 0 {
+		return b.Players[0]
+	}
 	return b.Players[b.RemainingPlayers[b.RemainingPlayerIndex]]
 }
 
@@ -346,12 +350,85 @@ func (b Board) getAccessibleTilesForCoordinate(coordinate *Coordinate) Coordinat
 // GetAccessibleTiles returns the tiles that are accessible by the current
 // player.
 func (b Board) GetAccessibleTiles() Coordinates {
-	return b.getAccessibleTilesForCoordinate(b.GetCurrentPlayer().Position)
+	accessibleTiles := b.getAccessibleTilesForCoordinate(b.GetCurrentPlayer().Position)
+
+	currentPlayer := b.GetCurrentPlayer()
+	if len(currentPlayer.Targets) == 0 {
+		return accessibleTiles
+	}
+
+	for _, coordinate := range accessibleTiles {
+		currentTile := b.Tiles[coordinate.Line][coordinate.Row]
+		if currentTile.Tile.Treasure == currentPlayer.Targets[0] {
+			return b.getShortestPath()
+		}
+	}
+
+	return accessibleTiles
 }
 
 // GetSize returns the board size in tiles.
 func (b Board) GetSize() int {
 	return len(b.Tiles)
+}
+
+// tileId returns  a unique identifier for the tile based on its line and row.
+func (b Board) tileId(line, row int) int {
+	return line*b.GetSize() + row
+}
+
+func (b Board) getShortestPath() Coordinates {
+	var (
+		currentPlayer = b.GetCurrentPlayer()
+
+		size  = b.GetSize()
+		graph = dijkstra.NewGraph()
+
+		// targetNode is the target node, defaults to remaining tile ID.
+		targetNode = size*size + 1
+
+		// reverseCoordinates holds the coordinates for a tile ID.
+		reverseCoordinates = make(map[int]*Coordinate)
+	)
+
+	graph.AddVertex(targetNode)
+	for line := 0; line < size; line++ {
+		for row := 0; row < size; row++ {
+
+			currentTile := b.tileId(line, row)
+			graph.AddVertex(currentTile)
+
+			reverseCoordinates[currentTile] = &Coordinate{
+				Line: line,
+				Row:  row,
+			}
+			if b.Tiles[line][row].Tile.Treasure == currentPlayer.Targets[0] {
+				targetNode = currentTile
+			}
+
+			neighbors := b.getAccessibleNeighbors(line, row)
+			for _, neighbor := range neighbors {
+				graph.AddArc(currentTile, b.tileId(neighbor.Line, neighbor.Row), 1)
+			}
+		}
+	}
+
+	var (
+		sourceNode = b.tileId(currentPlayer.Position.Line, currentPlayer.Position.Row)
+		best, err  = graph.Shortest(sourceNode, targetNode)
+	)
+
+	// No path was found.
+	if err != nil {
+		return nil
+	}
+
+	path := make(Coordinates, 0, len(best.Path))
+	for _, vertex := range best.Path[1:] {
+		path = append(path, reverseCoordinates[vertex])
+	}
+
+	return path
 }
 
 // generateTiles generates tile list for the given board size.

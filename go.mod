@@ -3,6 +3,7 @@ module github.com/marmelab/labyrinth
 go 1.20
 
 require (
+	github.com/RyanCarrier/dijkstra v1.2.0
 	github.com/awesome-gocui/gocui v1.1.0
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
