@@ -7,13 +7,21 @@ To run this program, you will need `go` installed. You can download it from [htt
 You can run the program using either
 
 ```sh
-make SAVE_ID=<save-id> run
+# The following options are available :
+# - SAVE_ID=<save-id>       To set the save ID name.
+# - BOARD_SIZE=<size>       To set the board size.
+# - PLAYER_COUNT=<count>    To set the numbe rof players.
+make [options] run
 ```
 
 or
 
 ```sh
-go run labyrinth.go -s <save-id>
+# The following options are available :
+# - --save=<save-id>        To set the save ID name.
+# - --size=<size>           To set the board size.
+# - --players=<count>       To set the numbe rof players.
+go run labyrinth.go [options]
 ```
 
 Note: To start a new game, just pick a new save id

@@ -29,6 +29,36 @@ const (
 	GameStateEnd
 )
 
+var (
+	players = []*Player{
+		{
+			Color: ColorBlue,
+			Line:  0,
+			Row:   0,
+			Score: 0,
+		},
+		{
+			Color: ColorGreen,
+			Line:  -1,
+			Row:   -1,
+			Score: 0,
+		},
+		{
+			Color: ColorRed,
+			Line:  0,
+			Row:   -1,
+			Score: 0,
+		},
+		{
+			Color: ColorYellow,
+			Line:  -1,
+			Row:   0,
+			Score: 0,
+		},
+	}
+	remainingPlayers = []int{0, 1, 2, 3}
+)
+
 // Board represents the game board.
 type Board struct {
 
@@ -40,6 +70,13 @@ type Board struct {
 
 	// Players holds the players that are part of the game.
 	Players []*Player `json:"players"`
+
+	// RemainingPlayers holds the players that did not got all their targets yet.
+	RemainingPlayers []int `json:"remainingPlayers"`
+
+	// RemainingPlayerIndex is the index of the current player in the remaining
+	// players array.
+	RemainingPlayerIndex int `json:"currentPlayerIndex"`
 
 	// GameState is the current game state
 	State GameState `json:"gameState"`
@@ -199,6 +236,22 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 	}
 
 	if len(currentPlayer.Targets) == 0 {
+
+		// This removes the current player from the remaining player array
+		b.RemainingPlayers = append(
+			b.RemainingPlayers[:b.RemainingPlayerIndex],
+			b.RemainingPlayers[b.RemainingPlayerIndex+1:]...)
+
+		if b.RemainingPlayerIndex >= len(b.RemainingPlayers) {
+			b.RemainingPlayerIndex = 0
+		}
+	} else {
+		// We advance the remaining player index to the next player.
+		b.RemainingPlayerIndex = (b.RemainingPlayerIndex + 1) % len(b.RemainingPlayers)
+	}
+
+	// TODO: Do not force last player to end the game.
+	if len(b.RemainingPlayers) == 0 {
 		b.State = GameStateEnd
 	} else {
 		b.State = GameStatePlaceTile
@@ -208,7 +261,7 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 
 // CurrentPlayer returns the current player.
 func (b Board) CurrentPlayer() *Player {
-	return b.Players[0]
+	return b.Players[b.RemainingPlayers[b.RemainingPlayerIndex]]
 }
 
 // Size returns the board size in tiles.
@@ -302,13 +355,20 @@ func randomRotation() Rotation {
 }
 
 // NewBoard returns a board for the given size.
-// The size param MUST be an odd number.
-func NewBoard(size int) (*Board, error) {
-	if (size & 1) != 1 {
-		return nil, fmt.Errorf("size must be an odd number, got: %d", size)
+func NewBoard(size, playerCount int) (*Board, error) {
+	if size != 3 && size != 7 {
+		return nil, fmt.Errorf("the board size must be either 3 or 7, got: %d", size)
 	}
 
-	tiles, treasures := generateTiles(size)
+	if playerCount < 1 || playerCount > 4 {
+		return nil, fmt.Errorf("the number of players must be between 1 and 4 included, got: %d", playerCount)
+	}
+
+	var (
+		tiles, treasures = generateTiles(size)
+		treasureCount    = len(treasures)
+		targetPerPlayer  = treasureCount / playerCount
+	)
 
 	randomGenerator.Shuffle(len(tiles), func(i, j int) {
 		tiles[i], tiles[j] = tiles[j], tiles[i]
@@ -319,17 +379,25 @@ func NewBoard(size int) (*Board, error) {
 	})
 
 	board := &Board{
-		Tiles: make([][]*BoardTile, size),
-		Players: []*Player{
-			{
-				Color:   ColorBlue,
-				Line:    0,
-				Row:     0,
-				Targets: treasures,
-				Score:   0,
-			},
-		},
-		State: GameStatePlaceTile,
+		Tiles:                make([][]*BoardTile, size),
+		Players:              players[:playerCount],
+		RemainingPlayers:     remainingPlayers[:playerCount],
+		RemainingPlayerIndex: 0,
+		State:                GameStatePlaceTile,
+	}
+
+	for i, player := range board.Players {
+		treasureOffset := i * targetPerPlayer
+
+		if player.Line == -1 {
+			player.Line = size - 1
+		}
+
+		if player.Row == -1 {
+			player.Row = size - 1
+		}
+
+		player.Targets = treasures[treasureOffset : treasureOffset+targetPerPlayer]
 	}
 
 	// The tile index is required here to track placed tiles on the board.

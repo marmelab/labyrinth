@@ -115,6 +115,8 @@ func (g gameUi) drawTiles(tileCount int) error {
 				topLeftY     = BoardMargin + line*TileOuterSize + TileBorderSize
 				bottomRightX = topLeftX + TileSize + TileBorderSize
 				bottomRightY = topLeftY + TileSize + TileBorderSize
+
+				currentTile = g.board.Tiles[line][row]
 			)
 
 			tileView, err := g.gui.SetView(name, topLeftX, topLeftY, bottomRightX, bottomRightY, 1)
@@ -134,10 +136,17 @@ func (g gameUi) drawTiles(tileCount int) error {
 				return errors.Join(errors.New("failed to draw tile"), err)
 			}
 
-			currentPlayer := g.board.CurrentPlayer()
+			var (
+				currentPlayer = g.board.CurrentPlayer()
+				targets       = currentPlayer.Targets
+			)
+
 			if currentPlayer.Line == line && currentPlayer.Row == row {
 				tileView.BgColor = g.backgroundColor()
 				tileView.FgColor = g.foregroundColor()
+			} else if len(targets) > 0 && targets[0] == currentTile.Tile.Treasure {
+				tileView.BgColor = gocui.ColorCyan
+				tileView.FgColor = gocui.ColorBlack
 			} else if g.board.State == model.GameStateMovePawn {
 				tileView.BgColor = gocui.ColorMagenta
 				tileView.FgColor = gocui.ColorWhite
@@ -375,6 +384,5 @@ func (g gameUi) layout(gui *gocui.Gui) error {
 	if err := g.drawScores(boardOffset); err != nil {
 		return err
 	}
-
 	return nil
 }
