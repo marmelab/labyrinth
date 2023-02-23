@@ -21,8 +21,8 @@ type Player struct {
 	// Row is the current player row.
 	Row int `json:"row"`
 
-	// Player hand
-	Targets []Treasure `json:"hand"`
+	// Player targets
+	Targets []Treasure `json:"targets"`
 
 	// Player score
 	Score int `json:"score"`

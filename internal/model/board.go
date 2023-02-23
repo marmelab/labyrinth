@@ -41,6 +41,13 @@ type Board struct {
 	// Players holds the players that are part of the game.
 	Players []*Player `json:"players"`
 
+	// RemainingPlayers holds the players that did not got all their targets yet.
+	RemainingPlayers []int `json:"remainingPlayers"`
+
+	// RemainingPlayerIndex is the index of the current player in the remaining
+	// players array.
+	RemainingPlayerIndex int `json:"currentPlayerIndex"`
+
 	// GameState is the current game state
 	State GameState `json:"gameState"`
 }
@@ -199,6 +206,20 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 	}
 
 	if len(currentPlayer.Targets) == 0 {
+		// This removes the current player from the remaining player array
+		b.RemainingPlayers = append(
+			b.RemainingPlayers[:b.RemainingPlayerIndex],
+			b.RemainingPlayers[b.RemainingPlayerIndex+1:]...)
+
+		if b.RemainingPlayerIndex >= len(b.RemainingPlayers) {
+			b.RemainingPlayerIndex = 0
+		}
+	} else {
+		// We advance the remaining player index to the next player.
+		b.RemainingPlayerIndex = (b.RemainingPlayerIndex + 1) % len(b.RemainingPlayers)
+	}
+
+	if len(b.RemainingPlayers) <= 1 {
 		b.State = GameStateEnd
 	} else {
 		b.State = GameStatePlaceTile
@@ -208,7 +229,7 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 
 // CurrentPlayer returns the current player.
 func (b Board) CurrentPlayer() *Player {
-	return b.Players[0]
+	return b.Players[b.RemainingPlayers[b.RemainingPlayerIndex]]
 }
 
 // Size returns the board size in tiles.
@@ -328,9 +349,11 @@ func NewBoard(size, playerCount int) (*Board, error) {
 	})
 
 	board := &Board{
-		Tiles:   make([][]*BoardTile, size),
-		Players: make([]*Player, 0, playerCount),
-		State:   GameStatePlaceTile,
+		Tiles:                make([][]*BoardTile, size),
+		Players:              make([]*Player, 0, playerCount),
+		RemainingPlayers:     make([]int, 0, playerCount),
+		RemainingPlayerIndex: 0,
+		State:                GameStatePlaceTile,
 	}
 
 	board.Players = append(board.Players, &Player{
@@ -340,6 +363,7 @@ func NewBoard(size, playerCount int) (*Board, error) {
 		Targets: treasures[treasureOffset : treasureOffset+targetPerPlayer],
 		Score:   0,
 	})
+	board.RemainingPlayers = append(board.RemainingPlayers, 0)
 	treasureOffset += targetPerPlayer
 
 	if playerCount >= 2 {
@@ -350,6 +374,7 @@ func NewBoard(size, playerCount int) (*Board, error) {
 			Targets: treasures[treasureOffset : treasureOffset+targetPerPlayer],
 			Score:   0,
 		})
+		board.RemainingPlayers = append(board.RemainingPlayers, 1)
 		treasureOffset += targetPerPlayer
 	}
 
@@ -361,6 +386,7 @@ func NewBoard(size, playerCount int) (*Board, error) {
 			Targets: treasures[treasureOffset : treasureOffset+targetPerPlayer],
 			Score:   0,
 		})
+		board.RemainingPlayers = append(board.RemainingPlayers, 2)
 		treasureOffset += targetPerPlayer
 	}
 
@@ -372,6 +398,7 @@ func NewBoard(size, playerCount int) (*Board, error) {
 			Targets: treasures[treasureOffset : treasureOffset+targetPerPlayer],
 			Score:   0,
 		})
+		board.RemainingPlayers = append(board.RemainingPlayers, 3)
 	}
 
 	// The tile index is required here to track placed tiles on the board.
