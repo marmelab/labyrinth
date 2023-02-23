@@ -307,7 +307,7 @@ func (g gameUi) drawCurrentPlayer(boardOffset int) error {
 Current player: %10s
 
 Target: %18s
-`, currentPlayer.Name(), string(currentPlayer.Hand[0]))
+`, currentPlayer.Name(), string(currentPlayer.Targets[0]))
 
 	return nil
 }

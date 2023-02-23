@@ -22,7 +22,7 @@ type Player struct {
 	Row int `json:"row"`
 
 	// Player hand
-	Hand []Treasure `json:"hand"`
+	Targets []Treasure `json:"hand"`
 
 	// Player score
 	Score int `json:"score"`

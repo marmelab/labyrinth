@@ -191,8 +191,8 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 	currentPlayer.Row = row
 
 	currentTile := b.Tiles[line][row]
-	if currentTile.Tile.Treasure == currentPlayer.Hand[0] {
-		currentPlayer.Hand = currentPlayer.Hand[1:]
+	if currentTile.Tile.Treasure == currentPlayer.Targets[0] {
+		currentPlayer.Targets = currentPlayer.Targets[1:]
 		currentPlayer.Score = currentPlayer.Score + 1
 		currentTile.Tile.Treasure = NoTreasure
 	}
@@ -317,11 +317,11 @@ func NewBoard(size int) (*Board, error) {
 		Tiles: make([][]*BoardTile, size),
 		Players: []*Player{
 			{
-				Color: ColorBlue,
-				Line:  0,
-				Row:   0,
-				Hand:  treasures,
-				Score: 0,
+				Color:   ColorBlue,
+				Line:    0,
+				Row:     0,
+				Targets: treasures,
+				Score:   0,
 			},
 		},
 		State: GameStatePlaceTile,

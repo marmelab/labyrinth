@@ -87,7 +87,7 @@ func NewTestBoard() *Board {
 				Color: ColorBlue,
 				Line:  1,
 				Row:   1,
-				Hand: []Treasure{
+				Targets: []Treasure{
 					'B',
 					'E',
 					'C',
@@ -562,7 +562,7 @@ func TestBoard(t *testing.T) {
 
 			err := board.MoveCurrentPlayerTo(0, 0)
 			assert.Nil(t, err)
-			assert.Equal(t, Treasure('B'), board.Players[0].Hand[0])
+			assert.Equal(t, Treasure('B'), board.Players[0].Targets[0])
 		})
 
 		t.Run("Should pop treasure from hand if on target treasure", func(t *testing.T) {
@@ -571,7 +571,7 @@ func TestBoard(t *testing.T) {
 
 			err := board.MoveCurrentPlayerTo(0, 1)
 			assert.Nil(t, err)
-			assert.Equal(t, Treasure('E'), board.Players[0].Hand[0])
+			assert.Equal(t, Treasure('E'), board.Players[0].Targets[0])
 		})
 
 		t.Run("Should not remove treasure from tile if not on target treasure", func(t *testing.T) {
