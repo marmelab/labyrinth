@@ -29,6 +29,36 @@ const (
 	GameStateEnd
 )
 
+var (
+	players = []*Player{
+		{
+			Color: ColorBlue,
+			Line:  0,
+			Row:   0,
+			Score: 0,
+		},
+		{
+			Color: ColorGreen,
+			Line:  -1,
+			Row:   -1,
+			Score: 0,
+		},
+		{
+			Color: ColorRed,
+			Line:  0,
+			Row:   -1,
+			Score: 0,
+		},
+		{
+			Color: ColorYellow,
+			Line:  -1,
+			Row:   0,
+			Score: 0,
+		},
+	}
+	remainingPlayers = []int{0, 1, 2, 3}
+)
+
 // Board represents the game board.
 type Board struct {
 
@@ -325,8 +355,6 @@ func randomRotation() Rotation {
 }
 
 // NewBoard returns a board for the given size.
-// The size param MUST be either 3 or 7.
-// The player count must be between 1 and 4 included.
 func NewBoard(size, playerCount int) (*Board, error) {
 	if size != 3 && size != 7 {
 		return nil, fmt.Errorf("the board size must be either 3 or 7, got: %d", size)
@@ -340,7 +368,6 @@ func NewBoard(size, playerCount int) (*Board, error) {
 		tiles, treasures = generateTiles(size)
 		treasureCount    = len(treasures)
 		targetPerPlayer  = treasureCount / playerCount
-		treasureOffset   = 0
 	)
 
 	randomGenerator.Shuffle(len(tiles), func(i, j int) {
@@ -353,55 +380,24 @@ func NewBoard(size, playerCount int) (*Board, error) {
 
 	board := &Board{
 		Tiles:                make([][]*BoardTile, size),
-		Players:              make([]*Player, 0, playerCount),
-		RemainingPlayers:     make([]int, 0, playerCount),
+		Players:              players[:playerCount],
+		RemainingPlayers:     remainingPlayers[:playerCount],
 		RemainingPlayerIndex: 0,
 		State:                GameStatePlaceTile,
 	}
 
-	board.Players = append(board.Players, &Player{
-		Color:   ColorBlue,
-		Line:    0,
-		Row:     0,
-		Targets: treasures[treasureOffset : treasureOffset+targetPerPlayer],
-		Score:   0,
-	})
-	board.RemainingPlayers = append(board.RemainingPlayers, 0)
-	treasureOffset += targetPerPlayer
+	for i, player := range board.Players {
+		treasureOffset := i * targetPerPlayer
 
-	if playerCount >= 2 {
-		board.Players = append(board.Players, &Player{
-			Color:   ColorGreen,
-			Line:    size - 1,
-			Row:     size - 1,
-			Targets: treasures[treasureOffset : treasureOffset+targetPerPlayer],
-			Score:   0,
-		})
-		board.RemainingPlayers = append(board.RemainingPlayers, 1)
-		treasureOffset += targetPerPlayer
-	}
+		if player.Line == -1 {
+			player.Line = size - 1
+		}
 
-	if playerCount >= 3 {
-		board.Players = append(board.Players, &Player{
-			Color:   ColorRed,
-			Line:    0,
-			Row:     size - 1,
-			Targets: treasures[treasureOffset : treasureOffset+targetPerPlayer],
-			Score:   0,
-		})
-		board.RemainingPlayers = append(board.RemainingPlayers, 2)
-		treasureOffset += targetPerPlayer
-	}
+		if player.Row == -1 {
+			player.Row = size - 1
+		}
 
-	if playerCount >= 4 {
-		board.Players = append(board.Players, &Player{
-			Color:   ColorYellow,
-			Line:    size - 1,
-			Row:     0,
-			Targets: treasures[treasureOffset : treasureOffset+targetPerPlayer],
-			Score:   0,
-		})
-		board.RemainingPlayers = append(board.RemainingPlayers, 3)
+		player.Targets = treasures[treasureOffset : treasureOffset+targetPerPlayer]
 	}
 
 	// The tile index is required here to track placed tiles on the board.
