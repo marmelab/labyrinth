@@ -33,31 +33,59 @@ var (
 	players = []*Player{
 		{
 			Color: ColorBlue,
-			Line:  0,
-			Row:   0,
+			Position: &Coordinate{
+				Line: 0,
+				Row:  0,
+			},
 			Score: 0,
 		},
 		{
 			Color: ColorGreen,
-			Line:  -1,
-			Row:   -1,
+			Position: &Coordinate{
+				Line: -1,
+				Row:  -1,
+			},
 			Score: 0,
 		},
 		{
 			Color: ColorRed,
-			Line:  0,
-			Row:   -1,
+			Position: &Coordinate{
+				Line: 0,
+				Row:  -1,
+			},
 			Score: 0,
 		},
 		{
 			Color: ColorYellow,
-			Line:  -1,
-			Row:   0,
+			Position: &Coordinate{
+				Line: -1,
+				Row:  0,
+			},
 			Score: 0,
 		},
 	}
 	remainingPlayers = []int{0, 1, 2, 3}
 )
+
+// Coordinate is a coordinate on the board.
+type Coordinate struct {
+	Line int `json:"line"`
+	Row  int `json:"row"`
+}
+
+// Coordinates is set of cordinates.
+type Coordinates []*Coordinate
+
+// Contans returns whether the given Coordinate is present in the coordinate
+// array.
+func (c Coordinates) Contains(target *Coordinate) bool {
+	for _, coordinate := range c {
+		if coordinate.Line == target.Line && coordinate.Row == target.Row {
+			return true
+		}
+	}
+	return false
+}
 
 // Board represents the game board.
 type Board struct {
@@ -100,14 +128,14 @@ func (b *Board) InsertTileTopAt(row int) error {
 	}
 
 	var current = b.RemainingTile
-	for line := 0; line < b.Size(); line++ {
+	for line := 0; line < b.GetSize(); line++ {
 		b.Tiles[line][row], current = current, b.Tiles[line][row]
 
 	}
 
 	for _, player := range b.Players {
-		if player.Row == row {
-			player.Line = (player.Line + 1) % b.Size()
+		if player.Position.Row == row {
+			player.Position.Line = (player.Position.Line + 1) % b.GetSize()
 		}
 	}
 
@@ -122,15 +150,15 @@ func (b *Board) InsertTileRightAt(line int) error {
 	}
 
 	var current = b.RemainingTile
-	for row := b.Size() - 1; row >= 0; row-- {
+	for row := b.GetSize() - 1; row >= 0; row-- {
 		b.Tiles[line][row], current = current, b.Tiles[line][row]
 	}
 
 	for _, player := range b.Players {
-		if player.Line == line {
-			player.Row = player.Row - 1
-			if player.Row < 0 {
-				player.Row = b.Size() - 1
+		if player.Position.Line == line {
+			player.Position.Row = player.Position.Row - 1
+			if player.Position.Row < 0 {
+				player.Position.Row = b.GetSize() - 1
 			}
 		}
 	}
@@ -146,15 +174,15 @@ func (b *Board) InsertTileBottomAt(row int) error {
 	}
 
 	var current = b.RemainingTile
-	for line := b.Size() - 1; line >= 0; line-- {
+	for line := b.GetSize() - 1; line >= 0; line-- {
 		b.Tiles[line][row], current = current, b.Tiles[line][row]
 	}
 
 	for _, player := range b.Players {
-		if player.Row == row {
-			player.Line = player.Line - 1
-			if player.Line < 0 {
-				player.Line = b.Size() - 1
+		if player.Position.Row == row {
+			player.Position.Line = player.Position.Line - 1
+			if player.Position.Line < 0 {
+				player.Position.Line = b.GetSize() - 1
 			}
 		}
 	}
@@ -170,13 +198,13 @@ func (b *Board) InsertTileLeftAt(line int) error {
 	}
 
 	var current = b.RemainingTile
-	for row := 0; row < b.Size(); row++ {
+	for row := 0; row < b.GetSize(); row++ {
 		b.Tiles[line][row], current = current, b.Tiles[line][row]
 	}
 
 	for _, player := range b.Players {
-		if player.Line == line {
-			player.Row = (player.Row + 1) % b.Size()
+		if player.Position.Line == line {
+			player.Position.Row = (player.Position.Row + 1) % b.GetSize()
 		}
 	}
 
@@ -216,17 +244,21 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 		return ErrInvalidAction
 	}
 
-	if line >= b.Size() {
+	if line >= b.GetSize() {
 		return ErrInvalidAction
 	}
 
-	if row >= b.Size() {
+	if row >= b.GetSize() {
 		return ErrInvalidAction
 	}
 
-	currentPlayer := b.CurrentPlayer()
-	currentPlayer.Line = line
-	currentPlayer.Row = row
+	if !b.GetAccessibleTiles().Contains(&Coordinate{line, row}) {
+		return ErrInvalidAction
+	}
+
+	currentPlayer := b.GetCurrentPlayer()
+	currentPlayer.Position.Line = line
+	currentPlayer.Position.Row = row
 
 	currentTile := b.Tiles[line][row]
 	if currentTile.Tile.Treasure == currentPlayer.Targets[0] {
@@ -259,38 +291,68 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 	return nil
 }
 
-// CurrentPlayer returns the current player.
-func (b Board) CurrentPlayer() *Player {
+// GetCurrentPlayer returns the current player.
+func (b Board) GetCurrentPlayer() *Player {
 	return b.Players[b.RemainingPlayers[b.RemainingPlayerIndex]]
 }
 
-// Size returns the board size in tiles.
-func (b Board) Size() int {
+// getAccessibleNeighbors returns the tile neighbors that can be accessed.
+func (b Board) getAccessibleNeighbors(line, row int) Coordinates {
+	var (
+		coordinates = make(Coordinates, 0, 4)
+		lastIndex   = b.GetSize() - 1
+		exits       = b.Tiles[line][row].GetExits()
+	)
+
+	for _, exit := range exits {
+		exitTarget := exit.ExitCoordinate(line, row)
+
+		if exitTarget.Line < 0 || exitTarget.Line > lastIndex || exitTarget.Row < 0 || exitTarget.Row > lastIndex {
+			continue
+		}
+
+		targetTile := b.Tiles[exitTarget.Line][exitTarget.Row]
+		if !targetTile.GetExits().Contains(exit.Opposite()) {
+			continue
+		}
+
+		coordinates = append(coordinates, exitTarget)
+	}
+
+	return coordinates
+}
+
+// getAccessibleTilesForCoordinate returns the available tiles from the given coordinates.
+func (b Board) getAccessibleTilesForCoordinate(coordinate *Coordinate) Coordinates {
+	var (
+		results = make(Coordinates, 0)
+		queue   = append(make(Coordinates, 0), coordinate)
+	)
+
+	for len(queue) > 0 {
+		currentTile := queue[0]
+		queue = queue[1:]
+		if results.Contains(currentTile) {
+			continue
+		}
+
+		results = append(results, currentTile)
+		queue = append(queue, b.getAccessibleNeighbors(currentTile.Line, currentTile.Row)...)
+	}
+
+	return results
+}
+
+// GetAccessibleTiles returns the tiles that are accessible by the current
+// player.
+func (b Board) GetAccessibleTiles() Coordinates {
+	return b.getAccessibleTilesForCoordinate(b.GetCurrentPlayer().Position)
+}
+
+// GetSize returns the board size in tiles.
+func (b Board) GetSize() int {
 	return len(b.Tiles)
 }
-
-// BoardTile represents a tile that is placed on a board with a given rotation.
-type BoardTile struct {
-
-	// Tile is the underlying tile.
-	Tile *Tile `json:"tile"`
-
-	// Rotation is the tile rotation.
-	Rotation Rotation `json:"rotation"`
-}
-
-// Rotation represents a tile rotation on a board.
-type Rotation int
-
-const (
-	Rotation0 Rotation = 0
-
-	Rotation90 Rotation = 90
-
-	Rotation180 Rotation = 180
-
-	Rotation270 Rotation = 270
-)
 
 // generateTiles generates tile list for the given board size.
 // It will only generate size*size - 3 cards, since the tiles on each corner is
@@ -389,12 +451,12 @@ func NewBoard(size, playerCount int) (*Board, error) {
 	for i, player := range board.Players {
 		treasureOffset := i * targetPerPlayer
 
-		if player.Line == -1 {
-			player.Line = size - 1
+		if player.Position.Line == -1 {
+			player.Position.Line = size - 1
 		}
 
-		if player.Row == -1 {
-			player.Row = size - 1
+		if player.Position.Row == -1 {
+			player.Position.Row = size - 1
 		}
 
 		player.Targets = treasures[treasureOffset : treasureOffset+targetPerPlayer]

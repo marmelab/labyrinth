@@ -15,11 +15,8 @@ type Player struct {
 	// Color is the player color
 	Color Color `json:"color"`
 
-	// Line is the player current line.
-	Line int `json:"line"`
-
-	// Row is the current player row.
-	Row int `json:"row"`
+	// position is the player current position
+	Position *Coordinate `json:"position"`
 
 	// Player targets
 	Targets []Treasure `json:"targets"`

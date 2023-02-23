@@ -258,10 +258,10 @@ func TestBoardDrawer(t *testing.T) {
 						Rotation: model.Rotation90,
 					}, {
 						Tile: &model.Tile{
-							Shape:    model.ShapeV,
+							Shape:    model.ShapeT,
 							Treasure: 'C',
 						},
-						Rotation: model.Rotation90,
+						Rotation: model.Rotation270,
 					}, {
 						Tile: &model.Tile{
 							Shape:    model.ShapeI,
@@ -280,10 +280,10 @@ func TestBoardDrawer(t *testing.T) {
 						Rotation: model.Rotation90,
 					}, {
 						Tile: &model.Tile{
-							Shape:    model.ShapeV,
+							Shape:    model.ShapeT,
 							Treasure: 'D',
 						},
-						Rotation: model.Rotation90,
+						Rotation: model.Rotation0,
 					}, {
 						Tile: &model.Tile{
 							Shape:    model.ShapeI,
@@ -301,10 +301,10 @@ func TestBoardDrawer(t *testing.T) {
 ───│ ┌┐ ┌
 │ │┘ │───
 │·│ C│ · 
-│ │──┘───
-│ │┘ │───
-│·│ D│ · 
-│ │──┘───
+│ │┐ │───
+│ │┘ └───
+│·│ D  · 
+│ │──────
 `[1:], writer.String())
 	})
 }

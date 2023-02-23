@@ -18,7 +18,7 @@ type gameUi struct {
 }
 
 func (g gameUi) backgroundColor() gocui.Attribute {
-	switch g.board.CurrentPlayer().Color {
+	switch g.board.GetCurrentPlayer().Color {
 	case model.ColorBlue:
 		return gocui.ColorBlue
 	case model.ColorGreen:
@@ -31,7 +31,7 @@ func (g gameUi) backgroundColor() gocui.Attribute {
 }
 
 func (g gameUi) foregroundColor() gocui.Attribute {
-	switch g.board.CurrentPlayer().Color {
+	switch g.board.GetCurrentPlayer().Color {
 	case model.ColorBlue, model.ColorGreen, model.ColorRed:
 		return gocui.ColorWhite
 	default:
@@ -107,6 +107,8 @@ func (g gameUi) drawBoard(tileCount, boardSize int) error {
 }
 
 func (g gameUi) drawTiles(tileCount int) error {
+	accessibleTiles := g.board.GetAccessibleTiles()
+
 	for line := 0; line < tileCount; line++ {
 		for row := 0; row < tileCount; row++ {
 			var (
@@ -137,17 +139,19 @@ func (g gameUi) drawTiles(tileCount int) error {
 			}
 
 			var (
-				currentPlayer = g.board.CurrentPlayer()
+				currentPlayer = g.board.GetCurrentPlayer()
 				targets       = currentPlayer.Targets
 			)
 
-			if currentPlayer.Line == line && currentPlayer.Row == row {
+			if currentPlayer.Position.Line == line && currentPlayer.Position.Row == row {
 				tileView.BgColor = g.backgroundColor()
 				tileView.FgColor = g.foregroundColor()
 			} else if len(targets) > 0 && targets[0] == currentTile.Tile.Treasure {
 				tileView.BgColor = gocui.ColorCyan
 				tileView.FgColor = gocui.ColorBlack
-			} else if g.board.State == model.GameStateMovePawn {
+			} else if g.board.State == model.GameStateMovePawn &&
+				accessibleTiles.Contains(&model.Coordinate{Line: line, Row: row}) {
+
 				tileView.BgColor = gocui.ColorMagenta
 				tileView.FgColor = gocui.ColorWhite
 			} else {
@@ -320,7 +324,7 @@ func (g gameUi) drawCurrentPlayer(boardOffset int) error {
 		return nil
 	}
 
-	currentPlayer := g.board.CurrentPlayer()
+	currentPlayer := g.board.GetCurrentPlayer()
 	fmt.Fprintf(currentPlayerBox, `
 Current player: %10s
 
@@ -360,7 +364,7 @@ Scores:
 
 func (g gameUi) layout(gui *gocui.Gui) error {
 	var (
-		tileCount   = g.board.Size()
+		tileCount   = g.board.GetSize()
 		boardSize   = tileCount*TileOuterSize + TileBorderSize + 1
 		boardOffset = boardSize + TileOuterSize + 1
 	)
