@@ -9,10 +9,9 @@ import (
 )
 
 const (
-	IShapedPercentage                = 0.26
-	TShapedPercentage                = 0.36
-	VShapedWithoutTreasurePercentage = 0.20
-	VShapedWithTreasurePercentage    = 0.18
+	IShapedPercentage             = 0.26
+	TShapedPercentage             = 0.36
+	VShapedWithTreasurePercentage = 0.11
 )
 
 var (
@@ -190,6 +189,14 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 	currentPlayer := b.CurrentPlayer()
 	currentPlayer.Line = line
 	currentPlayer.Row = row
+
+	currentTile := b.Tiles[line][row]
+	if currentTile.Tile.Treasure == currentPlayer.Targets[0] {
+		currentPlayer.Targets = currentPlayer.Targets[1:]
+		currentPlayer.Score = currentPlayer.Score + 1
+		currentTile.Tile.Treasure = NoTreasure
+	}
+
 	b.State = GameStatePlaceTile
 	return nil
 }
@@ -227,47 +234,53 @@ const (
 	Rotation270 Rotation = 270
 )
 
-// generate tiles generates tile list for the given board size.
+// generateTiles generates tile list for the given board size.
 // It will only generate size*size - 3 cards, since the tiles on each corner is
 // predefined (fixed V-shaped).
-func generateTiles(size int) (tiles []*Tile, treasureCount int) {
+func generateTiles(size int) (tiles []*Tile, treasures []Treasure) {
 	var (
 		tileCount = size*size + 1
 
 		// We need to generate 4 less tiles as the corners are V tiles
-		generatedTiles           = tileCount - 4
-		tShapedThreshold         = int(math.Round(TShapedPercentage * float64(tileCount)))
-		vShapedWithTreasureCount = tShapedThreshold + int(math.Round(VShapedWithTreasurePercentage*float64(tileCount)))
-		iShapedThreshold         = vShapedWithTreasureCount + int(math.Round(IShapedPercentage*float64(tileCount)))
+		generatedTiles               = tileCount - 4
+		tShapedThreshold             = int(math.Round(TShapedPercentage * float64(tileCount)))
+		vShapedWithTreasureThreshold = tShapedThreshold + int(math.Round(VShapedWithTreasurePercentage*float64(tileCount)))
+		iShapedThreshold             = vShapedWithTreasureThreshold + int(math.Round(IShapedPercentage*float64(tileCount)))
 	)
 
 	tiles = make([]*Tile, 0, generatedTiles)
+	treasures = make([]Treasure, 0, vShapedWithTreasureThreshold)
 
-	for i := 0; i < generatedTiles; i++ {
-		if i < tShapedThreshold {
+	var (
+		appendTileWithTreasure = func(shape Shape, i int) {
+			treasure := 'A' + Treasure(i)
 			tiles = append(tiles, &Tile{
-				Shape:    ShapeT,
-				Treasure: 'A' + Treasure(i),
+				Shape:    shape,
+				Treasure: treasure,
 			})
-		} else if i < vShapedWithTreasureCount {
+			treasures = append(treasures, treasure)
+		}
+		appendTileWithoutTreasure = func(shape Shape) {
 			tiles = append(tiles, &Tile{
-				Shape:    ShapeV,
-				Treasure: 'A' + Treasure(i),
-			})
-		} else if i < iShapedThreshold {
-			tiles = append(tiles, &Tile{
-				Shape:    ShapeI,
-				Treasure: NoTreasure,
-			})
-		} else {
-			tiles = append(tiles, &Tile{
-				Shape:    ShapeV,
+				Shape:    shape,
 				Treasure: NoTreasure,
 			})
 		}
+	)
+
+	for i := 0; i < generatedTiles; i++ {
+		if i < tShapedThreshold {
+			appendTileWithTreasure(ShapeT, i)
+		} else if i < vShapedWithTreasureThreshold {
+			appendTileWithTreasure(ShapeV, i)
+		} else if i < iShapedThreshold {
+			appendTileWithoutTreasure(ShapeI)
+		} else {
+			appendTileWithoutTreasure(ShapeV)
+		}
 	}
 
-	return tiles, vShapedWithTreasureCount
+	return tiles, treasures
 }
 
 func randomRotation() Rotation {
@@ -290,19 +303,25 @@ func NewBoard(size int) (*Board, error) {
 		return nil, fmt.Errorf("size must be an odd number, got: %d", size)
 	}
 
-	tiles, _ := generateTiles(size)
+	tiles, treasures := generateTiles(size)
 
 	randomGenerator.Shuffle(len(tiles), func(i, j int) {
 		tiles[i], tiles[j] = tiles[j], tiles[i]
+	})
+
+	randomGenerator.Shuffle(len(treasures), func(i, j int) {
+		treasures[i], treasures[j] = treasures[j], treasures[i]
 	})
 
 	board := &Board{
 		Tiles: make([][]*BoardTile, size),
 		Players: []*Player{
 			{
-				Color: ColorBlue,
-				Line:  0,
-				Row:   0,
+				Color:   ColorBlue,
+				Line:    0,
+				Row:     0,
+				Targets: treasures,
+				Score:   0,
 			},
 		},
 		State: GameStatePlaceTile,

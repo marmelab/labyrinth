@@ -285,6 +285,61 @@ func (g gameUi) drawRemainingTile(boardSize, boardOffset int) error {
 	return nil
 }
 
+func (g gameUi) drawCurrentPlayer(boardOffset int) error {
+
+	var (
+		topLeftX     = BoardMargin + boardOffset + 1
+		topLeftY     = BoardMargin
+		bottomRightX = topLeftX + 27
+		bottomRightY = topLeftY + 6
+	)
+
+	currentPlayerBox, err := g.gui.SetView("current-player-box", topLeftX, topLeftY, bottomRightX, bottomRightY, 0)
+	if err != nil {
+		if err != gocui.ErrUnknownView {
+			return errors.Join(errors.New("failed to initialize current player box"), err)
+		}
+	}
+
+	currentPlayerBox.Clear()
+	currentPlayer := g.board.CurrentPlayer()
+	fmt.Fprintf(currentPlayerBox, `
+Current player: %10s
+
+Target: %18s
+`, currentPlayer.Name(), string(currentPlayer.Targets[0]))
+
+	return nil
+}
+
+func (g gameUi) drawScores(boardOffset int) error {
+
+	var (
+		topLeftX     = BoardMargin + boardOffset + 1
+		topLeftY     = BoardMargin + 8
+		bottomRightX = topLeftX + 27
+		bottomRightY = topLeftY + 2*len(g.board.Players) + 4
+	)
+	scoreBox, err := g.gui.SetView("score-box", topLeftX, topLeftY, bottomRightX, bottomRightY, 0)
+	if err != nil {
+		if err != gocui.ErrUnknownView {
+			return errors.Join(errors.New("failed to initialize current player box"), err)
+		}
+	}
+
+	scoreBox.Clear()
+	fmt.Fprintf(scoreBox, `
+Scores:
+`)
+	for _, player := range g.board.Players {
+		fmt.Fprintf(scoreBox, `
+%-10s %15d
+`, player.Name(), player.Score)
+	}
+
+	return nil
+}
+
 func (g gameUi) layout(gui *gocui.Gui) error {
 	var (
 		tileCount   = g.board.Size()
@@ -301,6 +356,14 @@ func (g gameUi) layout(gui *gocui.Gui) error {
 	}
 
 	if err := g.drawRemainingTile(boardSize, boardOffset); err != nil {
+		return err
+	}
+
+	if err := g.drawCurrentPlayer(boardOffset); err != nil {
+		return err
+	}
+
+	if err := g.drawScores(boardOffset); err != nil {
 		return err
 	}
 
