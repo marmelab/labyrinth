@@ -33,26 +33,34 @@ var (
 	players = []*Player{
 		{
 			Color: ColorBlue,
-			Line:  0,
-			Row:   0,
+			Position: &Coordinate{
+				Line: 0,
+				Row:  0,
+			},
 			Score: 0,
 		},
 		{
 			Color: ColorGreen,
-			Line:  -1,
-			Row:   -1,
+			Position: &Coordinate{
+				Line: -1,
+				Row:  -1,
+			},
 			Score: 0,
 		},
 		{
 			Color: ColorRed,
-			Line:  0,
-			Row:   -1,
+			Position: &Coordinate{
+				Line: 0,
+				Row:  -1,
+			},
 			Score: 0,
 		},
 		{
 			Color: ColorYellow,
-			Line:  -1,
-			Row:   0,
+			Position: &Coordinate{
+				Line: -1,
+				Row:  0,
+			},
 			Score: 0,
 		},
 	}
@@ -68,6 +76,15 @@ const (
 	TileExitBottom
 	TileExitLeft
 )
+
+// Coordinate is a coordinate on the board.
+type Coordinate struct {
+	Line int `json:"line"`
+	Row  int `json:"row"`
+}
+
+// Coordinates is set of cordinates.
+type Coordinates []*Coordinate
 
 // Board represents the game board.
 type Board struct {
@@ -116,8 +133,8 @@ func (b *Board) InsertTileTopAt(row int) error {
 	}
 
 	for _, player := range b.Players {
-		if player.Row == row {
-			player.Line = (player.Line + 1) % b.Size()
+		if player.Position.Row == row {
+			player.Position.Line = (player.Position.Line + 1) % b.Size()
 		}
 	}
 
@@ -137,10 +154,10 @@ func (b *Board) InsertTileRightAt(line int) error {
 	}
 
 	for _, player := range b.Players {
-		if player.Line == line {
-			player.Row = player.Row - 1
-			if player.Row < 0 {
-				player.Row = b.Size() - 1
+		if player.Position.Line == line {
+			player.Position.Row = player.Position.Row - 1
+			if player.Position.Row < 0 {
+				player.Position.Row = b.Size() - 1
 			}
 		}
 	}
@@ -161,10 +178,10 @@ func (b *Board) InsertTileBottomAt(row int) error {
 	}
 
 	for _, player := range b.Players {
-		if player.Row == row {
-			player.Line = player.Line - 1
-			if player.Line < 0 {
-				player.Line = b.Size() - 1
+		if player.Position.Row == row {
+			player.Position.Line = player.Position.Line - 1
+			if player.Position.Line < 0 {
+				player.Position.Line = b.Size() - 1
 			}
 		}
 	}
@@ -185,8 +202,8 @@ func (b *Board) InsertTileLeftAt(line int) error {
 	}
 
 	for _, player := range b.Players {
-		if player.Line == line {
-			player.Row = (player.Row + 1) % b.Size()
+		if player.Position.Line == line {
+			player.Position.Row = (player.Position.Row + 1) % b.Size()
 		}
 	}
 
@@ -235,8 +252,8 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 	}
 
 	currentPlayer := b.CurrentPlayer()
-	currentPlayer.Line = line
-	currentPlayer.Row = row
+	currentPlayer.Position.Line = line
+	currentPlayer.Position.Row = row
 
 	currentTile := b.Tiles[line][row]
 	if currentTile.Tile.Treasure == currentPlayer.Targets[0] {
@@ -272,6 +289,57 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 // CurrentPlayer returns the current player.
 func (b Board) CurrentPlayer() *Player {
 	return b.Players[b.RemainingPlayers[b.RemainingPlayerIndex]]
+}
+
+// getAccessibleNeighbors returns the tile neighbors that can be accessed.
+func (b Board) getAccessibleNeighbors(line, row int) Coordinates {
+	var (
+		coordinates = make(Coordinates, 0, 4)
+		lastIndex   = b.Size() - 1
+		exits       = b.Tiles[line][row].Exits()
+	)
+
+	if line > 0 && (exits&TileExitTop) > 0 {
+		topTileExits := b.Tiles[line-1][row].Exits()
+		if (topTileExits & TileExitBottom) > 0 {
+			coordinates = append(coordinates, &Coordinate{
+				Line: line - 1,
+				Row:  row,
+			})
+		}
+	}
+
+	if row < lastIndex && (exits&TileExitRight) > 0 {
+		rightTileExits := b.Tiles[line][row+1].Exits()
+		if (rightTileExits & TileExitLeft) > 0 {
+			coordinates = append(coordinates, &Coordinate{
+				Line: line,
+				Row:  row + 1,
+			})
+		}
+	}
+
+	if line < lastIndex && (exits&TileExitBottom) > 0 {
+		bottomTileExits := b.Tiles[line+1][row].Exits()
+		if (bottomTileExits & TileExitTop) > 0 {
+			coordinates = append(coordinates, &Coordinate{
+				Line: line + 1,
+				Row:  row,
+			})
+		}
+	}
+
+	if row > 0 && (exits&TileExitLeft) > 0 {
+		leftTileExits := b.Tiles[line][row-1].Exits()
+		if (leftTileExits & TileExitRight) > 0 {
+			coordinates = append(coordinates, &Coordinate{
+				Line: line,
+				Row:  row - 1,
+			})
+		}
+	}
+
+	return coordinates
 }
 
 // Size returns the board size in tiles.
@@ -447,12 +515,12 @@ func NewBoard(size, playerCount int) (*Board, error) {
 	for i, player := range board.Players {
 		treasureOffset := i * targetPerPlayer
 
-		if player.Line == -1 {
-			player.Line = size - 1
+		if player.Position.Line == -1 {
+			player.Position.Line = size - 1
 		}
 
-		if player.Row == -1 {
-			player.Row = size - 1
+		if player.Position.Row == -1 {
+			player.Position.Row = size - 1
 		}
 
 		player.Targets = treasures[treasureOffset : treasureOffset+targetPerPlayer]

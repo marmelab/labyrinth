@@ -141,7 +141,7 @@ func (g gameUi) drawTiles(tileCount int) error {
 				targets       = currentPlayer.Targets
 			)
 
-			if currentPlayer.Line == line && currentPlayer.Row == row {
+			if currentPlayer.Position.Line == line && currentPlayer.Position.Row == row {
 				tileView.BgColor = g.backgroundColor()
 				tileView.FgColor = g.foregroundColor()
 			} else if len(targets) > 0 && targets[0] == currentTile.Tile.Treasure {

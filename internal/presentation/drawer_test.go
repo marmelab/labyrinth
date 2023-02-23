@@ -283,7 +283,7 @@ func TestBoardDrawer(t *testing.T) {
 							Shape:    model.ShapeV,
 							Treasure: 'D',
 						},
-						Rotation: model.Rotation90,
+						Rotation: model.Rotation180,
 					}, {
 						Tile: &model.Tile{
 							Shape:    model.ShapeI,
@@ -302,9 +302,9 @@ func TestBoardDrawer(t *testing.T) {
 │ │┘ │───
 │·│ C│ · 
 │ │──┘───
-│ │┘ │───
-│·│ D│ · 
-│ │──┘───
+│ ││ └───
+│·││D  · 
+│ │└─────
 `[1:], writer.String())
 	})
 }
