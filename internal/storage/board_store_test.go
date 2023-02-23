@@ -94,7 +94,7 @@ func TestFileBoardStore(t *testing.T) {
 			})
 
 			// Get
-			board, _, err := store.Get(testSaveId)
+			board, _, err := store.Get(testSaveId, 7, 1)
 			assert.Nil(t, err)
 			assert.Nil(t, store.Save(testSaveId, board))
 
@@ -115,7 +115,7 @@ func TestFileBoardStore(t *testing.T) {
 			)
 
 			// Save
-			board, _, err := store.Get(testSaveId)
+			board, _, err := store.Get(testSaveId, 7, 1)
 			assert.Nil(t, err)
 			assert.Nil(t, store.Save(testSaveId, board))
 

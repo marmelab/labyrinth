@@ -31,7 +31,11 @@ type BoardStore interface {
 	// Get board using its ID, or create a new one if save does not exist yet.
 	// This function also returns a save function that provide an  easy way to
 	// store the save without knowing the save ID.
-	Get(id string) (board *model.Board, saveBoard BoardSaveFn, err error)
+	//
+	// Note:
+	//   The board size and player count will be used to initialize the board if
+	//   the board is not stored yet.
+	Get(id string, boardSize, playerCount int) (board *model.Board, saveBoard BoardSaveFn, err error)
 }
 
 // fileBoardStore is a board store that uses a file store
@@ -72,7 +76,7 @@ func (s fileBoardStore) Save(id string, board *model.Board) error {
 	return nil
 }
 
-func (s fileBoardStore) Get(id string) (*model.Board, BoardSaveFn, error) {
+func (s fileBoardStore) Get(id string, boardSize, playerCount int) (*model.Board, BoardSaveFn, error) {
 	board, err := s.Load(id)
 	if err != nil {
 		if !os.IsNotExist(err) {
@@ -80,7 +84,7 @@ func (s fileBoardStore) Get(id string) (*model.Board, BoardSaveFn, error) {
 			return nil, nil, err
 		}
 
-		board, err = model.NewBoard(7)
+		board, err = model.NewBoard(7, 1)
 		if err != nil {
 			log.Printf("Failed to create board: %v", err)
 			return nil, nil, err

@@ -630,14 +630,48 @@ func TestBoard(t *testing.T) {
 
 func TestNewBoard(t *testing.T) {
 	t.Run("Should return an error if size is even.", func(t *testing.T) {
-		board, err := NewBoard(2)
+		board, err := NewBoard(2, 1)
 		assert.NotNil(t, err)
 		assert.Equal(t, "size must be an odd number, got: 2", err.Error())
 		assert.Nil(t, board)
 	})
 
+	t.Run("Should return an error if player count is not between 1 and 4.", func(t *testing.T) {
+		{
+			_, err := NewBoard(3, 0)
+			assert.NotNil(t, err)
+			assert.Equal(t, "the number of players must be between 1 and 4 included, got: 0", err.Error())
+		}
+
+		{
+			_, err := NewBoard(3, 1)
+			assert.Nil(t, err)
+		}
+
+		{
+			_, err := NewBoard(3, 2)
+			assert.Nil(t, err)
+		}
+
+		{
+			_, err := NewBoard(3, 3)
+			assert.Nil(t, err)
+		}
+
+		{
+			_, err := NewBoard(3, 4)
+			assert.Nil(t, err)
+		}
+
+		{
+			_, err := NewBoard(3, 5)
+			assert.NotNil(t, err)
+			assert.Equal(t, "the number of players must be between 1 and 4 included, got: 5", err.Error())
+		}
+	})
+
 	t.Run("Should return a board instance if size is odd", func(t *testing.T) {
-		board, err := NewBoard(3)
+		board, err := NewBoard(3, 1)
 		assert.Nil(t, err)
 		assert.NotNil(t, board)
 	})
@@ -645,7 +679,7 @@ func TestNewBoard(t *testing.T) {
 	t.Run("Should initialize tiles in board", func(t *testing.T) {
 		{
 			size := 3
-			board, _ := NewBoard(size)
+			board, _ := NewBoard(size, 1)
 			assert.Equal(t, size, len(board.Tiles))
 			for i := 0; i < size; i++ {
 				assert.Equal(t, size, len(board.Tiles[i]))
@@ -660,17 +694,65 @@ func TestNewBoard(t *testing.T) {
 
 	t.Run("Should initialize players", func(t *testing.T) {
 		{
-			board, _ := NewBoard(3)
+			board, _ := NewBoard(3, 1)
 			assert.Equal(t, 1, len(board.Players))
 			assert.Equal(t, ColorBlue, board.Players[0].Color)
 			assert.Equal(t, 0, board.Players[0].Line)
 			assert.Equal(t, 0, board.Players[0].Row)
 		}
+
+		{
+			board, _ := NewBoard(3, 2)
+			assert.Equal(t, 2, len(board.Players))
+			assert.Equal(t, ColorBlue, board.Players[0].Color)
+			assert.Equal(t, 0, board.Players[0].Line)
+			assert.Equal(t, 0, board.Players[0].Row)
+
+			assert.Equal(t, ColorGreen, board.Players[1].Color)
+			assert.Equal(t, 2, board.Players[1].Line)
+			assert.Equal(t, 2, board.Players[1].Row)
+		}
+
+		{
+			board, _ := NewBoard(3, 3)
+			assert.Equal(t, 3, len(board.Players))
+			assert.Equal(t, ColorBlue, board.Players[0].Color)
+			assert.Equal(t, 0, board.Players[0].Line)
+			assert.Equal(t, 0, board.Players[0].Row)
+
+			assert.Equal(t, ColorGreen, board.Players[1].Color)
+			assert.Equal(t, 2, board.Players[1].Line)
+			assert.Equal(t, 2, board.Players[1].Row)
+
+			assert.Equal(t, ColorRed, board.Players[2].Color)
+			assert.Equal(t, 0, board.Players[2].Line)
+			assert.Equal(t, 2, board.Players[2].Row)
+		}
+
+		{
+			board, _ := NewBoard(3, 4)
+			assert.Equal(t, 4, len(board.Players))
+			assert.Equal(t, ColorBlue, board.Players[0].Color)
+			assert.Equal(t, 0, board.Players[0].Line)
+			assert.Equal(t, 0, board.Players[0].Row)
+
+			assert.Equal(t, ColorGreen, board.Players[1].Color)
+			assert.Equal(t, 2, board.Players[1].Line)
+			assert.Equal(t, 2, board.Players[1].Row)
+
+			assert.Equal(t, ColorRed, board.Players[2].Color)
+			assert.Equal(t, 0, board.Players[2].Line)
+			assert.Equal(t, 2, board.Players[2].Row)
+
+			assert.Equal(t, ColorYellow, board.Players[3].Color)
+			assert.Equal(t, 2, board.Players[3].Line)
+			assert.Equal(t, 0, board.Players[3].Row)
+		}
 	})
 
 	t.Run("Should initialize remaining tile", func(t *testing.T) {
 		{
-			board, _ := NewBoard(3)
+			board, _ := NewBoard(3, 1)
 			assert.NotNil(t, board.RemainingTile)
 			assert.NotNil(t, board.RemainingTile.Tile)
 			assert.Equal(t, Rotation0, board.RemainingTile.Rotation)

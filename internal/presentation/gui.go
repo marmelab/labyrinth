@@ -138,13 +138,13 @@ func (g gameUi) drawTiles(tileCount int) error {
 
 			var (
 				currentPlayer = g.board.CurrentPlayer()
-				hand          = currentPlayer.Hand
+				targets       = currentPlayer.Targets
 			)
 
 			if currentPlayer.Line == line && currentPlayer.Row == row {
 				tileView.BgColor = g.backgroundColor()
 				tileView.FgColor = g.foregroundColor()
-			} else if len(hand) > 0 && hand[0] == currentTile.Tile.Treasure {
+			} else if len(targets) > 0 && targets[0] == currentTile.Tile.Treasure {
 				tileView.BgColor = gocui.ColorCyan
 				tileView.FgColor = gocui.ColorBlack
 			} else if g.board.State == model.GameStateMovePawn {

@@ -3,7 +3,7 @@ package model
 type Color int
 
 const (
-	ColorBlue Color = 1 << iota
+	ColorBlue Color = iota
 	ColorGreen
 	ColorRed
 	ColorYellow

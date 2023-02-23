@@ -13,6 +13,12 @@ import (
 var (
 	// LoadStateId holds the state to load from file
 	LoadStateId string
+
+	// BoardSize holds the board size param.
+	BoardSize int
+
+	// PlayerCount holds the player count param.
+	PlayerCount int
 )
 
 var (
@@ -26,7 +32,7 @@ func RunApplication(cmd *cobra.Command, args []string) {
 		log.Fatalf("Failed to initialize storage: %v.", err)
 	}
 
-	board, saveBoard, err := boardStore.Get(LoadStateId)
+	board, saveBoard, err := boardStore.Get(LoadStateId, BoardSize, PlayerCount)
 	if err != nil {
 		log.Fatalf("Failed to initialize board: %v.", err)
 	}
@@ -45,7 +51,15 @@ func main() {
 
 	command.
 		PersistentFlags().
-		StringVarP(&LoadStateId, "save", "s", "_default", "the save to load, it will be created if it does not exist yet.")
+		StringVarP(&LoadStateId, "save", "s", "_default", "The save to load, it will be created if it does not exist yet.")
+
+	command.
+		PersistentFlags().
+		IntVarP(&BoardSize, "size", "b", 7, "The board size when initialized, defaults to 7.")
+
+	command.
+		PersistentFlags().
+		IntVarP(&PlayerCount, "players", "p", 1, "The number of players, defaults to 1.")
 
 	if err := command.Execute(); err != nil {
 		log.Fatalf("Failed to execute command: %v.", err)

@@ -303,9 +303,13 @@ func randomRotation() Rotation {
 
 // NewBoard returns a board for the given size.
 // The size param MUST be an odd number.
-func NewBoard(size int) (*Board, error) {
+func NewBoard(size, playerCount int) (*Board, error) {
 	if (size & 1) != 1 {
 		return nil, fmt.Errorf("size must be an odd number, got: %d", size)
+	}
+
+	if playerCount < 1 || playerCount > 4 {
+		return nil, fmt.Errorf("the number of players must be between 1 and 4 included, got: %d", playerCount)
 	}
 
 	tiles, treasures := generateTiles(size)
@@ -319,17 +323,47 @@ func NewBoard(size int) (*Board, error) {
 	})
 
 	board := &Board{
-		Tiles: make([][]*BoardTile, size),
-		Players: []*Player{
-			{
-				Color:   ColorBlue,
-				Line:    0,
-				Row:     0,
-				Targets: treasures,
-				Score:   0,
-			},
-		},
-		State: GameStatePlaceTile,
+		Tiles:   make([][]*BoardTile, size),
+		Players: make([]*Player, 0, playerCount),
+		State:   GameStatePlaceTile,
+	}
+
+	board.Players = append(board.Players, &Player{
+		Color:   ColorBlue,
+		Line:    0,
+		Row:     0,
+		Targets: treasures,
+		Score:   0,
+	})
+
+	if playerCount >= 2 {
+		board.Players = append(board.Players, &Player{
+			Color:   ColorGreen,
+			Line:    size - 1,
+			Row:     size - 1,
+			Targets: treasures,
+			Score:   0,
+		})
+	}
+
+	if playerCount >= 3 {
+		board.Players = append(board.Players, &Player{
+			Color:   ColorRed,
+			Line:    0,
+			Row:     size - 1,
+			Targets: treasures,
+			Score:   0,
+		})
+	}
+
+	if playerCount >= 4 {
+		board.Players = append(board.Players, &Player{
+			Color:   ColorYellow,
+			Line:    size - 1,
+			Row:     0,
+			Targets: treasures,
+			Score:   0,
+		})
 	}
 
 	// The tile index is required here to track placed tiles on the board.
