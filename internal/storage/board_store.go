@@ -84,7 +84,7 @@ func (s fileBoardStore) Get(id string, boardSize, playerCount int) (*model.Board
 			return nil, nil, err
 		}
 
-		board, err = model.NewBoard(7, 1)
+		board, err = model.NewBoard(boardSize, playerCount)
 		if err != nil {
 			log.Printf("Failed to create board: %v", err)
 			return nil, nil, err
