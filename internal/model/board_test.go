@@ -635,6 +635,14 @@ func TestBoard(t *testing.T) {
 			assert.Equal(t, NoTreasure, board.Tiles[0][1].Tile.Treasure)
 		})
 
+		t.Run("Should only allow to go to target if shortest path is found", func(t *testing.T) {
+			board := NewTestBoard()
+			board.State = GameStateMovePawn
+
+			err := board.MoveCurrentPlayerTo(2, 1)
+			assert.Equal(t, ErrInvalidAction, err)
+		})
+
 		t.Run("Should set to game end if only one player remains", func(t *testing.T) {
 			board := NewTestBoard()
 			board.RemainingPlayers = []int{0}
@@ -785,13 +793,15 @@ func TestBoard(t *testing.T) {
 			board := NewTestBoard()
 			board.Players[0].Targets = []Treasure{'E'}
 
+			accessibleTiles, isShortestPath := board.GetAccessibleTiles()
 			assert.Equal(t, Coordinates{
 				{1, 1},
 				{0, 1},
 				{2, 1},
 				{0, 2},
 				{2, 2},
-			}, board.GetAccessibleTiles())
+			}, accessibleTiles)
+			assert.False(t, isShortestPath)
 		})
 	})
 
@@ -813,6 +823,7 @@ func TestBoard(t *testing.T) {
 
 			path := board.getShortestPath()
 			assert.Equal(t, Coordinates{
+				{2, 1},
 				{1, 1},
 				{0, 1},
 			}, path)

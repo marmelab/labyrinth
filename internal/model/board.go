@@ -254,7 +254,10 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 		return ErrInvalidAction
 	}
 
-	if !b.GetAccessibleTiles().Contains(&Coordinate{line, row}) {
+	accessibleTiles, isShortestPath := b.GetAccessibleTiles()
+	if targetTile := accessibleTiles[len(accessibleTiles)-1]; isShortestPath && (targetTile.Line != line || targetTile.Row != row) {
+		return ErrInvalidAction
+	} else if !accessibleTiles.Contains(&Coordinate{line, row}) {
 		return ErrInvalidAction
 	}
 
@@ -349,22 +352,22 @@ func (b Board) getAccessibleTilesForCoordinate(coordinate *Coordinate) Coordinat
 
 // GetAccessibleTiles returns the tiles that are accessible by the current
 // player.
-func (b Board) GetAccessibleTiles() Coordinates {
+func (b Board) GetAccessibleTiles() (tiles Coordinates, isShortestPath bool) {
 	accessibleTiles := b.getAccessibleTilesForCoordinate(b.GetCurrentPlayer().Position)
 
 	currentPlayer := b.GetCurrentPlayer()
 	if len(currentPlayer.Targets) == 0 {
-		return accessibleTiles
+		return accessibleTiles, false
 	}
 
 	for _, coordinate := range accessibleTiles {
 		currentTile := b.Tiles[coordinate.Line][coordinate.Row]
 		if currentTile.Tile.Treasure == currentPlayer.Targets[0] {
-			return b.getShortestPath()
+			return b.getShortestPath(), true
 		}
 	}
 
-	return accessibleTiles
+	return accessibleTiles, false
 }
 
 // GetSize returns the board size in tiles.
@@ -372,60 +375,81 @@ func (b Board) GetSize() int {
 	return len(b.Tiles)
 }
 
-// tileId returns  a unique identifier for the tile based on its line and row.
-func (b Board) tileId(line, row int) int {
+// vertextId returns  a unique identifier for the tile based on its line and row.
+func (b Board) vertextId(line, row int) int {
 	return line*b.GetSize() + row
 }
 
-func (b Board) getShortestPath() Coordinates {
+func (b Board) buildGraph() (graph *dijkstra.Graph, getCoordinatesByVertex func(id int) *Coordinate) {
+	graph = dijkstra.NewGraph()
+
 	var (
-		currentPlayer = b.GetCurrentPlayer()
-
-		size  = b.GetSize()
-		graph = dijkstra.NewGraph()
-
-		// targetNode is the target node, defaults to remaining tile ID.
-		targetNode = size*size + 1
-
-		// reverseCoordinates holds the coordinates for a tile ID.
-		reverseCoordinates = make(map[int]*Coordinate)
+		size                = b.GetSize()
+		coordinatesByVertex = make(map[int]*Coordinate)
 	)
 
-	graph.AddVertex(targetNode)
+	graph.AddVertex(size*size + 1)
 	for line := 0; line < size; line++ {
 		for row := 0; row < size; row++ {
 
-			currentTile := b.tileId(line, row)
-			graph.AddVertex(currentTile)
+			vertexId := b.vertextId(line, row)
+			graph.AddVertex(vertexId)
 
-			reverseCoordinates[currentTile] = &Coordinate{
+			coordinatesByVertex[vertexId] = &Coordinate{
 				Line: line,
 				Row:  row,
 			}
-			if b.Tiles[line][row].Tile.Treasure == currentPlayer.Targets[0] {
-				targetNode = currentTile
-			}
 
+		}
+	}
+
+	for line := 0; line < size; line++ {
+		for row := 0; row < size; row++ {
 			neighbors := b.getAccessibleNeighbors(line, row)
 			for _, neighbor := range neighbors {
-				graph.AddArc(currentTile, b.tileId(neighbor.Line, neighbor.Row), 1)
+				graph.AddArc(
+					b.vertextId(line, row),
+					b.vertextId(neighbor.Line, neighbor.Row),
+					1)
 			}
 		}
 	}
 
+	return graph, func(id int) *Coordinate {
+		return coordinatesByVertex[id]
+	}
+}
+
+func (b Board) getShortestPath() Coordinates {
 	var (
-		sourceNode = b.tileId(currentPlayer.Position.Line, currentPlayer.Position.Row)
-		best, err  = graph.Shortest(sourceNode, targetNode)
+		size          = b.GetSize()
+		currentPlayer = b.GetCurrentPlayer()
+
+		graph, getCoordinatesByVertex = b.buildGraph()
+
+		sourceVertex = b.vertextId(currentPlayer.Position.Line, currentPlayer.Position.Row)
+		// targetVertex is the target node, defaults to remaining tile ID.
+		targetVertex = size*size + 1
 	)
 
-	// No path was found.
-	if err != nil {
+	for line := 0; line < size; line++ {
+		for row := 0; row < size; row++ {
+			currentTile := b.vertextId(line, row)
+
+			if b.Tiles[line][row].Tile.Treasure == currentPlayer.Targets[0] {
+				targetVertex = currentTile
+			}
+		}
+	}
+
+	best, err := graph.Shortest(sourceVertex, targetVertex)
+	if err != nil { // No path was found.
 		return nil
 	}
 
 	path := make(Coordinates, 0, len(best.Path))
-	for _, vertex := range best.Path[1:] {
-		path = append(path, reverseCoordinates[vertex])
+	for _, vertex := range best.Path {
+		path = append(path, getCoordinatesByVertex(vertex))
 	}
 
 	return path
