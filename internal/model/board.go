@@ -6,6 +6,8 @@ import (
 	"math"
 	"math/rand"
 	"time"
+
+	"github.com/RyanCarrier/dijkstra"
 )
 
 const (
@@ -252,7 +254,10 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 		return ErrInvalidAction
 	}
 
-	if !b.GetAccessibleTiles().Contains(&Coordinate{line, row}) {
+	accessibleTiles, isShortestPath := b.GetAccessibleTiles()
+	if targetTile := accessibleTiles[len(accessibleTiles)-1]; isShortestPath && (targetTile.Line != line || targetTile.Row != row) {
+		return ErrInvalidAction
+	} else if !accessibleTiles.Contains(&Coordinate{line, row}) {
 		return ErrInvalidAction
 	}
 
@@ -291,8 +296,10 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 	return nil
 }
 
-// GetCurrentPlayer returns the current player.
 func (b Board) GetCurrentPlayer() *Player {
+	if len(b.RemainingPlayers) == 0 {
+		return b.Players[0]
+	}
 	return b.Players[b.RemainingPlayers[b.RemainingPlayerIndex]]
 }
 
@@ -345,13 +352,107 @@ func (b Board) getAccessibleTilesForCoordinate(coordinate *Coordinate) Coordinat
 
 // GetAccessibleTiles returns the tiles that are accessible by the current
 // player.
-func (b Board) GetAccessibleTiles() Coordinates {
-	return b.getAccessibleTilesForCoordinate(b.GetCurrentPlayer().Position)
+func (b Board) GetAccessibleTiles() (tiles Coordinates, isShortestPath bool) {
+	accessibleTiles := b.getAccessibleTilesForCoordinate(b.GetCurrentPlayer().Position)
+
+	currentPlayer := b.GetCurrentPlayer()
+	if len(currentPlayer.Targets) == 0 {
+		return accessibleTiles, false
+	}
+
+	for _, coordinate := range accessibleTiles {
+		currentTile := b.Tiles[coordinate.Line][coordinate.Row]
+		if currentTile.Tile.Treasure == currentPlayer.Targets[0] {
+			return b.getShortestPath(), true
+		}
+	}
+
+	return accessibleTiles, false
 }
 
 // GetSize returns the board size in tiles.
 func (b Board) GetSize() int {
 	return len(b.Tiles)
+}
+
+// vertextId returns  a unique identifier for the tile based on its line and row.
+func (b Board) vertextId(line, row int) int {
+	return line*b.GetSize() + row
+}
+
+func (b Board) buildGraph() (graph *dijkstra.Graph, getCoordinatesByVertex func(id int) *Coordinate) {
+	graph = dijkstra.NewGraph()
+
+	var (
+		size                = b.GetSize()
+		coordinatesByVertex = make(map[int]*Coordinate)
+	)
+
+	graph.AddVertex(size*size + 1)
+	for line := 0; line < size; line++ {
+		for row := 0; row < size; row++ {
+
+			vertexId := b.vertextId(line, row)
+			graph.AddVertex(vertexId)
+
+			coordinatesByVertex[vertexId] = &Coordinate{
+				Line: line,
+				Row:  row,
+			}
+
+		}
+	}
+
+	for line := 0; line < size; line++ {
+		for row := 0; row < size; row++ {
+			neighbors := b.getAccessibleNeighbors(line, row)
+			for _, neighbor := range neighbors {
+				graph.AddArc(
+					b.vertextId(line, row),
+					b.vertextId(neighbor.Line, neighbor.Row),
+					1)
+			}
+		}
+	}
+
+	return graph, func(id int) *Coordinate {
+		return coordinatesByVertex[id]
+	}
+}
+
+func (b Board) getShortestPath() Coordinates {
+	var (
+		size          = b.GetSize()
+		currentPlayer = b.GetCurrentPlayer()
+
+		graph, getCoordinatesByVertex = b.buildGraph()
+
+		sourceVertex = b.vertextId(currentPlayer.Position.Line, currentPlayer.Position.Row)
+		// targetVertex is the target node, defaults to remaining tile ID.
+		targetVertex = size*size + 1
+	)
+
+	for line := 0; line < size; line++ {
+		for row := 0; row < size; row++ {
+			currentTile := b.vertextId(line, row)
+
+			if b.Tiles[line][row].Tile.Treasure == currentPlayer.Targets[0] {
+				targetVertex = currentTile
+			}
+		}
+	}
+
+	best, err := graph.Shortest(sourceVertex, targetVertex)
+	if err != nil { // No path was found.
+		return nil
+	}
+
+	path := make(Coordinates, 0, len(best.Path))
+	for _, vertex := range best.Path {
+		path = append(path, getCoordinatesByVertex(vertex))
+	}
+
+	return path
 }
 
 // generateTiles generates tile list for the given board size.

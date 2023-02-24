@@ -1,3 +1,5 @@
+github.com/RyanCarrier/dijkstra v1.2.0 h1:tOEDXK7lcg4pI3JOc9eQTNsrWYehqzWbe/+0iWMiPZk=
+github.com/RyanCarrier/dijkstra v1.2.0/go.mod h1:9egjhC7eVsfREX6NrYS+1wHzk9C/9v2Cz26/bqpjjTc=
 github.com/awesome-gocui/gocui v1.1.0 h1:db2j7yFEoHZjpQFeE2xqiatS8bm1lO3THeLwE6MzOII=
 github.com/awesome-gocui/gocui v1.1.0/go.mod h1:M2BXkrp7PR97CKnPRT7Rk0+rtswChPtksw/vRAESGpg=
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=

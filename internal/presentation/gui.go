@@ -9,6 +9,32 @@ import (
 	"github.com/marmelab/labyrinth/internal/model"
 )
 
+type TileAccessibleColor map[bool](func() (background gocui.Attribute, foreground gocui.Attribute))
+
+// TileShortestPathColor returns the tile color given the tile is accessible or not,
+type TileShortestPathColor map[bool]TileAccessibleColor
+
+var (
+	tileColorMap = TileShortestPathColor{
+		false: TileAccessibleColor{
+			true: func() (gocui.Attribute, gocui.Attribute) {
+				return gocui.ColorMagenta, gocui.ColorWhite
+			},
+			false: func() (gocui.Attribute, gocui.Attribute) {
+				return gocui.ColorWhite, gocui.ColorBlack
+			},
+		},
+		true: TileAccessibleColor{
+			true: func() (gocui.Attribute, gocui.Attribute) {
+				return gocui.ColorWhite, gocui.ColorBlack
+			},
+			false: func() (gocui.Attribute, gocui.Attribute) {
+				return gocui.ColorDefault, gocui.ColorDefault
+			},
+		},
+	}
+)
+
 type gameUi struct {
 	gui  *gocui.Gui
 	loop *gameLoop
@@ -107,7 +133,7 @@ func (g gameUi) drawBoard(tileCount, boardSize int) error {
 }
 
 func (g gameUi) drawTiles(tileCount int) error {
-	accessibleTiles := g.board.GetAccessibleTiles()
+	accessibleTiles, isShortestPath := g.board.GetAccessibleTiles()
 
 	for line := 0; line < tileCount; line++ {
 		for row := 0; row < tileCount; row++ {
@@ -149,14 +175,11 @@ func (g gameUi) drawTiles(tileCount int) error {
 			} else if len(targets) > 0 && targets[0] == currentTile.Tile.Treasure {
 				tileView.BgColor = gocui.ColorCyan
 				tileView.FgColor = gocui.ColorBlack
-			} else if g.board.State == model.GameStateMovePawn &&
-				accessibleTiles.Contains(&model.Coordinate{Line: line, Row: row}) {
-
-				tileView.BgColor = gocui.ColorMagenta
-				tileView.FgColor = gocui.ColorWhite
 			} else {
-				tileView.BgColor = gocui.ColorWhite
-				tileView.FgColor = gocui.ColorBlack
+				isAccessible := g.board.State == model.GameStateMovePawn &&
+					accessibleTiles.Contains(&model.Coordinate{Line: line, Row: row})
+
+				tileView.BgColor, tileView.FgColor = tileColorMap[isShortestPath][isAccessible]()
 			}
 		}
 	}
@@ -225,12 +248,16 @@ func (g gameUi) drawBoardActions(tileCount, boardSize int) error {
 	return nil
 }
 
-func (g gameUi) drawRemainingTile(boardSize, boardOffset int) error {
+func (g gameUi) drawRemainingTile(leftOffset int) error {
+	var (
+		boardSize   = 7*TileOuterSize + TileBorderSize + 1
+		boardOffset = boardSize + TileOuterSize + 1
+	)
 
 	var (
-		topLeftX     = BoardMargin
-		topLeftY     = BoardMargin + boardOffset + 1
-		bottomRightX = topLeftX + boardSize
+		topLeftX     = leftOffset + BoardMargin + 1
+		topLeftY     = boardOffset - 3
+		bottomRightX = topLeftX + 27
 		bottomRightY = topLeftY + 8
 	)
 
@@ -243,7 +270,7 @@ func (g gameUi) drawRemainingTile(boardSize, boardOffset int) error {
 	{
 		var (
 			name         = "button-rotate-anticlockwise"
-			topLeftX     = topLeftX + 5
+			topLeftX     = topLeftX + 3
 			topLeftY     = topLeftY + 2
 			bottomRightX = topLeftX + TileOuterSize
 			bottomRightY = topLeftY + TileOuterSize
@@ -256,7 +283,7 @@ func (g gameUi) drawRemainingTile(boardSize, boardOffset int) error {
 
 	{
 		var (
-			topLeftX     = topLeftX + 13
+			topLeftX     = topLeftX + 11
 			topLeftY     = topLeftY + 2
 			bottomRightX = topLeftX + 4
 			bottomRightY = topLeftY + TileOuterSize
@@ -284,7 +311,7 @@ func (g gameUi) drawRemainingTile(boardSize, boardOffset int) error {
 	{
 		var (
 			name         = "button-rotate-clockwise"
-			topLeftX     = topLeftX + 21
+			topLeftX     = topLeftX + 19
 			topLeftY     = topLeftY + 2
 			bottomRightX = topLeftX + 4
 			bottomRightY = topLeftY + TileOuterSize
@@ -377,7 +404,7 @@ func (g gameUi) layout(gui *gocui.Gui) error {
 		return err
 	}
 
-	if err := g.drawRemainingTile(boardSize, boardOffset); err != nil {
+	if err := g.drawRemainingTile(boardOffset); err != nil {
 		return err
 	}
 
