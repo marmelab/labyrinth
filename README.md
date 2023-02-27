@@ -4,7 +4,7 @@ To run this program, you will need `go` installed. You can download it from [htt
 
 ## CLI
 
-You can run the CLI program using either
+You can run the CLI program using:
 
 ```sh
 # The following options are available :
@@ -14,24 +14,33 @@ You can run the CLI program using either
 make [options] cli-run
 ```
 
+Note: You can clean existing saves using the following command:
+
+```sh
+make cli-clean
+```
+
+
 ## Web application
 
 To run the web application, you will need to create the environment files, and then set the corresponding environment variables:
 
 ```sh
-cp webapp/.env.dist webapp/.env
-cp docker-compose.env.dist docker-compose.env
+make setup-env
+
+# This will create the following files:
+webapp/.env
 ```
 
-Once the env file has been set,you can either run the app in development mode using
+Once the env file has been set,you can either run the app in development mode using:
 
-```sh
-make develop
-```
-
-Or in production mode using
 ```sh
 make run
+```
+
+Or in production mode using:
+```sh
+make production
 ```
 
 This will start the following applications:
@@ -46,12 +55,4 @@ You can run the unit tests for both domain and webapp using the following comman
 
 ```sh
 make test
-```
-
-## Clean saves
-
-You can clean existing saves using the following command:
-
-```sh
-make cli-clean
 ```

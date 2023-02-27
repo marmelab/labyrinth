@@ -8,17 +8,20 @@ PLAYER_COUNT="1"
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
+setup-env:								## Setup the environment
+	@(cp webapp/.env.dist webapp/.env)
+
+run: develop							## Run the program for development, alias of develop
+
 develop: 								## Run the program for development
 	@(mkdir -p logs)
 	docker compose \
-		--env-file docker-compose.env \
 		-f docker-compose.yml \
 		-f docker-compose.dev.yml \
 		up --build
 
 develop-config: 						## Dumps the docker development compose file with environment set
 	docker compose \
-		--env-file docker-compose.env \
 		-f docker-compose.yml \
 		-f docker-compose.dev.yml \
 		config
@@ -26,14 +29,12 @@ develop-config: 						## Dumps the docker development compose file with environm
 production: 							## Run the program for production
 	@(mkdir -p logs)
 	docker compose \
-		--env-file docker-compose.env \
 		-f docker-compose.yml \
 		-f docker-compose.prod.yml \
 		up --build
 
 production-config: 						## Dumps the docker production compose file with environment set
 	docker compose \
-		--env-file docker-compose.env \
 		-f docker-compose.yml \
 		-f docker-compose.prod.yml \
 		config
