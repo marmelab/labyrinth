@@ -7,7 +7,9 @@ services:
       - APP_ENV=dev
 
     volumes:
-      - ./webapp:/var/www/labyrinth
+      - ./webapp/src:/var/www/labyrinth/src
+      - ./webapp/templates:/var/www/labyrinth/templates
+      - ./webapp/translations:/var/www/labyrinth/translations
 
   proxy:
     volumes:
