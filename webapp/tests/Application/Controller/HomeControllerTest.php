@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Tests\Unit\Service;
+namespace App\Tests\Unit\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 
-use App\Service\DomainService;
+use App\Controller\HomeController;
+use App\Service\DomainServiceInterface;
 
-class DomainServiceTest extends KernelTestCase
+class HomeControllerTest extends WebTestCase
 {
     private const EXPECTED_BOARD = [
         'tiles' => [
@@ -113,32 +114,22 @@ class DomainServiceTest extends KernelTestCase
         'gameState' => 0
     ];
 
-    public function testNewBoard__Ok()
+    function testIndex()
     {
-        $mockResponse = new MockResponse(json_encode(self::EXPECTED_BOARD));
-        $mockClient = new MockHttpClient($mockResponse);
+        $client = static::createClient();
 
-        $domainServiceClient = new DomainService(
-            $mockClient,
-            "http://domain-api"
-        );
+        $container = static::getContainer();
 
-        $this->assertEquals(self::EXPECTED_BOARD, $domainServiceClient->newBoard());
-    }
+        $domainServiceMock = $this->createMock(DomainServiceInterface::class);
+        $domainServiceMock->expects(self::once())
+            ->method('newBoard')
+            ->willReturn(self::EXPECTED_BOARD);
 
-    public function testNewBoard__InternalServererror()
-    {
-        $mockResponse = new MockResponse("", [
-            'http_code' => 500,
-        ]);
-        $mockClient = new MockHttpClient($mockResponse);
+        $container->set(DomainServiceInterface::class, $domainServiceMock);
 
-        $domainServiceClient = new DomainService(
-            $mockClient,
-            "http://domain-api"
-        );
+        $crawler = $client->request('GET', '/');
 
-        $this->expectException(ServerExceptionInterface::class);
-        $domainServiceClient->newBoard();
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(9, $crawler->filter('.tile'));
     }
 }
