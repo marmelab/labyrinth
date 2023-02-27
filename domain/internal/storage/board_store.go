@@ -7,7 +7,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/marmelab/labyrinth/internal/model"
+	"github.com/marmelab/labyrinth/domain/internal/model"
 )
 
 var (

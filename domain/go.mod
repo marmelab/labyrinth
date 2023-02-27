@@ -1,4 +1,4 @@
-module github.com/marmelab/labyrinth
+module github.com/marmelab/labyrinth/domain
 
 go 1.20
 

@@ -3,7 +3,7 @@ package presentation
 import (
 	"io"
 
-	"github.com/marmelab/labyrinth/internal/model"
+	"github.com/marmelab/labyrinth/domain/internal/model"
 )
 
 const (
