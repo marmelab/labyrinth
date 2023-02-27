@@ -1,0 +1,13 @@
+# Environment
+/.env
+
+# Symfony
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+
+# PHP Unit
+/phpunit.xml
+.phpunit.result.cache
+

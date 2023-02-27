@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  webapp:
+    environment:
+      - APP_DEBUG=true
+      - APP_ENV=dev
+
+    volumes:
+      - ./webapp:/var/www/labyrinth
+
+  proxy:
+    volumes:
+      - ./logs/nginx:/var/log/nginx

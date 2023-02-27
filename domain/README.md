@@ -2,7 +2,7 @@
 
 To run this program, you will need `go` installed. You can download it from [https://go.dev/dl/](https://go.dev/dl/).
 
-## Usage
+## CLI
 
 You can run the program using either
 
