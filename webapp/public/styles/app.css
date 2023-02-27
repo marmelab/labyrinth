@@ -1,0 +1,102 @@
+:root {
+    --tile-size: 90px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+}
+
+/**
+ * Board
+ */
+.board {
+    display: grid;
+    height: calc(var(--tile-size) * 7);
+    width: calc(var(--tile-size) * 7);
+    background: url(/images/background.png) repeat;
+
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(7, 1fr);
+}
+
+.board .tile {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    width: var(--tile-size);
+    height: var(--tile-size);
+}
+
+.tile::before,
+.tile::after {
+    position: absolute;
+    content: "";
+    background-color: #ffffff;
+    z-index: 0;
+}
+
+.tile-shape-0::before {
+    top: 30px;
+    right: 0;
+    bottom: 30px;
+    left: 0;
+}
+
+.tile-shape-1::before {
+    top: 30px;
+    right: 0;
+    bottom: 30px;
+    left: 0;
+}
+
+.tile-shape-1::after {
+    top: 0;
+    right: 30px;
+    bottom: 60px;
+    left: 30px;
+}
+
+.tile-shape-2::before {
+    top: 30px;
+    right: 30px;
+    bottom: 30px;
+    left: 0;
+}
+
+.tile-shape-2::after {
+    top: 60px;
+    right: 30px;
+    bottom: 0px;
+    left: 30px;
+}
+
+.tile-rotation-90 {
+    transform: rotate(90deg);
+}
+
+.tile-rotation-180 {
+    transform: rotate(180deg);
+}
+
+.tile-rotation-270 {
+    transform: rotate(270deg);
+}
