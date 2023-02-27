@@ -6,7 +6,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/marmelab/labyrinth/internal/model"
+	"github.com/marmelab/labyrinth/domain/internal/model"
 	"github.com/stretchr/testify/assert"
 )
 

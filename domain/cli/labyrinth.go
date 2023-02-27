@@ -5,8 +5,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/marmelab/labyrinth/internal/presentation"
-	"github.com/marmelab/labyrinth/internal/storage"
+	"github.com/marmelab/labyrinth/domain/internal/presentation"
+	"github.com/marmelab/labyrinth/domain/internal/storage"
 	"github.com/spf13/cobra"
 )
 

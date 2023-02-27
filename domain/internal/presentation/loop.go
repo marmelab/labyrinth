@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	"github.com/awesome-gocui/gocui"
-	"github.com/marmelab/labyrinth/internal/model"
-	"github.com/marmelab/labyrinth/internal/storage"
+	"github.com/marmelab/labyrinth/domain/internal/model"
+	"github.com/marmelab/labyrinth/domain/internal/storage"
 )
 
 const (

@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  api-domain:
+    build:
+      dockerfile: ./domain/api/Dockerfile
+    ports:
+      - "127.0.0.1:9001:80"
