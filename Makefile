@@ -47,6 +47,9 @@ test: 									## Run unit tests
 	@(${MAKE} -C domain test)
 	@(${MAKE} -C webapp test)
 
+test-webapp:							## Run unit tests for the webapp
+	@(cd webapp && composer install && bin/phpunit)
+
 cli-run: 								## Run the CLI version of the labyrinth.
 	@(${MAKE} -C domain run)
 
