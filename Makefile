@@ -62,10 +62,25 @@ production-image-push: production-image			## Push production images to Docker Hu
 	docker image push --all-tags ${DOCKER_IMAGE_PROXY}
 
 production-deploy: production-image-push		## Deploy production to AWS
+	scp \
+		-i .secrets/labyrinth-ed25519.pem \
+		docker-compose.yml docker-compose.prod.yml scripts/run-production.sh \
+		ubuntu@ec2-13-37-240-163.eu-west-3.compute.amazonaws.com:~
+
+	ssh \
+	 	-i .secrets/labyrinth-ed25519.pem \
+	 	ubuntu@ec2-13-37-240-163.eu-west-3.compute.amazonaws.com \
+	 	'echo "TAG=${COMMIT_HASH}" > .env'
+	
+	ssh \
+	 	-i .secrets/labyrinth-ed25519.pem \
+	 	ubuntu@ec2-13-37-240-163.eu-west-3.compute.amazonaws.com \
+	 	'./run-production.sh'
 
 production: production-image					## Run the program for production
 	@(mkdir -p logs)
 	TAG=${COMMIT_HASH} docker compose \
+		--pull always \
 		-f docker-compose.yml \
 		-f docker-compose.prod.yml \
 		up

@@ -6,11 +6,15 @@ services:
 
   webapp:
     image: jonathanmarmelab/labyrinth-webapp:${TAG}
+    env_file:
+      - webapp/.env
     environment:
       - APP_DEBUG=false
       - APP_ENV=prod
 
   proxy:
     image: jonathanmarmelab/labyrinth-proxy:${TAG}
+    volumes:
+      - ./logs:/var/log/nginx
     ports:
       - "80:80"

@@ -6,3 +6,6 @@ docker-compose.env
 
 # Logs
 logs
+
+# Deployment
+.secrets
