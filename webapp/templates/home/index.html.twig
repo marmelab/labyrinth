@@ -1,15 +1,18 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Welcome to Labyrinth Online!{% endblock %}
+{% block title %}Welcome to Labyrinth Online!
+{% endblock %}
 
 {% block body %}
 
-<div class="board">
-{% for line in board.tiles %}
-    {% for boardTile in line %}
-        <div class="tile tile-shape-{{ boardTile.tile.shape }} tile-rotation-{{ boardTile.rotation }}"></div>
-    {% endfor %}
-{% endfor %}
-</div>
+	<div class="board">
+		{% for line in board.tiles %}
+			{% for boardTile in line %}
+				<div class="tile tile-shape-{{ boardTile.tile.shape }} tile-rotation-{{ boardTile.rotation }}">
+					<div class="emoji">{{ emojis[boardTile.tile.treasure] }}</div>
+				</div>
+			{% endfor %}
+		{% endfor %}
+	</div>
 
 {% endblock %}

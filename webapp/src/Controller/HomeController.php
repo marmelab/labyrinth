@@ -10,6 +10,33 @@ use App\Service\DomainServiceInterface;
 
 class HomeController extends AbstractController
 {
+    const TREASURE_EMOJIS = [
+        '·' => '',
+        'A' => '💌',
+        'B' => '💣',
+        'C' => '🛍',
+        'D' => '📿',
+        'E' => '🔭',
+        'F' => '💎',
+        'G' => '💰',
+        'H' => '📜',
+        'I' => '🗿',
+        'J' => '🏺',
+        'K' => '🔫',
+        'L' => '🛡',
+        'M' => '💈',
+        'N' => '🛎',
+        'O' => '⌛',
+        'P' => '🌡',
+        'Q' => '⛱',
+        'R' => '🎈',
+        'S' => '🎎',
+        'T' => '🎁',
+        'U' => '🔮',
+        'V' => '📷',
+        'W' => '🕯',
+        'X' => '🥦',
+    ];
 
     public function __construct(
         private DomainServiceInterface $domainService
@@ -25,6 +52,7 @@ class HomeController extends AbstractController
 
         return $this->render('home/index.html.twig', [
             'board' => $board,
+            'emojis' => self::TREASURE_EMOJIS,
         ]);
     }
 }
