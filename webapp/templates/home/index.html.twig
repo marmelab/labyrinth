@@ -3,16 +3,60 @@
 {% block title %}Welcome to Labyrinth Online!
 {% endblock %}
 
+{% set target = "·" %}
+{% if board.players[0].targets|length > 0 %}
+	{% set target = board.players[0].targets[0] %}
+{% endif %}
+
 {% block body %}
 
-	<div class="board">
-		{% for line in board.tiles %}
-			{% for boardTile in line %}
-				<div class="tile tile-shape-{{ boardTile.tile.shape }} tile-rotation-{{ boardTile.rotation }}">
-					<div class="emoji">{{ emojis[boardTile.tile.treasure] }}</div>
-				</div>
+	<div class="game">
+		<div class="board">
+			{% for line in board.tiles %}
+				{% for boardTile in line %}
+					{% set tile = boardTile.tile %}
+					<div class="tile tile-shape-{{ tile.shape }} tile-rotation-{{ boardTile.rotation }} {% if target == tile.treasure %}tile-target{% endif %}">
+						<div class="emoji">
+							{{ emojis[tile.treasure] }}
+						</div>
+					</div>
+				{% endfor %}
 			{% endfor %}
-		{% endfor %}
+		</div>
+
+		<div class="player">
+			<div class="row">
+				<div class="row-label">
+					Player
+				</div>
+
+				<div class="row-value">
+					{{ board.players[0].color }}
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="row-label">
+					Target
+				</div>
+
+				<div class="row-value">
+					{{ emojis[target] }}
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="tile">
+					{% set remainingTile = board.remainingTile %}
+					{% set tile = remainingTile.tile %}
+					<div class="tile tile-remaining tile-shape-{{ tile.shape }} tile-rotation-{{ remainingTile.rotation }} {% if target == tile.treasure %}tile-target{% endif %}">
+						<div class="emoji">
+							{{ emojis[tile.treasure] }}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 
 {% endblock %}

@@ -11,7 +11,7 @@ use App\Service\DomainServiceInterface;
 class HomeController extends AbstractController
 {
     const TREASURE_EMOJIS = [
-        '·' => '',
+        '·' => ' ',
         'A' => '💌',
         'B' => '💣',
         'C' => '🛍',
