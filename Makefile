@@ -9,7 +9,11 @@ help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 setup-env:								## Setup the environment
-	@(cp webapp/.env.dist webapp/.env)
+	@(${MAKE} -C webapp setup-env)
+
+install:								## Install dependencies
+	@(${MAKE} -C domain install)
+	@(${MAKE} -C webapp install)
 
 run: develop							## Run the program for development, alias of develop
 
@@ -39,10 +43,9 @@ production-config: 						## Dumps the docker production compose file with enviro
 		-f docker-compose.prod.yml \
 		config
 
-test: test-domain						## Run unit tests
-
-test-domain:							## Run unit tests for the domain directory
+test: 									## Run unit tests
 	@(${MAKE} -C domain test)
+	@(${MAKE} -C webapp test)
 
 cli-run: 								## Run the CLI version of the labyrinth.
 	@(${MAKE} -C domain run)
