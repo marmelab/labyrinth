@@ -2,5 +2,7 @@ version: '3.8'
 
 services:
   webapp:
+    env_file:
+      - webapp/.env
     environment:
       - DOMAIN_SERVICE_URL=http://api-domain:80

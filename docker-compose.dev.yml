@@ -8,8 +8,6 @@ services:
       - "127.0.0.1:9001:80"
 
   webapp:
-    env_file:
-      - webapp/.env
     build:
       dockerfile: ./webapp/Dockerfile
     environment:

@@ -6,8 +6,6 @@ services:
 
   webapp:
     image: jonathanmarmelab/labyrinth-webapp:${TAG}
-    env_file:
-      - webapp/.env
     environment:
       - APP_DEBUG=false
       - APP_ENV=prod

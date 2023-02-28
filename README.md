@@ -51,12 +51,21 @@ api-domain          127.0.0.1:9001
 
 ## Deploy to production
 
-To dpeloy to production, you will need the SHH key and add it to `.secrets/labyrinth-ed25519`. Then you can run the
-deploy command:
+To deploy to production, you will need to:
+* Add the SSH key to `.secrets/labyrinth-ed25519.pem` ;
+* Create the `.secrets/.env` file:
+
+```sh
+export SERVER_USER=<server-user>
+export SERVER_HOSTNAME=<server-domain>
+```
+
+You can the run the deploy command:
 
 ```sh
 make production-deploy
 ```
+
 
 ## Test
 

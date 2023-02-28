@@ -12,10 +12,19 @@ DOCKER_IMAGE_DOMAIN_API=${DOCKER_IMAGE_NAMESPACE}/labyrinth-domain-api
 DOCKER_IMAGE_WEBAPP=${DOCKER_IMAGE_NAMESPACE}/labyrinth-webapp
 DOCKER_IMAGE_PROXY=${DOCKER_IMAGE_NAMESPACE}/labyrinth-proxy
 
+SERVER_USER=""
+SERVER_HOSTNAME=""
+
+ifneq (,$(wildcard .secrets/.env))
+include .secrets/.env
+    export
+endif
+
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 setup-env:										## Setup the environment
+	
 	@(${MAKE} -C webapp setup-env)
 
 install:										## Install dependencies
@@ -37,7 +46,7 @@ develop-config: 								## Dumps the docker development compose file with enviro
 		-f docker-compose.dev.yml \
 		config
 
-production-image:
+production-image-build:
 	docker build \
 		-f domain/api/Dockerfile \
 		-t ${DOCKER_IMAGE_DOMAIN_API}:${COMMIT_HASH} \
@@ -61,20 +70,20 @@ production-image-push: production-image			## Push production images to Docker Hu
 	docker image push --all-tags ${DOCKER_IMAGE_WEBAPP}
 	docker image push --all-tags ${DOCKER_IMAGE_PROXY}
 
-production-deploy: production-image-push		## Deploy production to AWS
+production-deploy: production-image-push 		## Deploy production to AWS
 	scp \
 		-i .secrets/labyrinth-ed25519.pem \
 		docker-compose.yml docker-compose.prod.yml scripts/run-production.sh \
-		ubuntu@ec2-13-37-240-163.eu-west-3.compute.amazonaws.com:~
+		${SERVER_USER}@${SERVER_HOSTNAME}:~
 
 	ssh \
 	 	-i .secrets/labyrinth-ed25519.pem \
-	 	ubuntu@ec2-13-37-240-163.eu-west-3.compute.amazonaws.com \
+	 	${SERVER_USER}@${SERVER_HOSTNAME} \
 	 	'echo "TAG=${COMMIT_HASH}" > .env'
 	
 	ssh \
 	 	-i .secrets/labyrinth-ed25519.pem \
-	 	ubuntu@ec2-13-37-240-163.eu-west-3.compute.amazonaws.com \
+	 	${SERVER_USER}@${SERVER_HOSTNAME} \
 	 	'./run-production.sh'
 
 production: production-image					## Run the program for production
