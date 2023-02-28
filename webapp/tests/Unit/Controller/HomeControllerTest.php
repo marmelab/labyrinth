@@ -3,11 +3,7 @@
 namespace App\Tests\Unit\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response\MockResponse;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 
-use App\Controller\HomeController;
 use App\Service\DomainServiceInterface;
 
 class HomeControllerTest extends WebTestCase
