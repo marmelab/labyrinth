@@ -2,9 +2,9 @@
 
 To run this program, you will need `go` installed. You can download it from [https://go.dev/dl/](https://go.dev/dl/).
 
-## Usage
+## CLI
 
-You can run the program using either
+You can run the program using:
 
 ```sh
 # The following options are available :
@@ -30,7 +30,7 @@ Note: You can use the `Noto Color Emoji` font to have an almost square display.
 
 ## Test
 
-You can run the tests using either
+You can run the tests using:
 
 ```sh
 make test

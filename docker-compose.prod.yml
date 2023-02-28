@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  webapp:
+    environment:
+      - APP_DEBUG=false
+      - APP_ENV=prod
+
+  proxy:
+    ports:
+      - "80:80"
