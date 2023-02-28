@@ -1,22 +1,6 @@
 version: '3.8'
 
 services:
-  api-domain:
-    build:
-      dockerfile: ./domain/api/Dockerfile
-    ports:
-      - "127.0.0.1:9001:80"
-
   webapp:
-    env_file:
-      - webapp/.env
-    build:
-      dockerfile: ./webapp/Dockerfile
     environment:
       - DOMAIN_SERVICE_URL=http://api-domain:80
-
-  proxy:
-    build:
-      dockerfile: ./proxy/Dockerfile
-    ports:
-      - "127.0.0.1:9000:80"
