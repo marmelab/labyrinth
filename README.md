@@ -56,3 +56,5 @@ You can run the unit tests for both domain and webapp using the following comman
 ```sh
 make test
 ```
+
+/!\ Warning: Running tests requires `go`, `php` and `composer` installed globally.
