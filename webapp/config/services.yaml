@@ -20,5 +20,12 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+
+    App\Service\DomainServiceInterface:
+        class: App\Service\DomainService
+        public: true
+        arguments:
+            $domainServiceUrl:  '%env(string:DOMAIN_SERVICE_URL)%'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

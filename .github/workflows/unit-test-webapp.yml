@@ -1,0 +1,32 @@
+name: Unit Test Webapp
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+defaults:
+  run:
+    working-directory: webapp
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: List files
+      run:  ls -l
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+
+    - name: Install dependencies
+      run: composer install --prefer-dist
+
+    - name: Test
+      run: SYMFONY_DEPRECATIONS_HELPER=weak php bin/phpunit # SYMFONY_DEPRECATIONS_HELPER avoids test failure due to monolog depreciation warning.

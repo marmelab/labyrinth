@@ -12,6 +12,8 @@ services:
       - webapp/.env
     build:
       dockerfile: ./webapp/Dockerfile
+    environment:
+      - DOMAIN_SERVICE_URL=http://api-domain:80
 
   proxy:
     build:
