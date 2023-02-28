@@ -11,111 +11,21 @@ use App\Service\DomainService;
 
 class DomainServiceTest extends KernelTestCase
 {
-    private const EXPECTED_BOARD = [
-        'tiles' => [
-            [
-                [
-                    'tile' => [
-                        'shape' => 2,
-                        'treasure' => '·'
-                    ],
-                    'rotation' => 270
-                ],
-                [
-                    'tile' => [
-                        'shape' => 1,
-                        'treasure' => 'A'
-                    ],
-                    'rotation' => 270
-                ],
-                [
-                    'tile' => [
-                        'shape' => 2,
-                        'treasure' => '·'
-                    ],
-                    'rotation' => 270
-                ],
-            ],
-            [
-                [
-                    'tile' => [
-                        'shape' => 2,
-                        'treasure' => '·'
-                    ],
-                    'rotation' => 90
-                ],
-                [
-                    'tile' => [
-                        'shape' => 1,
-                        'treasure' => 'B'
-                    ],
-                    'rotation' => 0
-                ],
-                [
-                    'tile' => [
-                        'shape' => 2,
-                        'treasure' => '·'
-                    ],
-                    'rotation' => 270
-                ],
-            ],
-            [
-                [
-                    'tile' => [
-                        'shape' => 2,
-                        'treasure' => '·'
-                    ],
-                    'rotation' => 90
-                ],
-                [
-                    'tile' => [
-                        'shape' => 1,
-                        'treasure' => 'C'
-                    ],
-                    'rotation' => 0
-                ],
-                [
-                    'tile' => [
-                        'shape' => 2,
-                        'treasure' => '·'
-                    ],
-                    'rotation' => 270
-                ],
-            ],
-        ],
-        'remainingTile' => [
-            'tile' => [
-                'shape' => 0,
-                'treasure' => '·'
-            ],
-            'rotation' => 0
-        ],
-        'players' => [
-            [
-                'color' => 0,
-                'position' => [
-                    'line' => 0,
-                    'row' => 0
-                ],
-                'targets' => [
-                    'C',
-                    'M',
-                    'J',
-                    'Q',
-                ],
-                'score' => 0
-            ]
-        ],
-        'remainingPlayers' => [
-            0
-        ],
-        'currentPlayerIndex' => 0,
-        'gameState' => 0
-    ];
-
-    public function testNewBoard__Ok()
+    public function provideBoardData(): array
     {
-        $mockResponse = new MockResponse(json_encode(self::EXPECTED_BOARD));
+        $boardJson = file_get_contents("./tests/Unit/Data/board.json");
+        $board = json_decode($boardJson, true);
+        return [
+            [$boardJson, $board],
+        ];
+    }
+
+    /**
+     * @dataProvider provideBoardData
+     */
+    public function testNewBoard__Ok(string $boardJson, array $board): void
+    {
+        $mockResponse = new MockResponse($boardJson);
         $mockClient = new MockHttpClient($mockResponse);
 
         $domainServiceClient = new DomainService(
@@ -123,10 +33,10 @@ class DomainServiceTest extends KernelTestCase
             "http://domain-api"
         );
 
-        $this->assertEquals(self::EXPECTED_BOARD, $domainServiceClient->newBoard());
+        $this->assertEquals($board, $domainServiceClient->newBoard());
     }
 
-    public function testNewBoard__InternalServererror()
+    public function testNewBoard__InternalServererror(): void
     {
         $mockResponse = new MockResponse("", [
             'http_code' => 500,
