@@ -69,6 +69,178 @@ var (
 	remainingPlayers = []int{0, 1, 2, 3}
 )
 
+type BoardRowTemplate map[int]*BoardTile
+type BoardLineTemplate map[int]BoardRowTemplate
+type BoardTemplate map[int]BoardLineTemplate
+
+var (
+	boardTemplate BoardTemplate = BoardTemplate{
+		3: BoardLineTemplate{
+			0: BoardRowTemplate{
+				0: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeV,
+						Treasure: NoTreasure,
+					},
+					Rotation: Rotation270,
+				},
+				2: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeV,
+						Treasure: NoTreasure,
+					},
+					Rotation: Rotation0,
+				},
+			},
+			2: BoardRowTemplate{
+				0: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeV,
+						Treasure: NoTreasure,
+					},
+					Rotation: Rotation180,
+				},
+				2: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeV,
+						Treasure: NoTreasure,
+					},
+					Rotation: Rotation90,
+				},
+			},
+		},
+		7: BoardLineTemplate{
+			0: BoardRowTemplate{
+				0: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeV,
+						Treasure: NoTreasure,
+					},
+					Rotation: Rotation270,
+				},
+				2: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeT,
+						Treasure: 'A',
+					},
+					Rotation: Rotation180,
+				},
+				4: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeT,
+						Treasure: 'B',
+					},
+					Rotation: Rotation180,
+				},
+				6: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeV,
+						Treasure: NoTreasure,
+					},
+					Rotation: Rotation0,
+				},
+			},
+			2: BoardRowTemplate{
+				0: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeT,
+						Treasure: 'C',
+					},
+					Rotation: Rotation90,
+				},
+				2: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeT,
+						Treasure: 'D',
+					},
+					Rotation: Rotation90,
+				},
+				4: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeT,
+						Treasure: 'E',
+					},
+					Rotation: Rotation180,
+				},
+				6: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeT,
+						Treasure: 'F',
+					},
+					Rotation: Rotation270,
+				},
+			},
+			4: BoardRowTemplate{
+				0: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeT,
+						Treasure: 'G',
+					},
+					Rotation: Rotation90,
+				},
+				2: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeT,
+						Treasure: 'H',
+					},
+					Rotation: Rotation0,
+				},
+				4: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeT,
+						Treasure: 'I',
+					},
+					Rotation: Rotation270,
+				},
+				6: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeT,
+						Treasure: 'J',
+					},
+					Rotation: Rotation270,
+				},
+			},
+			6: BoardRowTemplate{
+				0: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeV,
+						Treasure: NoTreasure,
+					},
+					Rotation: Rotation180,
+				},
+				2: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeT,
+						Treasure: 'K',
+					},
+					Rotation: Rotation0,
+				},
+				4: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeT,
+						Treasure: 'L',
+					},
+					Rotation: Rotation0,
+				},
+				6: &BoardTile{
+					Tile: &Tile{
+						Shape:    ShapeV,
+						Treasure: NoTreasure,
+					},
+					Rotation: Rotation90,
+				},
+			},
+		},
+	}
+)
+
+var (
+	treasureSkipTShaped = map[int]int{
+		3: 0,
+		7: 12,
+	}
+)
+
 // Coordinate is a coordinate on the board.
 type Coordinate struct {
 	Line int `json:"line"`
@@ -468,7 +640,6 @@ func generateTiles(size int) (tiles []*Tile, treasures []Treasure) {
 		vShapedWithTreasureThreshold = tShapedThreshold + int(math.Round(VShapedWithTreasurePercentage*float64(tileCount)))
 		iShapedThreshold             = vShapedWithTreasureThreshold + int(math.Round(IShapedPercentage*float64(tileCount)))
 	)
-
 	tiles = make([]*Tile, 0, generatedTiles)
 	treasures = make([]Treasure, 0, vShapedWithTreasureThreshold)
 
@@ -533,6 +704,9 @@ func NewBoard(size, playerCount int) (*Board, error) {
 		targetPerPlayer  = treasureCount / playerCount
 	)
 
+	// Skip tiles that have been generated statically
+	tiles = tiles[treasureSkipTShaped[size]:]
+
 	randomGenerator.Shuffle(len(tiles), func(i, j int) {
 		tiles[i], tiles[j] = tiles[j], tiles[i]
 	})
@@ -571,38 +745,9 @@ func NewBoard(size, playerCount int) (*Board, error) {
 		board.Tiles[line] = make([]*BoardTile, size)
 
 		for row := 0; row < size; row++ {
-			if line == 0 && row == 0 {
-				board.Tiles[line][row] = &BoardTile{
-					Tile: &Tile{
-						Shape:    ShapeV,
-						Treasure: NoTreasure,
-					},
-					Rotation: Rotation270,
-				}
-			} else if line == 0 && row == size-1 {
-				board.Tiles[line][row] = &BoardTile{
-					Tile: &Tile{
-						Shape:    ShapeV,
-						Treasure: NoTreasure,
-					},
-					Rotation: Rotation0,
-				}
-			} else if line == size-1 && row == 0 {
-				board.Tiles[line][row] = &BoardTile{
-					Tile: &Tile{
-						Shape:    ShapeV,
-						Treasure: NoTreasure,
-					},
-					Rotation: Rotation180,
-				}
-			} else if line == size-1 && row == size-1 {
-				board.Tiles[line][row] = &BoardTile{
-					Tile: &Tile{
-						Shape:    ShapeV,
-						Treasure: NoTreasure,
-					},
-					Rotation: Rotation90,
-				}
+			template, ok := boardTemplate[size][line][row]
+			if ok {
+				board.Tiles[line][row] = template
 			} else {
 				board.Tiles[line][row] = &BoardTile{
 					Tile:     tiles[tileIndex],
