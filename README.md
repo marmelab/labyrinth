@@ -49,6 +49,24 @@ webapp              127.0.0.1:9000 (dev) / 0.0.0.0:80 (production)
 api-domain          127.0.0.1:9001
 ```
 
+## Deploy to production
+
+To deploy to production, you will need to:
+* Add the SSH key to `.secrets/labyrinth-ed25519.pem` ;
+* Create the `.secrets/.env` file:
+
+```sh
+export SERVER_USER=<server-user>
+export SERVER_HOSTNAME=<server-domain>
+```
+
+You can the run the deploy command:
+
+```sh
+make production-deploy
+```
+
+
 ## Test
 
 You can run the unit tests for both domain and webapp using the following command:

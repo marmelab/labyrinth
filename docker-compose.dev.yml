@@ -1,7 +1,15 @@
 version: '3.8'
 
 services:
+  api-domain:
+    build:
+      dockerfile: ./domain/api/Dockerfile
+    ports:
+      - "127.0.0.1:9001:80"
+
   webapp:
+    build:
+      dockerfile: ./webapp/Dockerfile
     environment:
       - APP_DEBUG=true
       - APP_ENV=dev
@@ -11,7 +19,11 @@ services:
       - ./webapp/templates:/var/www/labyrinth/templates
 
   proxy:
+    build:
+      dockerfile: ./proxy/Dockerfile
     volumes:
       - ./logs/nginx:/var/log/nginx
       - ./webapp/public/images:/var/www/labyrinth/public/images
       - ./webapp/public/styles:/var/www/labyrinth/public/styles
+    ports:
+      - "127.0.0.1:9000:80"

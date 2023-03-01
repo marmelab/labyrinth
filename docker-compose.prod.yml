@@ -1,11 +1,18 @@
 version: '3.8'
 
 services:
+  api-domain:
+    image: jonathanmarmelab/labyrinth-domain-api:${TAG}
+
   webapp:
+    image: jonathanmarmelab/labyrinth-webapp:${TAG}
     environment:
       - APP_DEBUG=false
       - APP_ENV=prod
 
   proxy:
+    image: jonathanmarmelab/labyrinth-proxy:${TAG}
+    volumes:
+      - ./logs:/var/log/nginx
     ports:
       - "80:80"
