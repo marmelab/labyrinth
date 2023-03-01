@@ -6,7 +6,7 @@ on:
       - "Unit Test Domain"
       - "Unit Test Webapp"
     branches:
-      - "feature/**",
+      - "feature/**"
       - "main"
     types:
       - completed
