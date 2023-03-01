@@ -9,10 +9,6 @@ on:
   pull_request:
     branches: [ "main" ]
 
-defaults:
-  run:
-    working-directory: domain
-    
 jobs:
   unit-test:
     runs-on: ubuntu-latest
@@ -34,6 +30,7 @@ jobs:
   
   deploy:
     runs-on: ubuntu-latest
+    environment: Deploy
     needs: unit-test
 
     steps:
