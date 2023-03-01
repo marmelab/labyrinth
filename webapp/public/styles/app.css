@@ -28,11 +28,36 @@ body {
     background-color: #f0f0f0;
 }
 
+
+
 .game {
     display: flex;
     gap: 20px;
     width: calc((var(--tile-size) * 7) + 380px);
 }
+
+.game button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+    width: 60px;
+    border-radius: 8px;
+    border: 1px #555555 solid;
+    background-color: #fff;
+    padding: 0;
+    cursor: pointer;
+    box-shadow: 0 0 4px rgba(0, 0, 0, .5);
+}
+
+.game button:hover {
+    border: 1px #222222 solid;
+}
+
+.game button:focus {
+    margin-top: 2px;
+}
+
 
 /**
  * Board
@@ -174,7 +199,6 @@ body {
 .row {
     display: flex;
     flex-direction: row;
-    flex-grow: 0 1;
     justify-content: space-between;
     gap: 10px;
 }
@@ -185,4 +209,15 @@ body {
 
 .row .row__value {
     width: 50%;
+}
+
+.row--end {
+    margin-top: auto;
+}
+
+.actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
 }
