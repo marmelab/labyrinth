@@ -15,7 +15,7 @@
 			{% for line in board.tiles %}
 				{% for boardTile in line %}
 					{% set tile = boardTile.tile %}
-					<div class="tile tile-shape-{{ tile.shape }} tile-rotation-{{ boardTile.rotation }} {% if target == tile.treasure %}tile-target{% endif %}">
+					<div class="tile tile--shape-{{ tile.shape }} tile--rotation-{{ boardTile.rotation }} {% if target == tile.treasure %}tile--target{% endif %}">
 						<div class="emoji">
 							{{ emojis[tile.treasure] }}
 						</div>
@@ -26,21 +26,21 @@
 
 		<div class="player">
 			<div class="row">
-				<div class="row-label">
+				<div class="row__label">
 					Player
 				</div>
 
-				<div class="row-value">
+				<div class="row__value">
 					{{ board.players[0].color }}
 				</div>
 			</div>
 
 			<div class="row">
-				<div class="row-label">
+				<div class="row__label">
 					Target
 				</div>
 
-				<div class="row-value">
+				<div class="row__value">
 					{{ emojis[target] }}
 				</div>
 			</div>
@@ -49,7 +49,7 @@
 				<div class="tile">
 					{% set remainingTile = board.remainingTile %}
 					{% set tile = remainingTile.tile %}
-					<div class="tile tile-remaining tile-shape-{{ tile.shape }} tile-rotation-{{ remainingTile.rotation }} {% if target == tile.treasure %}tile-target{% endif %}">
+					<div class="tile tile--remaining tile--shape-{{ tile.shape }} tile-rotation-{{ remainingTile.rotation }} {% if target == tile.treasure %}tile--target{% endif %}">
 						<div class="emoji">
 							{{ emojis[tile.treasure] }}
 						</div>

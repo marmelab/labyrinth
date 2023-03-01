@@ -31,7 +31,7 @@ body {
 .game {
     display: flex;
     gap: 20px;
-    width: calc((var(--tile-size) * 7) + 320px);
+    width: calc((var(--tile-size) * 7) + 380px);
 }
 
 /**
@@ -39,12 +39,13 @@ body {
  */
 .board {
     display: grid;
-    height: calc(var(--tile-size) * 7);
-    width: calc(var(--tile-size) * 7);
-    background: url(/images/background.png) repeat;
+    height: calc(var(--tile-size) * 7 + 60px);
+    width: calc(var(--tile-size) * 7 + 60px);
 
+    gap: 10px;
     grid-template-columns: repeat(7, 1fr);
     grid-template-rows: repeat(7, 1fr);
+    background: url(/images/background.png) repeat;
 }
 
 .tile {
@@ -57,20 +58,31 @@ body {
     justify-content: center;
 }
 
+
 .tile::before,
 .tile::after {
     position: absolute;
     content: "";
-    background-color: rgba(200, 200, 200, .85);
+    background-color: #e0e0e0;
+    opacity: 0.85;
     z-index: 0;
 }
 
-.tile-target::before,
-.tile-target::after {
+.tile:hover {
+    cursor: pointer;
+}
+
+.tile:hover::before,
+.tile:hover::after {
+    opacity: 1;
+}
+
+.tile--target::before,
+.tile--target::after {
     background-color: #7A82E3;
 }
 
-.tile-remaining {
+.tile--remaining {
     background: url(/images/background.png) repeat;
 }
 
@@ -78,62 +90,62 @@ body {
     z-index: 1;
 }
 
-.tile-shape-0::before {
+.tile--shape-0::before {
     top: 30px;
     right: 0;
     bottom: 30px;
     left: 0;
 }
 
-.tile-shape-1::before {
+.tile--shape-1::before {
     top: 30px;
     right: 0;
     bottom: 30px;
     left: 0;
 }
 
-.tile-shape-1::after {
+.tile--shape-1::after {
     top: 0;
     right: 30px;
     bottom: 60px;
     left: 30px;
 }
 
-.tile-shape-2::before {
+.tile--shape-2::before {
     top: 30px;
     right: 30px;
     bottom: 30px;
     left: 0;
 }
 
-.tile-shape-2::after {
+.tile--shape-2::after {
     top: 60px;
     right: 30px;
     bottom: 0px;
     left: 30px;
 }
 
-.tile-rotation-90 {
+.tile--rotation-90 {
     transform: rotate(90deg);
 }
 
-.tile-rotation-90 .emoji {
+.tile--rotation-90 .emoji {
     transform: rotate(-90deg);
 }
 
-.tile-rotation-180 {
+.tile--rotation-180 {
     transform: rotate(180deg);
 }
 
-.tile-rotation-180 .emoji {
+.tile--rotation-180 .emoji {
     transform: rotate(-180deg);
 }
 
-.tile-rotation-270 {
+.tile--rotation-270 {
     transform: rotate(270deg);
 }
 
-.tile-rotation-270 .emoji {
+.tile--rotation-270 .emoji {
     transform: rotate(-270deg);
 }
 
@@ -145,7 +157,7 @@ body {
     gap: 10px;
 }
 
-.player .row {
+.row {
     display: flex;
     flex-direction: row;
     flex-grow: 0 1;
@@ -153,10 +165,10 @@ body {
     gap: 10px;
 }
 
-.player .row .row-label {
+.row .row__label {
     font-weight: bold;
 }
 
-.player .row .row-value {
+.row .row__value {
     width: 50%;
 }
