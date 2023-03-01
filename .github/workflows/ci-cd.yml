@@ -48,6 +48,9 @@ jobs:
 
     - name: Setup deploy environment
       run: echo 'SERVER_USER=${{ secrets.SERVER_USER }}' >> .secrets/.env && echo 'SERVER_HOSTNAME=${{ secrets.SERVER_HOSTNAME }}' >> .secrets/.env
+    
+    - name: Test SSH Connection
+      run: make production-ssh-test
 
     - name: Deploy to Production
       run: make production-deploy
