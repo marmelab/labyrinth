@@ -11,4 +11,7 @@ install: setup-env			## Install dependencies
 	composer install
 
 test: install				## Run PHP tests
-	SYMFONY_DEPRECATIONS_HELPER=weak php bin/phpunit
+	SYMFONY_DEPRECATIONS_HELPER=weak php bin/phpunit tests/Unit
+
+test-e2e:					## Run end to end tests
+	SYMFONY_DEPRECATIONS_HELPER=weak php bin/phpunit tests/E2E

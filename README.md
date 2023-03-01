@@ -76,4 +76,26 @@ make test
 ```
 /!\ Warning: Running tests requires `go`, `php8.1` and `composer` installed globally.
 
-/!\ Warning: You will also need the following PHP extensions installed: `php8.1-xml`, `php8.1-mbstring` and `php8.1-curl`. 
+/!\ Warning: You will also need the following PHP extensions installed: `php8.1-xml`, `php8.1-mbstring`, `php8.1-zip` and `php8.1-curl`. 
+
+
+## End to End testing
+
+You will need to add the following configuration lines to the `webapp/.env` file:
+
+```sh
+# The webapp URL
+WEBAPP_URL="http://localhost:9000"
+```
+
+The you need to run the full app stack in development mod using:
+
+```sh
+make run
+```
+
+You can the  run end to end tests using:
+
+```sh
+make test-e2e
+```

@@ -2,6 +2,7 @@
 
 namespace App\Tests\Unit\Controller;
 
+use App\Controller\HomeController;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 use App\Service\DomainServiceInterface;
@@ -22,8 +23,8 @@ class HomeControllerTest extends WebTestCase
     function testIndex(array $board)
     {
         $client = static::createClient();
-
         $container = static::getContainer();
+
 
         $domainServiceMock = $this->createMock(DomainServiceInterface::class);
         $domainServiceMock->expects(self::once())

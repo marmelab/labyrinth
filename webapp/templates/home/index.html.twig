@@ -9,7 +9,6 @@
 {% endif %}
 
 {% block body %}
-
 	<div class="game">
 		<div class="board">
 			{% for line in board.tiles %}
@@ -47,7 +46,7 @@
 
 			<div class="row row--end actions">
 				{{ form_start(rotationForms.anticlockwise, { 'action': url('board_rotate_remaining_anticlockwise')}) }}
-				<button type="submit">
+				<button type="submit" id="submit-rotate-remaining-anticlockwise">
 					&#x21B6;
 				</button>
 				{{ form_end(rotationForms.anticlockwise) }}
@@ -63,7 +62,7 @@
 				</div>
 
 				{{ form_start(rotationForms.clockwise, { 'action': url('board_rotate_remaining_clockwise')}) }}
-				<button type="submit">
+				<button type="submit" id="submit-rotate-remaining-clockwise">
 					&#x21B7;
 				</button>
 				{{ form_end(rotationForms.clockwise) }}

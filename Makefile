@@ -110,6 +110,9 @@ test: 											## Run unit tests
 	@(${MAKE} -C domain test)
 	@(${MAKE} -C webapp test)
 
+test-e2e: 										## Run e2e tests
+	@(${MAKE} -C webapp test-e2e)
+
 cli-run: 										## Run the CLI version of the labyrinth.
 	@(${MAKE} -C domain run)
 

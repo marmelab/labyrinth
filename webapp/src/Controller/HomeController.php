@@ -13,7 +13,7 @@ use App\Service\DomainServiceInterface;
 
 class HomeController extends AbstractController
 {
-    const SESSION_BOARD_KEY = 'board';
+    const SESSION_BOARD_KEY = BoardController::SESSION_BOARD_KEY;
 
     const TREASURE_EMOJIS = [
         '.' => ' ',
