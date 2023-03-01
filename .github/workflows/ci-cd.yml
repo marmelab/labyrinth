@@ -46,5 +46,8 @@ jobs:
     - name: Setup SSH environment
       run: mkdir -p .secrets && echo "${{ secrets.SERVER_PRIVATE_KEY }}" > .secrets/labyrinth-ed25519.pem && chmod 0400 .secrets/labyrinth-ed25519.pem
 
+    - name: Setup deploy environment
+      run: echo 'COMMIT_HASH=${GITHUB_SHA}' >> .secrets/.env &&echo 'SERVER_USER=${{ secrets.SERVER_USER }}' >> .secrets/.env && echo 'SERVER_HOSTNAME=${{ secrets.SERVER_HOSTNAME }}' >> .secrets/.env
+
     - name: Deploy to Production
-      run: make COMMIT_HASH=${GITHUB_SHA} SERVER_HOSTNAME=${{ secrets.SERVER_HOSTNAME }} SERVER_USER=${{ secrets.SERVER_USER }} production-deploy
+      run: make production-deploy
