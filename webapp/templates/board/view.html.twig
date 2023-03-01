@@ -33,13 +33,19 @@
 			</div>
 
 			<div class="board">
-				{% for line in boardState.tiles %}
-					{% for boardTile in line %}
+				{% for line, lineTiles in boardState.tiles %}
+					{% for row, boardTile in lineTiles %}
 						{% set tile = boardTile.tile %}
 						<div class="tile tile--shape-{{ tile.shape }} tile--rotation-{{ boardTile.rotation }} {% if target == tile.treasure %}tile--target{% endif %}">
 							<div class="emoji">
 								{{ emojis[tile.treasure] }}
 							</div>
+
+							{% for player in boardState.players %}
+								{% if player.position.line == line and player.position.row == row %}
+									<div class="tile__player tile__player--color-{{ player.color }}"></div>
+								{% endif %}
+							{% endfor %}
 						</div>
 					{% endfor %}
 				{% endfor %}

@@ -126,7 +126,6 @@ body {
     background: url(/images/background.png) repeat;
 }
 
-
 .tile::before,
 .tile::after {
     position: absolute;
@@ -221,6 +220,22 @@ body {
 
 .tile--rotation-270 .emoji {
     transform: rotate(-270deg);
+}
+
+.tile__player {
+    height: 30px;
+    width: 30px;
+    position: absolute;
+    z-index: 5;
+    opacity: 0.9;
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgba(0, 0, 0, .75);
+}
+
+.tile__player--color-0 {
+    background-color: #0000FC;
+    top: 10px;
+    left: 10px;
 }
 
 .player {
