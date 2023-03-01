@@ -22,20 +22,10 @@ class HomeControllerTest extends WebTestCase
     function testIndex(array $board)
     {
         $client = static::createClient();
-        $container = static::getContainer();
-
-
-        $domainServiceMock = $this->createMock(DomainServiceInterface::class);
-        $domainServiceMock->expects(self::once())
-            ->method('newBoard')
-            ->willReturn($board);
-
-        $container->set(DomainServiceInterface::class, $domainServiceMock);
 
         $crawler = $client->request('GET', '/');
 
         $this->assertResponseIsSuccessful();
-        $this->assertCount(1, $crawler->filter('.board'));
-        $this->assertCount(49, $crawler->filter('.board .tile'));
+        $this->assertCount(1, $crawler->filter('button'));
     }
 }

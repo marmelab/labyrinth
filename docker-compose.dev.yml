@@ -1,6 +1,10 @@
 version: '3.8'
 
 services:
+  postgres:
+    ports:
+      - "127.0.0.1:5432:5432"
+
   api-domain:
     build:
       dockerfile: ./domain/api/Dockerfile
@@ -17,6 +21,13 @@ services:
     volumes:
       - ./webapp/src:/var/www/labyrinth/src
       - ./webapp/templates:/var/www/labyrinth/templates
+
+  webapp-migrations:
+    build:
+      dockerfile: ./webapp/migrations/Dockerfile
+    environment:
+      - APP_DEBUG=true
+      - APP_ENV=dev
 
   proxy:
     build:

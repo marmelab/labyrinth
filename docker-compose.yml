@@ -1,8 +1,28 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:15.2-alpine
+    env_file:
+      - webapp/.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /data/postgres
+    volumes:
+      - ./data/postgres:/data/postgres
+
   webapp:
     env_file:
       - webapp/.env
     environment:
       - DOMAIN_SERVICE_URL=http://api-domain:80
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/labyrinth?serverVersion=15&charset=utf8
+
+  webapp-migrations:
+    env_file:
+      - webapp/.env
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/labyrinth?serverVersion=15&charset=utf8
+    depends_on:
+      - postgres

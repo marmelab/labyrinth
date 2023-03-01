@@ -2,7 +2,7 @@
 
 source .env
 
-mkdir -p logs
+mkdir -p logs data
 
 sudo docker compose \
 	-f docker-compose.yml \
