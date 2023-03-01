@@ -39,8 +39,11 @@ body {
  */
 .board {
     display: grid;
-    height: calc(var(--tile-size) * 7 + 60px);
-    width: calc(var(--tile-size) * 7 + 60px);
+    height: calc(var(--tile-size) * 7 + 80px);
+    width: calc(var(--tile-size) * 7 + 80px);
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 1);
 
     gap: 10px;
     grid-template-columns: repeat(7, 1fr);
@@ -56,6 +59,9 @@ body {
     height: var(--tile-size);
     align-items: center;
     justify-content: center;
+    border: 1px #d0d0d0 solid;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 1);
 }
 
 
@@ -63,27 +69,34 @@ body {
 .tile::after {
     position: absolute;
     content: "";
-    background-color: #e0e0e0;
-    opacity: 0.85;
+    background-color: #d0d0d0;
     z-index: 0;
 }
 
 .tile:hover {
     cursor: pointer;
+    border-color: #ffffff;
 }
 
 .tile:hover::before,
 .tile:hover::after {
-    opacity: 1;
+    background-color: #ffffff;
 }
 
 .tile--target::before,
 .tile--target::after {
-    background-color: #7A82E3;
+    background-color: #ffA500;
+}
+
+.tile--target:hover::before,
+.tile--target:hover::after {
+
+    background-color: #ff4500;
 }
 
 .tile--remaining {
     background: url(/images/background.png) repeat;
+    box-shadow: 0 0 4px rgba(0, 0, 0, .15);
 }
 
 .tile .emoji {
@@ -91,38 +104,38 @@ body {
 }
 
 .tile--shape-0::before {
-    top: 30px;
+    top: 29px;
     right: 0;
-    bottom: 30px;
+    bottom: 29px;
     left: 0;
 }
 
 .tile--shape-1::before {
-    top: 30px;
+    top: 29px;
     right: 0;
-    bottom: 30px;
+    bottom: 29px;
     left: 0;
 }
 
 .tile--shape-1::after {
     top: 0;
-    right: 30px;
-    bottom: 60px;
-    left: 30px;
+    right: 29px;
+    bottom: 59px;
+    left: 29px;
 }
 
 .tile--shape-2::before {
-    top: 30px;
-    right: 30px;
-    bottom: 30px;
+    top: 29px;
+    right: 29px;
+    bottom: 29px;
     left: 0;
 }
 
 .tile--shape-2::after {
-    top: 60px;
-    right: 30px;
+    top: 59px;
+    right: 29px;
     bottom: 0px;
-    left: 30px;
+    left: 29px;
 }
 
 .tile--rotation-90 {
