@@ -3,7 +3,7 @@ package model
 type Treasure rune
 
 // NoTreasure is when tile has no treasure in it.
-const NoTreasure Treasure = '·'
+const NoTreasure Treasure = '.'
 
 func (t Treasure) MarshalJSON() ([]byte, error) {
 	return []byte(`"` + string(t) + `"`), nil

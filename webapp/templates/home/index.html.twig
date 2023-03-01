@@ -3,7 +3,7 @@
 {% block title %}Welcome to Labyrinth Online!
 {% endblock %}
 
-{% set target = "·" %}
+{% set target = "." %}
 {% if board.players[0].targets|length > 0 %}
 	{% set target = board.players[0].targets[0] %}
 {% endif %}
@@ -46,29 +46,28 @@
 			</div>
 
 			<div class="row row--end actions">
-				<form action="">
-					<button type="submit">
-						&#x21B6;
-					</button>
-				</form>
+				{{ form_start(rotationForms.anticlockwise, { 'action': url('board_rotate_remaining_anticlockwise')}) }}
+				<button type="submit">
+					&#x21B6;
+				</button>
+				{{ form_end(rotationForms.anticlockwise) }}
 
 				<div class="tile">
 					{% set remainingTile = board.remainingTile %}
 					{% set tile = remainingTile.tile %}
-					<div class="tile tile--remaining tile--shape-{{ tile.shape }} tile-rotation-{{ remainingTile.rotation }} {% if target == tile.treasure %}tile--target{% endif %}">
+					<div class="tile tile--remaining tile--shape-{{ tile.shape }} tile--rotation-{{ remainingTile.rotation }} {% if target == tile.treasure %}tile--target{% endif %}">
 						<div class="emoji">
 							{{ emojis[tile.treasure] }}
 						</div>
 					</div>
 				</div>
 
-				<form action="">
-					<button type="submit">
-						&#x21B7;
-					</button>
-				</form>
+				{{ form_start(rotationForms.clockwise, { 'action': url('board_rotate_remaining_clockwise')}) }}
+				<button type="submit">
+					&#x21B7;
+				</button>
+				{{ form_end(rotationForms.clockwise) }}
 			</div>
 		</div>
 	</div>
-
 {% endblock %}

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 )
 
@@ -27,6 +28,7 @@ func writeJsonResponse(w http.ResponseWriter, statusCode int, data interface{}) 
 
 	encodedBody, err := json.Marshal(data)
 	if err != nil {
+		log.Printf("Failed to encode body: %v.", err)
 		return err
 	}
 

@@ -26,7 +26,7 @@ func TestBoardDrawer(t *testing.T) {
 
 			assert.Equal(t, `
 ───
- · 
+ . 
 ───
 `[1:], writer.String())
 		}
@@ -43,7 +43,7 @@ func TestBoardDrawer(t *testing.T) {
 
 			assert.Equal(t, `
 │ │
-│·│
+│.│
 │ │
 `[1:], writer.String())
 		}
@@ -60,7 +60,7 @@ func TestBoardDrawer(t *testing.T) {
 
 			assert.Equal(t, `
 ───
- · 
+ . 
 ───
 `[1:], writer.String())
 		}
@@ -77,7 +77,7 @@ func TestBoardDrawer(t *testing.T) {
 
 			assert.Equal(t, `
 │ │
-│·│
+│.│
 │ │
 `[1:], writer.String())
 		}
@@ -198,7 +198,7 @@ func TestBoardDrawer(t *testing.T) {
 
 			assert.Equal(t, `
 │ └
-│· 
+│. 
 └──
 `[1:], writer.String())
 		}
@@ -215,7 +215,7 @@ func TestBoardDrawer(t *testing.T) {
 
 			assert.Equal(t, `
 ┌──
-│· 
+│. 
 │ ┌
 `[1:], writer.String())
 		}
@@ -297,13 +297,13 @@ func TestBoardDrawer(t *testing.T) {
 
 		assert.Equal(t, `
 ───┌─────
- · │B  A 
+ . │B  A 
 ───│ ┌┐ ┌
 │ │┘ │───
-│·│ C│ · 
+│.│ C│ . 
 │ │┐ │───
 │ │┘ └───
-│·│ D  · 
+│.│ D  . 
 │ │──────
 `[1:], writer.String())
 	})
