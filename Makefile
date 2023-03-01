@@ -47,6 +47,8 @@ develop-config: 								## Dumps the docker development compose file with enviro
 		config
 
 production-image-build:
+	echo "Building images using hash: ${COMMIT_HASH}"
+
 	docker build \
 		-f domain/api/Dockerfile \
 		-t ${DOCKER_IMAGE_DOMAIN_API}:${COMMIT_HASH} \
