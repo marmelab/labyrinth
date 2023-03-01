@@ -32,6 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: Deploy
     needs: unit-test
+    if: github.ref == 'refs/heads/main'
 
     steps:
     - name: Checkout
