@@ -65,7 +65,7 @@ production-image-build:
 		-t ${DOCKER_IMAGE_PROXY}:latest \
 		.
 
-production-image-push: production-image			## Push production images to Docker Hub
+production-image-push: production-image-build	## Push production images to Docker Hub
 	docker image push --all-tags ${DOCKER_IMAGE_DOMAIN_API}
 	docker image push --all-tags ${DOCKER_IMAGE_WEBAPP}
 	docker image push --all-tags ${DOCKER_IMAGE_PROXY}
