@@ -13,6 +13,11 @@ type rotateRemainingRequestBody struct {
 	Rotation string       `json:"rotation"`
 }
 
+const (
+	Clockwise     = "CLOCKWISE"
+	AntiClockwise = "ANTICLOCKWISE"
+)
+
 func rotateRemainingHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		log.Printf("Got '%v /rotate-remaining', expected 'POST /rotate-remaining'", r.Method)
@@ -27,16 +32,14 @@ func rotateRemainingHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch requestBody.Rotation {
-	case "CLOCKWISE":
+	case Clockwise:
 		requestBody.Board.RotateRemainingTileClockwise()
-	case "ANTICLOCKWISE":
+	case AntiClockwise:
 		requestBody.Board.RotateRemainingTileAntiClockwise()
 	default:
 		log.Printf("POST '/rotate-remaining' - Unsupported direction: %v", requestBody.Rotation)
 		http.Error(w, fmt.Sprintf("unsupported direction: %v", requestBody.Rotation), http.StatusInternalServerError)
 	}
-
-	log.Println(requestBody.Board.RemainingTile)
 
 	writeJsonResponse(w, http.StatusOK, requestBody.Board)
 }

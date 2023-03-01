@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Form\Type\InsertTileType;
+use App\Service\Direction;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,5 +49,46 @@ class BoardController extends AbstractController
     public function postRotateRemainingAnticlockwise(Request $request): Response
     {
         return $this->rotateRemaining($request, Rotation::ANTICLOCKWISE);
+    }
+
+    private function insertTile(Request $request, Direction $direction): Response
+    {
+        $session = $request->getSession();
+
+        $form = $this->createForm(InsertTileType::class);
+        $form->handleRequest($request);
+
+        if ($session->has(self::SESSION_BOARD_KEY) && $form->isSubmitted() && $form->isValid()) {
+            $insertTile = $form->getData();
+
+            $savedBoard = $session->get(self::SESSION_BOARD_KEY);
+            $updatedBoard = $this->domainService->insertTile($savedBoard, $direction, intval($insertTile['index']));
+            $session->set(self::SESSION_BOARD_KEY, $updatedBoard);
+        }
+        return $this->redirectToRoute('home');
+    }
+
+    #[Route('/board/insert-tile-top', name: 'board_insert_tile_top', methods: 'POST')]
+    public function postInsertTileTop(Request $request): Response
+    {
+        return $this->insertTile($request, Direction::TOP);
+    }
+
+    #[Route('/board/insert-tile-right', name: 'board_insert_tile_right', methods: 'POST')]
+    public function postInsertTileRight(Request $request): Response
+    {
+        return $this->insertTile($request, Direction::RIGHT);
+    }
+
+    #[Route('/board/insert-tile-bottom', name: 'board_insert_tile_bottom', methods: 'POST')]
+    public function postInsertTileBottom(Request $request): Response
+    {
+        return $this->insertTile($request, Direction::BOTTOM);
+    }
+
+    #[Route('/board/insert-tile-left', name: 'board_insert_tile_left', methods: 'POST')]
+    public function postInsertTileLeft(Request $request): Response
+    {
+        return $this->insertTile($request, Direction::LEFT);
     }
 }

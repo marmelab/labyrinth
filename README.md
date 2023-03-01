@@ -81,7 +81,7 @@ make test
 
 ## End to End testing
 
-You will need to add the following configuration lines to the `webapp/.env` file:
+You will need to have `Firefox` installed and add the following configuration lines to the `webapp/.env` file:
 
 ```sh
 # The webapp URL

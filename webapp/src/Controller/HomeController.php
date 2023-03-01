@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Form\Type\InsertTileType;
 use App\Service\Rotation;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -60,13 +61,8 @@ class HomeController extends AbstractController
             $session->set(self::SESSION_BOARD_KEY, $newBoard);
         }
 
-        $rotateRemainingClockwise = $this->createForm(RotateRemainingType::class, [
-            'rotation' => Rotation::CLOCKWISE,
-        ]);
-
-        $rotateRemainingAnticlockwise = $this->createForm(RotateRemainingType::class, [
-            'rotation' => Rotation::ANTICLOCKWISE,
-        ]);
+        $rotateRemainingClockwise = $this->createForm(RotateRemainingType::class);
+        $rotateRemainingAnticlockwise = $this->createForm(RotateRemainingType::class);
 
         $board = $session->get(self::SESSION_BOARD_KEY);
         return $this->render('home/index.html.twig', [
@@ -76,10 +72,6 @@ class HomeController extends AbstractController
                 'clockwise' => $rotateRemainingClockwise->createView(),
                 'anticlockwise' => $rotateRemainingAnticlockwise->createView(),
             ],
-            'rotation_type' => [
-                'clockwise' => Rotation::CLOCKWISE->value,
-                'anticlockwise' => Rotation::ANTICLOCKWISE->value,
-            ]
         ]);
     }
 }

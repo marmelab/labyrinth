@@ -36,4 +36,21 @@ class DomainService implements DomainServiceInterface
 
         return $response->toArray();
     }
+
+    function insertTile(array $board, Direction $direction, int $index): array
+    {
+
+        $response = $this->httpClient->request("POST", "{$this->domainServiceUrl}/insert-tile", [
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+            'body' => json_encode([
+                'board' => $board,
+                'direction' => $direction,
+                'index' => $index,
+            ]),
+        ]);
+
+        return $response->toArray();
+    }
 }
