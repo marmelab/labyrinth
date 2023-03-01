@@ -11,6 +11,9 @@ body {
     width: 100%;
     margin: 0;
     padding: 0;
+    font-family: sans-serif;
+    font-size: 20px;
+    line-height: 1.5;
 }
 
 html {
@@ -25,78 +28,160 @@ body {
     background-color: #f0f0f0;
 }
 
+.game {
+    display: flex;
+    gap: 20px;
+    width: calc((var(--tile-size) * 7) + 380px);
+}
+
 /**
  * Board
  */
 .board {
     display: grid;
-    height: calc(var(--tile-size) * 7);
-    width: calc(var(--tile-size) * 7);
-    background: url(/images/background.png) repeat;
+    height: calc(var(--tile-size) * 7 + 80px);
+    width: calc(var(--tile-size) * 7 + 80px);
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 1);
 
+    gap: 10px;
     grid-template-columns: repeat(7, 1fr);
     grid-template-rows: repeat(7, 1fr);
+    background: url(/images/background.png) repeat;
 }
 
-.board .tile {
+.tile {
     position: relative;
     display: flex;
     flex-direction: row;
     width: var(--tile-size);
     height: var(--tile-size);
+    align-items: center;
+    justify-content: center;
+    border: 1px #d0d0d0 solid;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 1);
 }
+
 
 .tile::before,
 .tile::after {
     position: absolute;
     content: "";
-    background-color: #ffffff;
+    background-color: #d0d0d0;
     z-index: 0;
 }
 
-.tile-shape-0::before {
-    top: 30px;
+.tile:hover {
+    cursor: pointer;
+    border-color: #ffffff;
+}
+
+.tile:hover::before,
+.tile:hover::after {
+    background-color: #ffffff;
+}
+
+.tile--target::before,
+.tile--target::after {
+    background-color: #ffA500;
+}
+
+.tile--target:hover::before,
+.tile--target:hover::after {
+
+    background-color: #ff4500;
+}
+
+.tile--remaining {
+    background: url(/images/background.png) repeat;
+    box-shadow: 0 0 4px rgba(0, 0, 0, .15);
+}
+
+.tile .emoji {
+    z-index: 1;
+}
+
+.tile--shape-0::before {
+    top: 29px;
     right: 0;
-    bottom: 30px;
+    bottom: 29px;
     left: 0;
 }
 
-.tile-shape-1::before {
-    top: 30px;
+.tile--shape-1::before {
+    top: 29px;
     right: 0;
-    bottom: 30px;
+    bottom: 29px;
     left: 0;
 }
 
-.tile-shape-1::after {
+.tile--shape-1::after {
     top: 0;
-    right: 30px;
-    bottom: 60px;
-    left: 30px;
+    right: 29px;
+    bottom: 59px;
+    left: 29px;
 }
 
-.tile-shape-2::before {
-    top: 30px;
-    right: 30px;
-    bottom: 30px;
+.tile--shape-2::before {
+    top: 29px;
+    right: 29px;
+    bottom: 29px;
     left: 0;
 }
 
-.tile-shape-2::after {
-    top: 60px;
-    right: 30px;
+.tile--shape-2::after {
+    top: 59px;
+    right: 29px;
     bottom: 0px;
-    left: 30px;
+    left: 29px;
 }
 
-.tile-rotation-90 {
+.tile--rotation-90 {
     transform: rotate(90deg);
 }
 
-.tile-rotation-180 {
+.tile--rotation-90 .emoji {
+    transform: rotate(-90deg);
+}
+
+.tile--rotation-180 {
     transform: rotate(180deg);
 }
 
-.tile-rotation-270 {
+.tile--rotation-180 .emoji {
+    transform: rotate(-180deg);
+}
+
+.tile--rotation-270 {
     transform: rotate(270deg);
+}
+
+.tile--rotation-270 .emoji {
+    transform: rotate(-270deg);
+}
+
+.player {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    justify-content: start;
+    gap: 10px;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 0 1;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.row .row__label {
+    font-weight: bold;
+}
+
+.row .row__value {
+    width: 50%;
 }
