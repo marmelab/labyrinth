@@ -5,10 +5,11 @@ on:
     workflows:
       - "Unit Test Domain"
       - "Unit Test Webapp"
+    branches:
+      - "feature/**",
+      - "main"
     types:
       - completed
-    branches:
-      - "*"
 
 jobs:
   deploy:
