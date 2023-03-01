@@ -74,16 +74,19 @@ production-image-push: production-image-build	## Push production images to Docke
 
 production-deploy: production-image-push 		## Deploy production to AWS
 	scp \
+        -o StrictHostKeyChecking=no \
 		-i .secrets/labyrinth-ed25519.pem \
 		docker-compose.yml docker-compose.prod.yml scripts/run-production.sh \
 		${SERVER_USER}@${SERVER_HOSTNAME}:~
 
 	ssh \
+        -o StrictHostKeyChecking=no \
 	 	-i .secrets/labyrinth-ed25519.pem \
 	 	${SERVER_USER}@${SERVER_HOSTNAME} \
 	 	'echo "TAG=${COMMIT_HASH}" > .env'
 	
 	ssh \
+        -o StrictHostKeyChecking=no \
 	 	-i .secrets/labyrinth-ed25519.pem \
 	 	${SERVER_USER}@${SERVER_HOSTNAME} \
 	 	'./run-production.sh'
@@ -95,6 +98,13 @@ production: production-image					## Run the program for production
 		-f docker-compose.yml \
 		-f docker-compose.prod.yml \
 		up
+
+production-ssh-test:
+	ssh -T \
+        -o StrictHostKeyChecking=no \
+		-i .secrets/labyrinth-ed25519.pem \
+		${SERVER_USER}@${SERVER_HOSTNAME} \
+		exit
 
 test: 											## Run unit tests
 	@(${MAKE} -C domain test)
