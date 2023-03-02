@@ -114,12 +114,17 @@ class BoardController extends AbstractController
 
         $boardState = $board->getState();
         if ($boardState['gameState'] == 2) {
+            $this->addFlash('errors', 'Game has ended.');
             return false;
         }
 
         $stateCurrentPlayer = $this->getCurrentPlayer($boardState);
         $currentPlayer = $board->getPlayers()[$stateCurrentPlayer['color']];
-        return $currentPlayer->getId() == $player->getId();
+        if ($currentPlayer->getId() == $player->getId()) {
+            return true;
+        }
+
+        return false;
     }
 
     private function canPlayerJoin(?Player $player, Board $board): bool
@@ -280,6 +285,7 @@ class BoardController extends AbstractController
         $entityManager = $doctrine->getManager();
         $player = $this->getPlayer($request, $entityManager);
         if (!$this->canPlayerPlay($board, $player)) {
+            $this->addFlash('errors', 'You cannot perform this action.');
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
         }
 
@@ -332,6 +338,7 @@ class BoardController extends AbstractController
         $entityManager = $doctrine->getManager();
         $player = $this->getPlayer($request, $entityManager);
         if (!$this->canPlayerPlay($board, $player)) {
+            $this->addFlash('errors', 'You cannot perform this action.');
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
         }
 
