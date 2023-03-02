@@ -168,7 +168,6 @@ button:not([disabled]) {
     color: #dddddd;
     border: 1px #dddddd solid;
     box-shadow: none;
-    cursor: default;
 }
 
 /**
@@ -218,13 +217,12 @@ button:not([disabled]) {
     z-index: 0;
 }
 
-.tile__content:hover {
-    cursor: pointer;
+.tile:not[disabled] .tile__content:hover {
     border-color: #ffffff;
 }
 
-.tile__content:hover::before,
-.tile__content:hover::after {
+.tile:not[disabled] .tile__content:hover::before,
+.tile:not[disabled] .tile__content:hover::after {
     background-color: #ffffff;
 }
 

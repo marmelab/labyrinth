@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Lobby
+{% endblock %}
+
+
+{% set player = app.session.get('player') %}
+{% set canJoin = true %}
+
+{% block body %}
+<div class="container">
+
+    <div class="row justify-content-center">
+        <div class="col col-4 justify-content-center">
+            <ul>
+                {% for gamePlayer in board.players %}
+                {% if gamePlayer.id == player.id %}{% set canJoin = false %}{% endif %}
+                <li>{{ gamePlayer.name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col col-4">
+            {% if canJoin %}
+            {{ form(form) }}
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

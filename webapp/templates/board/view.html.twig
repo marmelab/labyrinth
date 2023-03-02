@@ -36,6 +36,7 @@
 							"tile": boardTile.tile,
 							"rotation": boardTile.rotation,
 							"players": boardState.players,
+							"gameState": boardState.gameState,
 						} %}
 					{% endfor %}
 				{% endfor %}
@@ -78,7 +79,17 @@
 					</div>
 
 					<div class="scores__row__value">
-						{{ currentPlayer.color }}
+						{{ players[currentPlayer.color].name }}
+					</div>
+				</div>
+
+				<div class="scores__row">
+					<div class="scores__row__label">
+						Color
+					</div>
+
+					<div class="scores__row__value">
+						{{ colors[currentPlayer.color] }}
 					</div>
 				</div>
 
@@ -91,7 +102,6 @@
 						{{ emojis[target] }}
 					</div>
 				</div>
-
 			</div>
 		</div>
 

@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -27,6 +29,14 @@ class Player
     #[Assert\Regex('/^[a-zA-Z0-9]+/')]
     private ?string $name = null;
 
+    #[ORM\ManyToMany(targetEntity: Board::class, mappedBy: 'players')]
+    private Collection $boards;
+
+    public function __construct()
+    {
+        $this->boards = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -40,6 +50,33 @@ class Player
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Board>
+     */
+    public function getBoards(): Collection
+    {
+        return $this->boards;
+    }
+
+    public function addBoard(Board $board): self
+    {
+        if (!$this->boards->contains($board)) {
+            $this->boards->add($board);
+            $board->addPlayer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBoard(Board $board): self
+    {
+        if ($this->boards->removeElement($board)) {
+            $board->removePlayer($this);
+        }
 
         return $this;
     }
