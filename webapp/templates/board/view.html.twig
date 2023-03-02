@@ -3,6 +3,10 @@
 {% block title %}Welcome to Labyrinth Online!
 {% endblock %}
 
+{% block meta %}
+<meta http-equiv="Refresh" content="30">
+{% endblock %}
+
 {% set target = "" %}
 {% if currentPlayer.targets|length > 0 %}
 	{% set target = currentPlayer.targets[0] %}
