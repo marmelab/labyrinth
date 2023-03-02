@@ -23,6 +23,8 @@
 	</head>
 	<body>
 		<header>
+			<a href="{{ url('home') }}">Home</a>
+
 			{% set player = app.session.get('player') %}
 			{% if player == NULL %}
 				<form action="{{ url('player_sign_in') }}" method="POST">

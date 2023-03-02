@@ -53,7 +53,7 @@ class BoardController extends AbstractController
     ) {
     }
 
-    #[Route('/board/new', name: 'board_new')]
+    #[Route('/board/new', name: 'board_new', methods: 'POST')]
     public function getNew(ManagerRegistry $doctrine)
     {
         $entityManager = $doctrine->getManager();
@@ -71,7 +71,7 @@ class BoardController extends AbstractController
         ]);
     }
 
-    #[Route('/board/{id}/view', name: 'board_view')]
+    #[Route('/board/{id}/view', name: 'board_view', methods: 'GET')]
     public function getView(Board $board): Response
     {
         return $this->render('board/view.html.twig', [
