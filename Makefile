@@ -68,7 +68,7 @@ production-image-build:
 		.
 
 	docker build \
-		-f webapp/migrationsDockerfile \
+		-f webapp/migrations/Dockerfile \
 		-t ${DOCKER_IMAGE_WEBAPP_MIGRATIONS}:${COMMIT_HASH} \
 		-t ${DOCKER_IMAGE_WEBAPP_MIGRATIONS}:latest \
 		.
