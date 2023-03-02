@@ -162,12 +162,12 @@ class BoardController extends AbstractController
             $movePlayer = $form->getData();
 
             $updatedBoard = $this->domainService->movePlayer(
-                $this->getBoardState($board),
+                $board->getState(),
                 intval($movePlayer['line']),
                 intval($movePlayer['row']),
             );
 
-            $board->setState(json_encode($updatedBoard));
+            $board->setState($updatedBoard);
 
             $doctrine->getManager()->flush();
         }
