@@ -76,7 +76,8 @@ make test
 ```
 /!\ Warning: Running tests requires `go`, `php8.1` and `composer` installed globally.
 
-/!\ Warning: You will also need the following PHP extensions installed: `php8.1-xml`, `php8.1-mbstring`, `php8.1-zip` and `php8.1-curl`. 
+/!\ Warning: You will also need the following PHP extensions installed: `php8.1-xml`, `php8.1-mbstring`, `php8.1-zip`, 
+`php8.1-pgsql` and `php8.1-curl`. 
 
 
 ## End to End testing

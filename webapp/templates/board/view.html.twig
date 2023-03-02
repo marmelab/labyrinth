@@ -1,0 +1,120 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Welcome to Labyrinth Online!
+{% endblock %}
+
+{% set target = "." %}
+{% if boardState.players[0].targets|length > 0 %}
+	{% set target = boardState.players[0].targets[0] %}
+{% endif %}
+
+{% block body %}
+	<div class="game">
+		<div class="game__actions game__actions--top">
+			{% for i in range(1, 5, 2) %}
+				<form action="{{ url('board_insert_tile_top', { 'id': board.id }) }}" method="POST">
+					<input type="hidden" name="insert_tile[_token]" value="{{ csrf_token('insert_tile') }} ">
+					<input type="hidden" name="insert_tile[index]" value="{{i}}">
+					<button {% if boardState.gameState != 0 %} disabled {% endif %}>↓</button>
+				</form>
+			{% endfor %}
+		</div>
+
+		<div class="game__row">
+			<div class="game__actions game__actions--left">
+				{% for i in range(1, 5, 2) %}
+					<form action="{{ url('board_insert_tile_left', { 'id': board.id }) }}" method="POST">
+						<input type="hidden" name="insert_tile[_token]" value="{{ csrf_token('insert_tile') }} ">
+						<input type="hidden" name="insert_tile[index]" value="{{i}}">
+
+						<button {% if boardState.gameState != 0 %} disabled {% endif %}>→</button>
+					</form>
+				{% endfor %}
+			</div>
+
+			<div class="board">
+				{% for line in boardState.tiles %}
+					{% for boardTile in line %}
+						{% set tile = boardTile.tile %}
+						<div class="tile tile--shape-{{ tile.shape }} tile--rotation-{{ boardTile.rotation }} {% if target == tile.treasure %}tile--target{% endif %}">
+							<div class="emoji">
+								{{ emojis[tile.treasure] }}
+							</div>
+						</div>
+					{% endfor %}
+				{% endfor %}
+			</div>
+
+			<div class="game__actions game__actions--right">
+				{% for i in range(1, 5, 2) %}
+					<form action="{{ url('board_insert_tile_right', { 'id': board.id }) }}" method="POST">
+						<input type="hidden" name="insert_tile[_token]" value="{{ csrf_token('insert_tile') }} ">
+						<input type="hidden" name="insert_tile[index]" value="{{i}}">
+
+						<button {% if boardState.gameState != 0 %} disabled {% endif %}>←</button>
+					</form>
+				{% endfor %}
+			</div>
+
+			<div class="player">
+				<div class="row">
+					<div class="row__label">
+						Player
+					</div>
+
+					<div class="row__value">
+						{{ boardState.players[0].color }}
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="row__label">
+						Target
+					</div>
+
+					<div class="row__value">
+						{{ emojis[target] }}
+					</div>
+				</div>
+
+				<div class="row row--end actions">
+
+					<form action="{{ url('board_rotate_remaining_anticlockwise', { 'id': board.id }) }}" method="POST">
+						<input type="hidden" name="rotate_remaining[_token]" value="{{ csrf_token('rotate_remaining') }} ">
+						<button type="submit" id="submit-rotate-remaining-clockwise">
+							&#x21B6;
+						</button>
+					</form>
+
+					<div class="tile">
+						{% set remainingTile = boardState.remainingTile %}
+						{% set tile = remainingTile.tile %}
+						<div class="tile tile--remaining tile--shape-{{ tile.shape }} tile--rotation-{{ remainingTile.rotation }} {% if target == tile.treasure %}tile--target{% endif %}">
+							<div class="emoji">
+								{{ emojis[tile.treasure] }}
+							</div>
+						</div>
+					</div>
+
+					<form action="{{ url('board_rotate_remaining_clockwise', { 'id': board.id }) }}" method="POST">
+						<input type="hidden" name="rotate_remaining[_token]" value="{{ csrf_token('rotate_remaining') }} ">
+						<button type="submit" id="submit-rotate-remaining-clockwise">
+							&#x21B7;
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<div class="game__actions game__actions--bottom">
+			{% for i in range(1, 5, 2) %}
+				<form action="{{ url('board_insert_tile_bottom', { 'id': board.id }) }}" method="POST">
+					<input type="hidden" name="insert_tile[_token]" value="{{ csrf_token('insert_tile') }} ">
+					<input type="hidden" name="insert_tile[index]" value="{{i}}">
+
+					<button {% if boardState.gameState != 0 %} disabled {% endif %}>↑</button>
+				</form>
+			{% endfor %}
+		</div>
+	</div>
+{% endblock %}

@@ -13,6 +13,7 @@ COMMIT_HASH=$(shell git rev-parse HEAD)
 DOCKER_IMAGE_NAMESPACE=jonathanmarmelab
 DOCKER_IMAGE_DOMAIN_API=${DOCKER_IMAGE_NAMESPACE}/labyrinth-domain-api
 DOCKER_IMAGE_WEBAPP=${DOCKER_IMAGE_NAMESPACE}/labyrinth-webapp
+DOCKER_IMAGE_WEBAPP_MIGRATIONS=${DOCKER_IMAGE_NAMESPACE}/labyrinth-webapp-migrations
 DOCKER_IMAGE_PROXY=${DOCKER_IMAGE_NAMESPACE}/labyrinth-proxy
 
 SERVER_USER=""
@@ -37,14 +38,16 @@ install:										## Install dependencies
 run: develop									## Run the program for development, alias of develop
 
 develop: 										## Run the program for development
-	@(mkdir -p logs)
+	@(mkdir -p logs data/postgres)
 	docker compose \
+		--env-file webapp/.env \
 		-f docker-compose.yml \
 		-f docker-compose.dev.yml \
 		up --build
 
 develop-config: 								## Dumps the docker development compose file with environment set
 	docker compose \
+		--env-file webapp/.env \
 		-f docker-compose.yml \
 		-f docker-compose.dev.yml \
 		config
@@ -64,6 +67,12 @@ production-image-build:
 		-t ${DOCKER_IMAGE_WEBAPP}:latest \
 		.
 
+	docker build \
+		-f webapp/migrationsDockerfile \
+		-t ${DOCKER_IMAGE_WEBAPP_MIGRATIONS}:${COMMIT_HASH} \
+		-t ${DOCKER_IMAGE_WEBAPP_MIGRATIONS}:latest \
+		.
+	
 	docker build \
 		-f proxy/Dockerfile \
 		-t ${DOCKER_IMAGE_PROXY}:${COMMIT_HASH} \
@@ -95,8 +104,9 @@ production-deploy: production-image-push 		## Deploy production to AWS
 	 	'./run-production.sh'
 
 production: production-image					## Run the program for production
-	@(mkdir -p logs)
+	@(mkdir -p logs data/postgres)
 	TAG=${COMMIT_HASH} docker compose \
+		--env-file webapp/.env \
 		--pull always \
 		-f docker-compose.yml \
 		-f docker-compose.prod.yml \

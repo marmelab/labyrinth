@@ -13,8 +13,15 @@ class BoardTest extends PantherTestCase
         $client = static::createPantherClient([
             'browser' => PantherTestCase::FIREFOX,
         ]);
+
         $client->request('GET', $_ENV['WEBAPP_URL']);
         $client->manage()->window()->setSize(new WebDriverDimension(1920, 1080));
+
+        $crawler = $client->waitFor('body');
+        $newGameButton = $crawler->selectButton('New Game');
+        $this->assertCount(1, $newGameButton);
+
+        $newGameButton->first()->click();
 
         $crawler = $client->waitFor('.tile--remaining');
 
@@ -22,7 +29,7 @@ class BoardTest extends PantherTestCase
         $this->assertCount(1, $remainingTileFilter);
         $initialClasses = $remainingTileFilter->first()->getAttribute("class");
 
-        $client->submitForm('submit-rotate-remaining-clockwise');
+        $crawler->selectButton('↷')->click();
 
         $crawler = $client->waitFor('.tile--remaining');
 
@@ -34,7 +41,7 @@ class BoardTest extends PantherTestCase
         $this->assertNotEquals($initialClasses, $updatedClasses);
     }
 
-    public function testRotateRemainingTileAntilockwise(): void
+    public function testRotateRemainingTileAnticlockwise(): void
     {
         $client = static::createPantherClient([
             'browser' => PantherTestCase::FIREFOX,
@@ -42,13 +49,19 @@ class BoardTest extends PantherTestCase
         $client->request('GET', $_ENV['WEBAPP_URL']);
         $client->manage()->window()->setSize(new WebDriverDimension(1920, 1080));
 
+        $crawler = $client->waitFor('body');
+        $newGameButton = $crawler->selectButton('New Game');
+        $this->assertCount(1, $newGameButton);
+
+        $newGameButton->first()->click();
+
         $crawler = $client->waitFor('.tile--remaining');
 
         $remainingTileFilter = $crawler->filter('.tile--remaining');
         $this->assertCount(1, $remainingTileFilter);
         $initialClasses = $remainingTileFilter->first()->getAttribute("class");
 
-        $client->submitForm('submit-rotate-remaining-anticlockwise');
+        $crawler->selectButton('↶')->click();
 
         $crawler = $client->waitFor('.tile--remaining');
 
