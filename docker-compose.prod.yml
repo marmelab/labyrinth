@@ -2,22 +2,22 @@ version: '3.8'
 
 services:
   api-domain:
-    image: jonathanmarmelab/labyrinth-domain-api:${TAG}
+    image: jonathanmarmelab/labyrinth-domain-api:latest
 
   webapp:
-    image: jonathanmarmelab/labyrinth-webapp:${TAG}
+    image: jonathanmarmelab/labyrinth-webapp:latest
     environment:
       - APP_DEBUG=false
       - APP_ENV=prod
 
   webapp-migrations:
-    image: jonathanmarmelab/labyrinth-webapp-migrations:${TAG}
+    image: jonathanmarmelab/labyrinth-webapp-migrations:latest
     environment:
       - APP_DEBUG=false
       - APP_ENV=prod
 
   proxy:
-    image: jonathanmarmelab/labyrinth-proxy:${TAG}
+    image: jonathanmarmelab/labyrinth-proxy:latest
     volumes:
       - ./logs:/var/log/nginx
     ports:
