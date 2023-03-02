@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends "base.html.twig" %}
 
 {% block title %}Welcome to Labyrinth Online!
 {% endblock %}
@@ -11,49 +11,42 @@
 {% block body %}
 	<div class="game">
 		<div class="game__actions game__actions--top">
-			{% for i in range(1, 5, 2) %}
-				<form action="{{ url('board_insert_tile_top', { 'id': board.id }) }}" method="POST">
-					<input type="hidden" name="insert_tile[_token]" value="{{ csrf_token('insert_tile') }} ">
-					<input type="hidden" name="insert_tile[index]" value="{{i}}">
-					<button {% if boardState.gameState != 0 %} disabled {% endif %}>↓</button>
-				</form>
-			{% endfor %}
+			{% include "board/components/insert_tile.html.twig" with {
+				"actionUrl": url("board_insert_tile_top", { "id": board.id }),
+				"gameState": boardState.gameState,
+				"label": "↓",
+			} %}
 		</div>
 
 		<div class="game__row">
 			<div class="game__actions game__actions--left">
-				{% for i in range(1, 5, 2) %}
-					<form action="{{ url('board_insert_tile_left', { 'id': board.id }) }}" method="POST">
-						<input type="hidden" name="insert_tile[_token]" value="{{ csrf_token('insert_tile') }} ">
-						<input type="hidden" name="insert_tile[index]" value="{{i}}">
-
-						<button {% if boardState.gameState != 0 %} disabled {% endif %}>→</button>
-					</form>
-				{% endfor %}
+				{% include "board/components/insert_tile.html.twig" with {
+					"actionUrl": url("board_insert_tile_left", { "id": board.id }),
+					"gameState": boardState.gameState,
+					"label": "→",
+				} %}
 			</div>
 
 			<div class="board">
-				{% for line in boardState.tiles %}
-					{% for boardTile in line %}
-						{% set tile = boardTile.tile %}
-						<div class="tile tile--shape-{{ tile.shape }} tile--rotation-{{ boardTile.rotation }} {% if target == tile.treasure %}tile--target{% endif %}">
-							<div class="emoji">
-								{{ emojis[tile.treasure] }}
-							</div>
-						</div>
+				{% for line, lineTiles in boardState.tiles %}
+					{% for row, boardTile in lineTiles %}
+						{% include "board/components/tile.html.twig" with {
+							"line": line,
+							"row": row,
+							"tile": boardTile.tile,
+							"rotation": boardTile.rotation,
+							"players": boardState.players,
+						} %}
 					{% endfor %}
 				{% endfor %}
 			</div>
 
 			<div class="game__actions game__actions--right">
-				{% for i in range(1, 5, 2) %}
-					<form action="{{ url('board_insert_tile_right', { 'id': board.id }) }}" method="POST">
-						<input type="hidden" name="insert_tile[_token]" value="{{ csrf_token('insert_tile') }} ">
-						<input type="hidden" name="insert_tile[index]" value="{{i}}">
-
-						<button {% if boardState.gameState != 0 %} disabled {% endif %}>←</button>
-					</form>
-				{% endfor %}
+				{% include "board/components/insert_tile.html.twig" with {
+					"actionUrl": url("board_insert_tile_right", { "id": board.id }),
+					"gameState": boardState.gameState,
+					"label": "←",
+				} %}
 			</div>
 
 			<div class="player">
@@ -78,43 +71,35 @@
 				</div>
 
 				<div class="row row--end actions">
-
-					<form action="{{ url('board_rotate_remaining_anticlockwise', { 'id': board.id }) }}" method="POST">
-						<input type="hidden" name="rotate_remaining[_token]" value="{{ csrf_token('rotate_remaining') }} ">
-						<button type="submit" id="submit-rotate-remaining-clockwise">
-							&#x21B6;
-						</button>
-					</form>
+					{% include "board/components/rotate_remaining.html.twig" with {
+						"actionUrl": url("board_rotate_remaining_anticlockwise", { "id": board.id }),
+						"label": "↶",
+					} %}
 
 					<div class="tile">
 						{% set remainingTile = boardState.remainingTile %}
 						{% set tile = remainingTile.tile %}
-						<div class="tile tile--remaining tile--shape-{{ tile.shape }} tile--rotation-{{ remainingTile.rotation }} {% if target == tile.treasure %}tile--target{% endif %}">
+						<div class="tile__content tile--remaining tile--shape-{{ tile.shape }} tile--rotation-{{ remainingTile.rotation }} {% if target == tile.treasure %}tile--target{% endif %}">
 							<div class="emoji">
 								{{ emojis[tile.treasure] }}
 							</div>
 						</div>
 					</div>
 
-					<form action="{{ url('board_rotate_remaining_clockwise', { 'id': board.id }) }}" method="POST">
-						<input type="hidden" name="rotate_remaining[_token]" value="{{ csrf_token('rotate_remaining') }} ">
-						<button type="submit" id="submit-rotate-remaining-clockwise">
-							&#x21B7;
-						</button>
-					</form>
+					{% include "board/components/rotate_remaining.html.twig" with {
+						"actionUrl": url("board_rotate_remaining_clockwise", { "id": board.id }),
+						"label": "↷",
+					} %}
 				</div>
 			</div>
 		</div>
 
 		<div class="game__actions game__actions--bottom">
-			{% for i in range(1, 5, 2) %}
-				<form action="{{ url('board_insert_tile_bottom', { 'id': board.id }) }}" method="POST">
-					<input type="hidden" name="insert_tile[_token]" value="{{ csrf_token('insert_tile') }} ">
-					<input type="hidden" name="insert_tile[index]" value="{{i}}">
-
-					<button {% if boardState.gameState != 0 %} disabled {% endif %}>↑</button>
-				</form>
-			{% endfor %}
+			{% include "board/components/insert_tile.html.twig" with {
+				"actionUrl": url("board_insert_tile_bottom", { "id": board.id }),
+				"gameState": boardState.gameState,
+				"label": "↑",
+			} %}
 		</div>
 	</div>
 {% endblock %}

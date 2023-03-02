@@ -34,8 +34,6 @@ func insertTileHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to decode body", http.StatusInternalServerError)
 	}
 
-	log.Println(requestBody.Direction, requestBody.Index)
-
 	switch requestBody.Direction {
 	case DirectionTop:
 		requestBody.Board.InsertTileTopAt(requestBody.Index)

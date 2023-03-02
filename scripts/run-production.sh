@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
-source .env
-
-mkdir -p logs data
+mkdir -p logs data/postgres
 
 sudo docker compose \
+	--env-file=webapp/.env \
 	-f docker-compose.yml \
 	-f docker-compose.prod.yml \
-	up --pull always -d
+	up --pull=always -d

@@ -1,0 +1,6 @@
+<form action="{{ actionUrl }}" method="POST">
+	<input type="hidden" name="rotate_remaining[_token]" value="{{ csrf_token('rotate_remaining') }} ">
+	<button type="submit">
+		{{ label }}
+	</button>
+</form>

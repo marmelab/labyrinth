@@ -68,7 +68,7 @@ production-image-build:
 		.
 
 	docker build \
-		-f webapp/migrationsDockerfile \
+		-f webapp/migrations/Dockerfile \
 		-t ${DOCKER_IMAGE_WEBAPP_MIGRATIONS}:${COMMIT_HASH} \
 		-t ${DOCKER_IMAGE_WEBAPP_MIGRATIONS}:latest \
 		.
@@ -82,9 +82,10 @@ production-image-build:
 production-image-push: production-image-build	## Push production images to Docker Hub
 	docker image push --all-tags ${DOCKER_IMAGE_DOMAIN_API}
 	docker image push --all-tags ${DOCKER_IMAGE_WEBAPP}
+	docker image push --all-tags ${DOCKER_IMAGE_WEBAPP_MIGRATIONS}
 	docker image push --all-tags ${DOCKER_IMAGE_PROXY}
 
-production-deploy: production-image-push 		## Deploy production to AWS
+production-deploy: production-image-push		## Deploy production to AWS
 	scp \
         -o StrictHostKeyChecking=no \
 		-i .secrets/labyrinth-ed25519.pem \
@@ -102,15 +103,6 @@ production-deploy: production-image-push 		## Deploy production to AWS
 	 	-i .secrets/labyrinth-ed25519.pem \
 	 	${SERVER_USER}@${SERVER_HOSTNAME} \
 	 	'./run-production.sh'
-
-production: production-image					## Run the program for production
-	@(mkdir -p logs data/postgres)
-	TAG=${COMMIT_HASH} docker compose \
-		--env-file webapp/.env \
-		--pull always \
-		-f docker-compose.yml \
-		-f docker-compose.prod.yml \
-		up
 
 production-ssh-test:
 	ssh -T \
