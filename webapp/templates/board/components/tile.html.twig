@@ -1,0 +1,19 @@
+<form action="{{ url('board_move_player', { 'id': board.id }) }}" method="post">
+	<input type="hidden" name="move_player[_token]" value="{{ csrf_token('move_player') }} ">
+	<input type="hidden" name="move_player[line]" value="{{ line }}">
+	<input type="hidden" name="move_player[row]" value="{{ row }}">
+
+	<button class=" tile" type=" submit">
+		<div class="tile__content tile--shape-{{ tile.shape }} tile--rotation-{{ rotation }} {% if target == tile.treasure %}tile--target{% endif %}">
+			<div class="emoji">
+				{{ emojis[tile.treasure] }}
+			</div>
+
+			{% for player in players %}
+				{% if player.position.line == line and player.position.row == row %}
+					<div class="tile__player tile__player--color-{{ player.color }}"></div>
+				{% endif %}
+			{% endfor %}
+		</div>
+	</button>
+</form>

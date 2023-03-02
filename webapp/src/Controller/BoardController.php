@@ -11,6 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Board;
 use App\Form\Type\InsertTileType;
 use App\Form\Type\RotateRemainingType;
+use App\Form\Type\MovePlayerType;
 use App\Service\Direction;
 use App\Service\Rotation;
 use App\Service\DomainServiceInterface;
@@ -149,5 +150,27 @@ class BoardController extends AbstractController
     public function postInsertTileLeft(Request $request, ManagerRegistry $doctrine, Board $board): Response
     {
         return $this->insertTile($request, $doctrine, $board, Direction::LEFT);
+    }
+
+    #[Route('/board/{id}/move-player', name: 'board_move_player', methods: 'POST')]
+    public function postMovePlayer(Request $request, ManagerRegistry $doctrine, Board $board): Response
+    {
+        $form = $this->createForm(MovePlayerType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $movePlayer = $form->getData();
+
+            $updatedBoard = $this->domainService->movePlayer(
+                $this->getBoardState($board),
+                intval($movePlayer['line']),
+                intval($movePlayer['row']),
+            );
+
+            $board->setState(json_encode($updatedBoard));
+
+            $doctrine->getManager()->flush();
+        }
+        return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
     }
 }

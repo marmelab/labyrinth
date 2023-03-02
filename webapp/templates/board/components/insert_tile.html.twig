@@ -1,0 +1,8 @@
+{% for i in range(1, 5, 2) %}
+	<form action="{{ actionUrl }}" method="POST">
+		<input type="hidden" name="insert_tile[_token]" value="{{ csrf_token('insert_tile') }} ">
+		<input type="hidden" name="insert_tile[index]" value="{{i}}">
+
+		<button {% if gameState != 0 %} disabled {% endif %}>{{label}}</button>
+	</form>
+{% endfor %}

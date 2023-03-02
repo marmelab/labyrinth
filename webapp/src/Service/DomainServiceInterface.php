@@ -9,4 +9,6 @@ interface DomainServiceInterface
     function rotateRemainingTile(array $board, Rotation $rotation): array;
 
     function insertTile(array $board, Direction $direction, int $index): array;
+
+    function movePlayer(array $board, int $line, int $row): array;
 }
