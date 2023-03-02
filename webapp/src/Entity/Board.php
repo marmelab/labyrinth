@@ -14,20 +14,20 @@ class Board
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $state = null;
+    #[ORM\Column(type: Types::JSON)]
+    private ?array $state = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getState(): ?string
+    public function getState(): ?array
     {
         return $this->state;
     }
 
-    public function setState(string $state): self
+    public function setState(array $state): self
     {
         $this->state = $state;
 

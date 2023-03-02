@@ -52,11 +52,6 @@ class BoardController extends AbstractController
     ) {
     }
 
-    private function getBoardState(Board $board): array
-    {
-        return json_decode($board->getState(), true);
-    }
-
     #[Route('/board/new', name: 'board_new')]
     public function getNew(ManagerRegistry $doctrine)
     {
@@ -65,7 +60,7 @@ class BoardController extends AbstractController
         $boardState = $this->domainService->newBoard();
 
         $board = new Board();
-        $board->setState(json_encode($boardState));
+        $board->setState($boardState);
 
         $entityManager->persist($board);
         $entityManager->flush();
@@ -80,7 +75,7 @@ class BoardController extends AbstractController
     {
         return $this->render('board/view.html.twig', [
             'board' => $board,
-            'boardState' => $this->getBoardState($board),
+            'boardState' => $board->getState(),
             'emojis' => self::TREASURE_EMOJIS,
         ]);
     }
@@ -91,8 +86,8 @@ class BoardController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $updatedBoard = $this->domainService->rotateRemainingTile($this->getBoardState($board), $rotation);
-            $board->setState(json_encode($updatedBoard));
+            $updatedBoard = $this->domainService->rotateRemainingTile($board->getState(), $rotation);
+            $board->setState($updatedBoard);
 
             $doctrine->getManager()->flush();
         }
@@ -120,12 +115,12 @@ class BoardController extends AbstractController
             $insertTile = $form->getData();
 
             $updatedBoard = $this->domainService->insertTile(
-                $this->getBoardState($board),
+                $board->getState(),
                 $direction,
                 intval($insertTile['index'])
             );
 
-            $board->setState(json_encode($updatedBoard));
+            $board->setState($updatedBoard);
 
             $doctrine->getManager()->flush();
         }
