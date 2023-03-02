@@ -14,7 +14,7 @@ class HomeController extends AbstractController
 {
 
     #[Route('/', name: 'home')]
-    public function index(Request $request): Response
+    public function index(): Response
     {
         $signInForm = $this->createForm(SignInType::class, null, [
             'action' => $this->generateUrl('player_sign_in'),

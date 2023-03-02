@@ -3,9 +3,9 @@
 {% block title %}Welcome to Labyrinth Online!
 {% endblock %}
 
-{% set target = "." %}
-{% if boardState.players[0].targets|length > 0 %}
-	{% set target = boardState.players[0].targets[0] %}
+{% set target = "" %}
+{% if currentPlayer.targets|length > 0 %}
+	{% set target = currentPlayer.targets[0] %}
 {% endif %}
 
 {% block body %}
@@ -78,7 +78,7 @@
 					</div>
 
 					<div class="scores__row__value">
-						{{ boardState.players[0].color }}
+						{{ currentPlayer.color }}
 					</div>
 				</div>
 

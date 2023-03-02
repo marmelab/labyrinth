@@ -322,6 +322,24 @@ button:not([disabled]) {
     left: 10px;
 }
 
+.tile__player--color-1 {
+    background-color: #358138;
+    bottom: 10px;
+    right: 10px;
+}
+
+.tile__player--color-2 {
+    background-color: #E60000;
+    top: 10px;
+    right: 10px;
+}
+
+.tile__player--color-3 {
+    background-color: #FECF48;
+    bottom: 10px;
+    left: 10px;
+}
+
 .scores {
     display: flex;
     flex-grow: 1;

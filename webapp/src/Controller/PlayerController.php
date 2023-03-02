@@ -13,6 +13,7 @@ use App\Form\Type\SignInType;
 
 class PlayerController extends AbstractController
 {
+    const SESSION_PLAYER_KEY = 'player';
 
     #[Route('/player/sign-in', name: 'player_sign_in', methods: 'POST')]
     public function postSignIn(Request $request, ManagerRegistry $doctrine): Response
@@ -20,7 +21,7 @@ class PlayerController extends AbstractController
         $form = $this->createForm(SignInType::class, new Player());
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && !$form->isValid()) {
+        if (!$form->isSubmitted() || !$form->isValid()) {
             return $this->render('player/sign_in.html.twig', [
                 'form' => $form,
             ]);
@@ -40,13 +41,13 @@ class PlayerController extends AbstractController
             $entityManager->flush();
         }
 
-        $request->getSession()->set('player', $player);
+        $request->getSession()->set(static::SESSION_PLAYER_KEY, $player);
         return $this->redirectToRoute('home');
     }
     #[Route('/player/sign-out', name: 'player_sign_out', methods: 'POST')]
     public function postSignOut(Request $request): Response
     {
-        $request->getSession()->remove('player');
+        $request->getSession()->remove(static::SESSION_PLAYER_KEY);
         return $this->redirectToRoute('home');
     }
 }

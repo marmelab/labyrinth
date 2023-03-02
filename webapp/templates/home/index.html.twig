@@ -1,14 +1,13 @@
 {% extends 'base.html.twig' %}
 
-
 {% set player = app.session.get('player') %}
 
 {% block title %}Welcome to Labyrinth Online!
 {% endblock %}
 
 {% block body %}
-	{% if player == NULL %}
-		{{ form(signInForm) }}
-			{% else %}
-				{{ form(newBoardForm) }}{% endif %}
-			{% endblock %}
+{% if player == NULL %}
+	{{ form(signInForm) }}
+{% else %}
+	{{ form(newBoardForm) }}{% endif %}
+{% endblock %}

@@ -12,13 +12,14 @@ use App\Entity\Board;
 use App\Form\Type\InsertTileType;
 use App\Form\Type\RotateRemainingType;
 use App\Form\Type\MovePlayerType;
+use App\Form\Type\NewBoardType;
 use App\Service\Direction;
 use App\Service\Rotation;
 use App\Service\DomainServiceInterface;
 
 class BoardController extends AbstractController
 {
-    const SESSION_BOARD_KEY = 'board';
+    const SESSION_PLAYER_KEY = PlayerController::SESSION_PLAYER_KEY;
 
     const TREASURE_EMOJIS = [
         '.' => ' ',
@@ -54,11 +55,27 @@ class BoardController extends AbstractController
     }
 
     #[Route('/board/new', name: 'board_new', methods: 'POST')]
-    public function getNew(ManagerRegistry $doctrine)
+    public function getNew(Request $request, ManagerRegistry $doctrine)
     {
-        $entityManager = $doctrine->getManager();
+        $player = $request->getSession()->get(static::SESSION_PLAYER_KEY);
+        if ($player == NULL) {
+            return $this->redirectToRoute('home');
+        }
 
-        $boardState = $this->domainService->newBoard();
+        $entityManager = $doctrine->getManager();
+        $form = $this->createForm(NewBoardType::class, null, [
+            'action' => $this->generateUrl('board_new'),
+        ]);
+
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            return $this->render('board/new.html.twig', [
+                'form' => $form,
+            ]);
+        }
+
+        $playerCount = $form->getData()['player_count'];
+        $boardState = $this->domainService->newBoard(intval($playerCount));
 
         $board = new Board();
         $board->setState($boardState);
@@ -74,9 +91,18 @@ class BoardController extends AbstractController
     #[Route('/board/{id}/view', name: 'board_view', methods: 'GET')]
     public function getView(Board $board): Response
     {
+        $boardState = $board->getState();
+
+        $currentPlayer = $boardState['players'][0];
+        if (count($boardState['remainingPlayers']) > 0) {
+            $currentPlayerIndex = $boardState['remainingPlayers'][$boardState['currentPlayerIndex']];
+            $currentPlayer = $boardState['players'][$currentPlayerIndex];
+        }
+
         return $this->render('board/view.html.twig', [
             'board' => $board,
             'boardState' => $board->getState(),
+            'currentPlayer' => $currentPlayer,
             'emojis' => self::TREASURE_EMOJIS,
         ]);
     }
