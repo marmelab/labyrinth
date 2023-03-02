@@ -12,7 +12,7 @@ func TestTreasure(t *testing.T) {
 		{
 			bytes, err := json.Marshal(NoTreasure)
 			assert.Nil(t, err)
-			assert.Equal(t, `"·"`, string(bytes))
+			assert.Equal(t, `"."`, string(bytes))
 		}
 		{
 			treasure := Treasure('A')
@@ -30,7 +30,7 @@ func TestTreasure(t *testing.T) {
 
 	t.Run("UnmarshalJSON", func(t *testing.T) {
 		{
-			bytes := []byte(`"·"`)
+			bytes := []byte(`"."`)
 
 			var treasure Treasure
 			err := json.Unmarshal(bytes, &treasure)

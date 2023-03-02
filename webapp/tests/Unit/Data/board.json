@@ -4,7 +4,7 @@
             {
                 "tile": {
                     "shape": 2,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 270
             },
@@ -18,7 +18,7 @@
             {
                 "tile": {
                     "shape": 2,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 270
             },
@@ -39,14 +39,14 @@
             {
                 "tile": {
                     "shape": 0,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 90
             },
             {
                 "tile": {
                     "shape": 2,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 0
             }
@@ -55,7 +55,7 @@
             {
                 "tile": {
                     "shape": 2,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 90
             },
@@ -69,7 +69,7 @@
             {
                 "tile": {
                     "shape": 2,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 270
             },
@@ -83,14 +83,14 @@
             {
                 "tile": {
                     "shape": 0,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 0
             },
             {
                 "tile": {
                     "shape": 2,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 0
             },
@@ -127,7 +127,7 @@
             {
                 "tile": {
                     "shape": 0,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 90
             },
@@ -141,7 +141,7 @@
             {
                 "tile": {
                     "shape": 0,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 270
             },
@@ -171,7 +171,7 @@
             {
                 "tile": {
                     "shape": 0,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 270
             },
@@ -208,42 +208,42 @@
             {
                 "tile": {
                     "shape": 0,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 0
             },
             {
                 "tile": {
                     "shape": 2,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 270
             },
             {
                 "tile": {
                     "shape": 0,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 270
             },
             {
                 "tile": {
                     "shape": 2,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 0
             },
             {
                 "tile": {
                     "shape": 2,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 270
             },
             {
                 "tile": {
                     "shape": 2,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 0
             },
@@ -259,7 +259,7 @@
             {
                 "tile": {
                     "shape": 0,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 90
             },
@@ -273,7 +273,7 @@
             {
                 "tile": {
                     "shape": 0,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 90
             },
@@ -310,7 +310,7 @@
             {
                 "tile": {
                     "shape": 2,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 180
             },
@@ -324,35 +324,35 @@
             {
                 "tile": {
                     "shape": 0,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 90
             },
             {
                 "tile": {
                     "shape": 2,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 0
             },
             {
                 "tile": {
                     "shape": 0,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 90
             },
             {
                 "tile": {
                     "shape": 0,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 90
             },
             {
                 "tile": {
                     "shape": 2,
-                    "treasure": "·"
+                    "treasure": "."
                 },
                 "rotation": 90
             }
@@ -361,7 +361,7 @@
     "remainingTile": {
         "tile": {
             "shape": 0,
-            "treasure": "·"
+            "treasure": "."
         },
         "rotation": 0
     },

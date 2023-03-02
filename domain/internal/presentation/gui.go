@@ -121,7 +121,7 @@ func (g gameUi) drawBoard(tileCount, boardSize int) error {
 
 		boardView.FgColor = gocui.ColorCyan
 		for line := 0; line < boardSize; line++ {
-			fmt.Fprintln(boardView, strings.Repeat("·", boardSize))
+			fmt.Fprintln(boardView, strings.Repeat(".", boardSize))
 		}
 	}
 

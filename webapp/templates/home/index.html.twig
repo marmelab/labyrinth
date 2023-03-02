@@ -3,60 +3,115 @@
 {% block title %}Welcome to Labyrinth Online!
 {% endblock %}
 
-{% set target = "·" %}
+{% set target = "." %}
 {% if board.players[0].targets|length > 0 %}
 	{% set target = board.players[0].targets[0] %}
 {% endif %}
 
 {% block body %}
-
 	<div class="game">
-		<div class="board">
-			{% for line in board.tiles %}
-				{% for boardTile in line %}
-					{% set tile = boardTile.tile %}
-					<div class="tile tile--shape-{{ tile.shape }} tile--rotation-{{ boardTile.rotation }} {% if target == tile.treasure %}tile--target{% endif %}">
-						<div class="emoji">
-							{{ emojis[tile.treasure] }}
-						</div>
-					</div>
-				{% endfor %}
+		<div class="game__actions game__actions--top">
+			{% for i in range(1, 5, 2) %}
+				<form action="{{ url('board_insert_tile_top') }}" method="POST">
+					<input type="hidden" name="insert_tile[_token]" value="{{ csrf_token('insert_tile') }} ">
+					<input type="hidden" name="insert_tile[index]" value="{{i}}">
+					<button {% if board.gameState != 0 %} disabled {% endif %}>↓</button>
+				</form>
 			{% endfor %}
 		</div>
 
-		<div class="player">
-			<div class="row">
-				<div class="row__label">
-					Player
-				</div>
+		<div class="game__row">
+			<div class="game__actions game__actions--left">
+				{% for i in range(1, 5, 2) %}
+					<form action="{{ url('board_insert_tile_left') }}" method="POST">
+						<input type="hidden" name="insert_tile[_token]" value="{{ csrf_token('insert_tile') }} ">
+						<input type="hidden" name="insert_tile[index]" value="{{i}}">
 
-				<div class="row__value">
-					{{ board.players[0].color }}
-				</div>
+						<button {% if board.gameState != 0 %} disabled {% endif %}>→</button>
+					</form>
+				{% endfor %}
 			</div>
 
-			<div class="row">
-				<div class="row__label">
-					Target
-				</div>
-
-				<div class="row__value">
-					{{ emojis[target] }}
-				</div>
+			<div class="board">
+				{% for line in board.tiles %}
+					{% for boardTile in line %}
+						{% set tile = boardTile.tile %}
+						<div class="tile tile--shape-{{ tile.shape }} tile--rotation-{{ boardTile.rotation }} {% if target == tile.treasure %}tile--target{% endif %}">
+							<div class="emoji">
+								{{ emojis[tile.treasure] }}
+							</div>
+						</div>
+					{% endfor %}
+				{% endfor %}
 			</div>
 
-			<div class="row">
-				<div class="tile">
-					{% set remainingTile = board.remainingTile %}
-					{% set tile = remainingTile.tile %}
-					<div class="tile tile--remaining tile--shape-{{ tile.shape }} tile-rotation-{{ remainingTile.rotation }} {% if target == tile.treasure %}tile--target{% endif %}">
-						<div class="emoji">
-							{{ emojis[tile.treasure] }}
+			<div class="game__actions game__actions--right">
+				{% for i in range(1, 5, 2) %}
+					<form action="{{ url('board_insert_tile_right') }}" method="POST">
+						<input type="hidden" name="insert_tile[_token]" value="{{ csrf_token('insert_tile') }} ">
+						<input type="hidden" name="insert_tile[index]" value="{{i}}">
+
+						<button {% if board.gameState != 0 %} disabled {% endif %}>←</button>
+					</form>
+				{% endfor %}
+			</div>
+
+			<div class="player">
+				<div class="row">
+					<div class="row__label">
+						Player
+					</div>
+
+					<div class="row__value">
+						{{ board.players[0].color }}
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="row__label">
+						Target
+					</div>
+
+					<div class="row__value">
+						{{ emojis[target] }}
+					</div>
+				</div>
+
+				<div class="row row--end actions">
+					{{ form_start(rotationForms.anticlockwise, { 'action': url('board_rotate_remaining_anticlockwise')}) }}
+					<button type="submit" id="submit-rotate-remaining-anticlockwise">
+						&#x21B6;
+					</button>
+					{{ form_end(rotationForms.anticlockwise) }}
+
+					<div class="tile">
+						{% set remainingTile = board.remainingTile %}
+						{% set tile = remainingTile.tile %}
+						<div class="tile tile--remaining tile--shape-{{ tile.shape }} tile--rotation-{{ remainingTile.rotation }} {% if target == tile.treasure %}tile--target{% endif %}">
+							<div class="emoji">
+								{{ emojis[tile.treasure] }}
+							</div>
 						</div>
 					</div>
+
+					{{ form_start(rotationForms.clockwise, { 'action': url('board_rotate_remaining_clockwise')}) }}
+					<button type="submit" id="submit-rotate-remaining-clockwise">
+						&#x21B7;
+					</button>
+					{{ form_end(rotationForms.clockwise) }}
 				</div>
 			</div>
 		</div>
-	</div>
 
+		<div class="game__actions game__actions--bottom">
+			{% for i in range(1, 5, 2) %}
+				<form action="{{ url('board_insert_tile_bottom') }}" method="POST">
+					<input type="hidden" name="insert_tile[_token]" value="{{ csrf_token('insert_tile') }} ">
+					<input type="hidden" name="insert_tile[index]" value="{{i}}">
+
+					<button {% if board.gameState != 0 %} disabled {% endif %}>↑</button>
+				</form>
+			{% endfor %}
+		</div>
+	</div>
 {% endblock %}
