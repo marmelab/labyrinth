@@ -177,9 +177,7 @@ class BoardController extends AbstractController
     {
         $entityManager = $doctrine->getManager();
         $player = $this->getPlayer($request, $entityManager);
-
         if ($board->getRemainingSeats() > 0) {
-
             $form = $this->createForm(JoinBoardType::class, null, [
                 'action' => $this->generateUrl('board_join', ['id' => $board->getId()]),
             ]);
@@ -190,7 +188,6 @@ class BoardController extends AbstractController
                 'canJoin' => $this->canPlayerJoin($player, $board),
             ]);
         }
-
 
         $players = $board->getPlayers();
         $boardState = $board->getState();
