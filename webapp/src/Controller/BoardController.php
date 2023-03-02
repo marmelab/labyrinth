@@ -72,7 +72,7 @@ class BoardController extends AbstractController
     }
 
     #[Route('/board/{id}/view', name: 'board_view')]
-    public function getView(Request $request, Board $board): Response
+    public function getView(Board $board): Response
     {
         return $this->render('board/view.html.twig', [
             'board' => $board,
