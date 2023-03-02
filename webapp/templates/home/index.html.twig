@@ -6,8 +6,22 @@
 {% endblock %}
 
 {% block body %}
-{% if player == NULL %}
-	{{ form(signInForm) }}
-{% else %}
-	{{ form(newBoardForm) }}{% endif %}
+<div class="container">
+<div class="row">
+	<div class="col col-6">
+		{% if player == NULL %}
+			{{ form(signInForm) }}
+		{% else %}
+			{{ form(newBoardForm) }}
+		{% endif %}
+	</div>
+	<div class="col col-6">
+		<ul>
+		{% for board in boards %}
+			<li><a href="{{ url('board_view', { 'id': board.id }) }}">Board #{{ board.id }}</a> </li>
+		{% endfor %}
+		</ul>
+	</div>
+</div>
+</div>
 {% endblock %}
