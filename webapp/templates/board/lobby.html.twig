@@ -2,6 +2,9 @@
 
 {% block title %}Waiting for {{ board.remainingSeats }} players{% endblock %}
 
+{% block meta %}
+<meta http-equiv="Refresh" content="5">
+{% endblock %}
 
 {% set player = app.session.get('player') %}
 
@@ -13,7 +16,6 @@
             <div class="alert alert-info">
                 Waiting for {{ board.remainingSeats }} more players to start the game.
             </div>
-        </div>
     </div>
 
     <div class="row justify-content-center">
@@ -34,6 +36,5 @@
             {% endif %}
         </div>
     </div>
-
 </div>
 {% endblock %}

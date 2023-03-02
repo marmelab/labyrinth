@@ -111,7 +111,7 @@ button:not([disabled]) {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    width: calc((var(--tile-size) * 7) + 540px);
+    width: calc((var(--tile-size) * 7) + 640px);
 }
 
 .game__row {
@@ -130,16 +130,15 @@ button:not([disabled]) {
 .game__actions--top,
 .game__actions--bottom {
     flex-direction: row;
-    width: 100%;
+    width: 790px;
     flex-grow: 1;
-    padding-left: 95px;
-    padding-right: 365px;
+    padding-left: 80px;
 }
 
 .game__actions--right,
 .game__actions--left {
     flex-direction: column;
-    flex-grow: 1;
+    width: 60px;
 }
 
 .game button:not(.tile) {
@@ -344,6 +343,7 @@ button:not([disabled]) {
     flex-direction: column;
     justify-content: start;
     gap: 20px;
+    padding-left: 20px;
 }
 
 .scores__row {
@@ -351,6 +351,11 @@ button:not([disabled]) {
     flex-direction: row;
     justify-content: space-between;
     gap: 20px;
+}
+
+.scores__row--heading {
+    padding-top: 20px;
+    border-top: 1px #222222 solid;
 }
 
 .scores__row .scores__row__label {

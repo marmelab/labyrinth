@@ -8,6 +8,25 @@
 {% endblock %}
 
 {% block body %}
+	{% if canPlay %} 
+	<div class="toast show" style="position: absolute; bottom: 40px; right: 40px;">
+		<div class="toast-header">
+			<strong class="mr-auto">This is Your Turn</strong>
+		</div>
+		<div class="toast-body">
+			You can do the following actions:
+			<ul>
+				<li>Rotate remaining tile</li>
+			{% if boardState.gameState == 0 %}
+				<li>Place Tile</li>
+			{% elseif boardState.gameState == 0 %}
+				<li>Move Pawn</li>
+			{% endif %}
+			</ul>
+		</div>
+	</div>
+	{% endif %}
+
 	<div class="game">
 		<div class="game__actions game__actions--top">
 			{% include "board/components/insert_tile.html.twig" with {
@@ -79,6 +98,9 @@
 
 					<div class="scores__row__value">
 						{{ players[currentPlayer.color].name }}
+						{% if canPlay %}
+							<strong>(Your Turn)</strong>
+						{% endif %}
 					</div>
 				</div>
 
@@ -103,6 +125,24 @@
 					</div>
 				</div>
 				{% endif %}
+
+				<div class="scores__row scores__row--heading">
+					<div class="scores__row__label">
+						Player Scores
+					</div>
+				</div>
+
+				{% for boardPlayer in boardState.players %}
+					<div class="scores__row">
+						<div class="scores__row__label">
+							{{ players[boardPlayer.color].name }}
+						</div>
+
+						<div class="scores__row__value">
+							{{ boardPlayer.score  }} / {{ boardPlayer.score + boardPlayer.targets|length }}
+						</div>
+					</div>
+				{% endfor %}
 			</div>
 		</div>
 
