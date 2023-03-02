@@ -5,6 +5,9 @@ SAVE_ID="_default"
 BOARD_SIZE="7"
 PLAYER_COUNT="1"
 
+E2E_NO_HEADLESS="0"
+E2E_DEVTOOLS="0"
+
 # This is the hash used to tag Docker images
 COMMIT_HASH=$(shell git rev-parse HEAD)
 DOCKER_IMAGE_NAMESPACE=jonathanmarmelab
@@ -111,7 +114,7 @@ test: 											## Run unit tests
 	@(${MAKE} -C webapp test)
 
 test-e2e: 										## Run e2e tests
-	@(${MAKE} -C webapp test-e2e)
+	@(${MAKE} E2E_NO_HEADLESS=${E2E_NO_HEADLESS} E2E_DEVTOOLS=${E2E_DEVTOOLS} -C webapp test-e2e)
 
 cli-run: 										## Run the CLI version of the labyrinth.
 	@(${MAKE} -C domain run)

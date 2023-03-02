@@ -2,7 +2,6 @@
 
 namespace App\Tests\Unit\Controller;
 
-use App\Controller\HomeController;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 use App\Service\DomainServiceInterface;

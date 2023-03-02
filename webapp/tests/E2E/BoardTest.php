@@ -33,6 +33,7 @@ class BoardTest extends PantherTestCase
 
         $this->assertNotEquals($initialClasses, $updatedClasses);
     }
+
     public function testRotateRemainingTileAntilockwise(): void
     {
         $client = static::createPantherClient([
