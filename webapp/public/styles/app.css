@@ -54,6 +54,7 @@ header a {
     justify-content: center;
     color: #ffffff;
     text-decoration: none;
+    min-width: 150px;
 }
 
 header a:hover {
@@ -101,6 +102,11 @@ header form button {
     color: #ffffff;
     font-size: 1rem;
     padding: 5px 20px;
+}
+
+button[disabled] {
+    color: #444444;
+    cursor: default!important;
 }
 
 button:not([disabled]) {

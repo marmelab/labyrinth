@@ -26,7 +26,6 @@ class Player
         minMessage: 'Your name must be at least {{ limit }} characters long',
         maxMessage: 'Your name cannot be longer than {{ limit }} characters',
     )]
-    #[Assert\Regex('/^[a-zA-Z0-9-]+/')]
     private ?string $name = null;
 
     #[ORM\ManyToMany(targetEntity: Board::class, mappedBy: 'players')]

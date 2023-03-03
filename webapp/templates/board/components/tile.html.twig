@@ -4,7 +4,7 @@
 	<input type="hidden" name="move_player[row]" value="{{ row }}">
 
 	<button class="tile" type="submit" {% if gameState != 1 or not canPlay %} disabled {% endif %}>
-		<div class="tile__content tile--shape-{{ tile.shape }} tile--rotation-{{ rotation }} {% if target == tile.treasure %}tile--target{% endif %}">
+		<div class="tile__content tile--shape-{{ tile.shape }} tile--rotation-{{ rotation }} {% if playerInfo and playerInfo.target == tile.treasure %}tile--target{% endif %}">
 			<div class="emoji">
 				{{ emojis[tile.treasure] }}
 			</div>

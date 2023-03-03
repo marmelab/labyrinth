@@ -8,38 +8,12 @@
 {% endblock %}
 
 {% block body %}
-	{% if canPlay %}
-	<div class="toast show" style="position: absolute; bottom: 40px; right: 40px;">
-		<div class="toast-header">
-			<strong class="mr-auto">This is Your Turn</strong>
-		</div>
-		<div class="toast-body">
-			You can do the following actions:
-			<ul>
-				<li>Rotate remaining tile</li>
-			{% if boardState.gameState == 0 %}
-				<li>Place Tile</li>
-			{% elseif boardState.gameState == 0 %}
-				<li>Move Pawn</li>
-			{% endif %}
-			</ul>
-		</div>
-	</div>
-	{% endif %}
-
 	{% if app.session.flashbag.peek('errors')|length > 0 %}
-	<div class="toast show" style="position: absolute; bottom: 40px; right: 40px;">
-		<div class="toast-header">
-			<strong class="mr-auto">An Error Occurred</strong>
-		</div>
-		<div class="toast-body">
-			<ul>
-				{% for message in app.flashes('errors') %}
-				<li>{{ message }}</li>
-				{% endfor %}
-			</ul>
-		</div>
-	</div>
+		{% for message in app.flashes('errors') %}
+            <div class="alert alert-error">
+                {{ message }}
+            </div>
+		{% endfor %}
 	{% endif %}
 	
 	<div class="game">
@@ -93,7 +67,7 @@
 					<div class="tile">
 						{% set remainingTile = boardState.remainingTile %}
 						{% set tile = remainingTile.tile %}
-						<div class="tile__content tile--remaining tile--shape-{{ tile.shape }} tile--rotation-{{ remainingTile.rotation }} {% if target == tile.treasure %}tile--target{% endif %}">
+						<div class="tile__content tile--remaining tile--shape-{{ tile.shape }} tile--rotation-{{ remainingTile.rotation }} {% if playerInfo and playerInfo.target == tile.treasure %}tile--target{% endif %}">
 							<div class="emoji">
 								{{ emojis[tile.treasure] }}
 							</div>
@@ -106,40 +80,59 @@
 					} %}
 				</div>
 
+				{% if canPlay %}
+				<div class="alert alert-success">
+					This is Your Turn, you can: <br>
+					Rotate remaining tile,
+					{% if boardState.gameState == 0 %}
+						Place Tile.
+					{% elseif boardState.gameState == 0 %}
+						Move Pawn.
+					{% endif %}
+				</div>
+				{% endif %}
+
+				{% if playerInfo %}
 				<div class="scores__row">
 					<div class="scores__row__label">
-						Current Player
+						Your Color
 					</div>
 
 					<div class="scores__row__value">
-						{{ players[currentPlayer.color].name }}
-						{% if canPlay %}
-							<strong>(Your Turn)</strong>
-						{% endif %}
+						{{ colors[playerInfo.color] }}
 					</div>
 				</div>
-
-				<div class="scores__row">
-					<div class="scores__row__label">
-						Current Color
-					</div>
-
-					<div class="scores__row__value">
-						{{ colors[currentPlayer.color] }}
-					</div>
-				</div>
-
-				{% if target != "" %}
+					
 				<div class="scores__row">
 					<div class="scores__row__label">
 						Your Target
 					</div>
 
 					<div class="scores__row__value">
-						{{ emojis[target] }}
+						{{ emojis[playerInfo.target] }}
 					</div>
 				</div>
 				{% endif %}
+
+				<div class="scores__row scores__row--heading">
+					<div class="scores__row__label">
+						Waiting Player
+					</div>
+
+					<div class="scores__row__value">
+						{{ players[currentPlayer.color].name }}
+					</div>
+				</div>
+
+				<div class="scores__row">
+					<div class="scores__row__label">
+						Player Color
+					</div>
+
+					<div class="scores__row__value">
+						{{ colors[currentPlayer.color] }}
+					</div>
+				</div>
 
 				<div class="scores__row scores__row--heading">
 					<div class="scores__row__label">
