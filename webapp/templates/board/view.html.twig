@@ -9,15 +9,15 @@
 {% endblock %}
 
 {% block body %}
-	{% if app.session.flashbag.peek('errors')|length > 0 %}
-		{% for message in app.flashes('errors') %}
-            <div class="alert alert-error">
-                {{ message }}
-            </div>
-		{% endfor %}
-	{% endif %}
-	
 	<div class="game">
+		{% if app.session.flashbag.peek('errors')|length > 0 %}
+			{% for message in app.flashes('errors') %}
+				<div class="alert alert-danger">
+					{{ message }}
+				</div>
+			{% endfor %}
+		{% endif %}
+		
 		<div class="game__actions game__actions--top">
 			{% include "board/components/insert_tile.html.twig" with {
 				"actionUrl": url("board_insert_tile_top", { "id": board.id }),
@@ -162,4 +162,15 @@
 			} %}
 		</div>
 	</div>
+
+{% if boardState.gameState == 2 %}
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+	confetti({
+		particleCount: 1000,
+		spread: 500,
+		origin: { y: 0.6 }
+	});
+</script>
+{% endif %}
 {% endblock %}

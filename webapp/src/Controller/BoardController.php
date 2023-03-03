@@ -28,6 +28,7 @@ class BoardController extends AbstractController
     const SESSION_PLAYER_KEY = PlayerController::SESSION_PLAYER_KEY;
 
     const TREASURE_EMOJIS = [
+        '' => ' ',
         '.' => ' ',
         'A' => '💌',
         'B' => '💣',
