@@ -22,6 +22,9 @@ services:
       - ./webapp/src:/var/www/labyrinth/src
       - ./webapp/templates:/var/www/labyrinth/templates
 
+  mercure:
+    command: /usr/bin/caddy run --config /etc/caddy/Caddyfile.dev
+
   webapp-migrations:
     build:
       dockerfile: ./webapp/migrations/Dockerfile

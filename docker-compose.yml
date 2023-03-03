@@ -12,6 +12,13 @@ services:
     volumes:
       - ./data/postgres:/data/postgres
 
+  mercure:
+    image: dunglas/mercure:v0.14
+    env_file:
+      - webapp/.env
+    environment:
+      - SERVER_NAME=":80"
+
   webapp:
     env_file:
       - webapp/.env
