@@ -3,10 +3,9 @@
 {% block title %}Welcome to Labyrinth Online!
 {% endblock %}
 
-{% set target = "." %}
-{% if boardState.players[0].targets|length > 0 %}
-	{% set target = boardState.players[0].targets[0] %}
-{% endif %}
+{% block meta %}
+<meta http-equiv="Refresh" content="5">
+{% endblock %}
 
 {% block body %}
 	<div class="game">
@@ -36,6 +35,7 @@
 							"tile": boardTile.tile,
 							"rotation": boardTile.rotation,
 							"players": boardState.players,
+							"gameState": boardState.gameState,
 						} %}
 					{% endfor %}
 				{% endfor %}
@@ -49,28 +49,8 @@
 				} %}
 			</div>
 
-			<div class="player">
-				<div class="row">
-					<div class="row__label">
-						Player
-					</div>
-
-					<div class="row__value">
-						{{ boardState.players[0].color }}
-					</div>
-				</div>
-
-				<div class="row">
-					<div class="row__label">
-						Target
-					</div>
-
-					<div class="row__value">
-						{{ emojis[target] }}
-					</div>
-				</div>
-
-				<div class="row row--end actions">
+			<div class="scores">
+				<div class="scores__row scores__row--actions">
 					{% include "board/components/rotate_remaining.html.twig" with {
 						"actionUrl": url("board_rotate_remaining_anticlockwise", { "id": board.id }),
 						"label": "↶",
@@ -91,6 +71,38 @@
 						"label": "↷",
 					} %}
 				</div>
+
+				<div class="scores__row">
+					<div class="scores__row__label">
+						Current Player
+					</div>
+
+					<div class="scores__row__value">
+						{{ players[currentPlayer.color].name }}
+					</div>
+				</div>
+
+				<div class="scores__row">
+					<div class="scores__row__label">
+						Current Color
+					</div>
+
+					<div class="scores__row__value">
+						{{ colors[currentPlayer.color] }}
+					</div>
+				</div>
+
+				{% if target != "" %}
+				<div class="scores__row">
+					<div class="scores__row__label">
+						Your Target
+					</div>
+
+					<div class="scores__row__value">
+						{{ emojis[target] }}
+					</div>
+				</div>
+				{% endif %}
 			</div>
 		</div>
 

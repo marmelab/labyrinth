@@ -13,9 +13,16 @@ class DomainService implements DomainServiceInterface
     ) {
     }
 
-    public function newBoard(): array
+    public function newBoard(int $playerCount): array
     {
-        $response = $this->httpClient->request("POST", "{$this->domainServiceUrl}/new");
+        $response = $this->httpClient->request("POST", "{$this->domainServiceUrl}/new", [
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+            'body' => json_encode([
+                'playerCount' => $playerCount,
+            ]),
+        ]);
         return $response->toArray();
     }
 

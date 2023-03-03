@@ -54,7 +54,7 @@ class DomainServiceTest extends KernelTestCase
             "http://domain-api"
         );
 
-        $this->assertEquals($board, $domainServiceClient->newBoard());
+        $this->assertEquals($board, $domainServiceClient->newBoard(1));
     }
 
     public function testNewBoard__InternalServererror(): void
@@ -70,7 +70,7 @@ class DomainServiceTest extends KernelTestCase
         );
 
         $this->expectException(ServerExceptionInterface::class);
-        $domainServiceClient->newBoard();
+        $domainServiceClient->newBoard(1);
     }
 
     /**

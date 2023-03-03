@@ -4,7 +4,7 @@ namespace App\Service;
 
 interface DomainServiceInterface
 {
-    function newBoard(): array;
+    function newBoard(int $playerCount): array;
 
     function rotateRemainingTile(array $board, Rotation $rotation): array;
 
