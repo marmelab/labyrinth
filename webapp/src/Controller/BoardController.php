@@ -9,6 +9,8 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
 
 use App\Entity\Board;
@@ -22,6 +24,7 @@ use App\Form\Type\RotateRemainingType;
 use App\Service\Direction;
 use App\Service\Rotation;
 use App\Service\DomainServiceInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class BoardController extends AbstractController
 {
@@ -64,8 +67,19 @@ class BoardController extends AbstractController
     ];
 
     public function __construct(
-        private DomainServiceInterface $domainService
+        private DomainServiceInterface $domainService,
+        private HubInterface $hub
     ) {
+    }
+
+    private function publishUpdate(Board $board)
+    {
+        $update = new Update(
+            $this->generateUrl('board_view', ['id' => $board->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
+            json_encode([])
+        );
+
+        $this->hub->publish($update);
     }
 
     private function getPlayer(Request $request, ObjectManager $entityManager): ?Player
@@ -248,6 +262,8 @@ class BoardController extends AbstractController
 
             $entityManager->flush();
             $conn->commit();
+
+            $this->publishUpdate($board);
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
         } catch (\Exception $e) {
             $conn->rollBack();
@@ -271,7 +287,9 @@ class BoardController extends AbstractController
             $board->setState($updatedBoard);
 
             $entityManager->flush();
+            $this->publishUpdate($board);
         }
+
         return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
     }
 
@@ -311,7 +329,9 @@ class BoardController extends AbstractController
             $board->setState($updatedBoard);
 
             $entityManager->flush();
+            $this->publishUpdate($board);
         }
+
         return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
     }
 
@@ -364,6 +384,7 @@ class BoardController extends AbstractController
             $board->setState($updatedBoard);
 
             $entityManager->flush();
+            $this->publishUpdate($board);
         }
         return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
     }

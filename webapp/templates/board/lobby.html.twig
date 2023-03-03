@@ -2,10 +2,6 @@
 
 {% block title %}Waiting for {{ board.remainingSeats }} players{% endblock %}
 
-{% block meta %}
-<meta http-equiv="Refresh" content="5">
-{% endblock %}
-
 {% set player = app.session.get('player') %}
 
 {% block body %}
@@ -46,4 +42,13 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+const eventSource = new EventSource("{{ mercure(url('board_view', { 'id': board.id }))|escape('js') }}");
+eventSource.onmessage = event => {
+    window.location.reload();
+}
+</script>
 {% endblock %}

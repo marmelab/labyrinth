@@ -18,7 +18,5 @@ services:
 
   proxy:
     image: jonathanmarmelab/labyrinth-proxy:latest
-    volumes:
-      - ./logs:/var/log/nginx
     ports:
       - "80:80"

@@ -12,11 +12,20 @@ services:
     volumes:
       - ./data/postgres:/data/postgres
 
+  mercure:
+    image: dunglas/mercure:v0.14
+    env_file:
+      - webapp/.env
+    environment:
+      - SERVER_NAME=":80"
+
   webapp:
     env_file:
       - webapp/.env
     environment:
       - DOMAIN_SERVICE_URL=http://api-domain:80
+      - MERCURE_URL=http://mercure:80/.well-known/mercure
+      - MERCURE_PUBLIC_URL=/.well-known/mercure
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/labyrinth?serverVersion=15&charset=utf8
 
   webapp-migrations:
@@ -26,3 +35,10 @@ services:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/labyrinth?serverVersion=15&charset=utf8
     depends_on:
       - postgres
+
+  proxy:
+    volumes:
+      - ./logs:/var/log/nginx
+    depends_on:
+      - webapp
+      - mercure
