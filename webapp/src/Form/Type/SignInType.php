@@ -17,7 +17,7 @@ class SignInType extends AbstractType
         $builder
             ->add('name', TextType::class)
             ->add('sign_in', SubmitType::class, [
-                'label' => 'Sign In',
+                'label' => 'Sign In / Sign Up',
             ]);
     }
 

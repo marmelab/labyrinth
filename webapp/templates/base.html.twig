@@ -4,7 +4,7 @@
 		<meta charset="UTF-8">
 		{% block meta %}{% endblock %}
 		<title>
-			{% block title %}{% endblock %}
+			{% block title %}Labyrinth{% endblock %}
 		</title>
 		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
 
@@ -31,9 +31,9 @@
 				<form action="{{ url('player_sign_in') }}" method="POST">
 					<input type="hidden" name="sign_in[_token]" value="{{ csrf_token('sign_in') }} ">
 
-					<input type="text" name="sign_in[name]" id="sign-in-name" placeholder="Username">
+					<input type="text" name="sign_in[name]" minlength="2" maxlength="50" pattern="[a-zA-Z0-9-]+" id="sign-in-name" placeholder="Username">
 
-					<button type="submit">Sign In</button>
+					<button type="submit">Sign In / Sign Up</button>
 				</form>
 			{% else %}
 				<form action="{{ url('player_sign_out') }}" method="POST">

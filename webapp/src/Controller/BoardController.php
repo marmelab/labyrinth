@@ -55,7 +55,7 @@ class BoardController extends AbstractController
         'X' => '🥦',
     ];
 
-    const COLORS = [
+    const PLAYER_COLORS = [
         "Blue",
         "Green",
         "Red",
@@ -88,8 +88,12 @@ class BoardController extends AbstractController
         return $currentPlayer;
     }
 
-    private function canUserPlay(Board $board, Player $player): bool
+    private function canPlayerPlay(Board $board, ?Player $player): bool
     {
+        if ($player == null) {
+            return false;
+        }
+
         $boardState = $board->getState();
         if ($boardState['gameState'] == 2) {
             return false;
@@ -98,6 +102,20 @@ class BoardController extends AbstractController
         $stateCurrentPlayer = $this->getCurrentPlayer($boardState);
         $currentPlayer = $board->getPlayers()[$stateCurrentPlayer['color']];
         return $currentPlayer->getId() == $player->getId();
+    }
+
+    private function canPlayerJoin(?Player $player, Board $board): bool
+    {
+        if ($player == null) {
+            return false;
+        }
+
+        foreach ($board->getPlayers() as $gamePlayer) {
+            if ($gamePlayer->getId() == $player->getId()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     #[Route('/board/new', name: 'board_new', methods: 'POST')]
@@ -139,6 +157,9 @@ class BoardController extends AbstractController
     #[Route('/board/{id}/view', name: 'board_view', methods: 'GET')]
     public function getView(Request $request, ManagerRegistry $doctrine, Board $board): Response
     {
+        $entityManager = $doctrine->getManager();
+        $player = $this->getPlayer($request, $entityManager);
+
         if ($board->getRemainingSeats() > 0) {
 
             $form = $this->createForm(JoinBoardType::class, null, [
@@ -148,12 +169,10 @@ class BoardController extends AbstractController
             return $this->render('board/lobby.html.twig', [
                 'board' => $board,
                 'form' => $form,
-                'emojis' => self::TREASURE_EMOJIS,
+                'canJoin' => $this->canPlayerJoin($player, $board),
             ]);
         }
 
-        $entityManager = $doctrine->getManager();
-        $player = $this->getPlayer($request, $entityManager);
 
         $players = $board->getPlayers();
         $boardState = $board->getState();
@@ -164,9 +183,9 @@ class BoardController extends AbstractController
             'boardState' => $board->getState(),
             'currentPlayer' => $currentPlayer,
             'players' => $players,
-            'canPlay' => $this->canUserPlay($board, $player),
+            'canPlay' => $this->canPlayerPlay($board, $player),
             'emojis' => self::TREASURE_EMOJIS,
-            'colors' => self::COLORS,
+            'colors' => self::PLAYER_COLORS,
         ]);
     }
 
@@ -176,14 +195,8 @@ class BoardController extends AbstractController
         /** @var EntityManager $entityManager */
         $entityManager = $doctrine->getManager();
         $player = $this->getPlayer($request, $entityManager);
-        if ($player == NULL) {
-            return $this->redirectToRoute('home');
-        }
-
-        foreach ($board->getPlayers() as $gamePlayer) {
-            if ($player->getId() == $gamePlayer->getId()) {
-                return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
-            }
+        if (!$this->canPlayerJoin($player, $board)) {
+            return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
         }
 
         $conn = $entityManager->getConnection();
@@ -218,7 +231,7 @@ class BoardController extends AbstractController
     {
         $entityManager = $doctrine->getManager();
         $player = $this->getPlayer($request, $entityManager);
-        if ($player == NULL || !$this->canUserPlay($board, $player)) {
+        if (!$this->canPlayerPlay($board, $player)) {
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
         }
 
@@ -250,7 +263,7 @@ class BoardController extends AbstractController
     {
         $entityManager = $doctrine->getManager();
         $player = $this->getPlayer($request, $entityManager);
-        if ($player == NULL || !$this->canUserPlay($board, $player)) {
+        if (!$this->canPlayerPlay($board, $player)) {
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
         }
 
@@ -302,7 +315,7 @@ class BoardController extends AbstractController
     {
         $entityManager = $doctrine->getManager();
         $player = $this->getPlayer($request, $entityManager);
-        if ($player == NULL || !$this->canUserPlay($board, $player)) {
+        if (!$this->canPlayerPlay($board, $player)) {
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
         }
 
