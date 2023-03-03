@@ -36,7 +36,6 @@ services:
     build:
       dockerfile: ./proxy/Dockerfile
     volumes:
-      - ./logs/nginx:/var/log/nginx
       - ./webapp/public/images:/var/www/labyrinth/public/images
       - ./webapp/public/styles:/var/www/labyrinth/public/styles
     ports:

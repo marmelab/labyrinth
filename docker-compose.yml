@@ -24,6 +24,8 @@ services:
       - webapp/.env
     environment:
       - DOMAIN_SERVICE_URL=http://api-domain:80
+      - MERCURE_URL=http://mercure:80/.well-known/mercure
+      - MERCURE_PUBLIC_URL=/.well-known/mercure
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/labyrinth?serverVersion=15&charset=utf8
 
   webapp-migrations:
@@ -33,3 +35,10 @@ services:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/labyrinth?serverVersion=15&charset=utf8
     depends_on:
       - postgres
+
+  proxy:
+    volumes:
+      - ./logs:/var/log/nginx
+    depends_on:
+      - webapp
+      - mercure
