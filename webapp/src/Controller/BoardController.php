@@ -88,6 +88,24 @@ class BoardController extends AbstractController
         return $currentPlayer;
     }
 
+    private function getPlayerTarget(Board $board, ?Player $player): string
+    {
+        if ($player == null) {
+            return '';
+        }
+
+        foreach ($board->getPlayers() as $index => $gamePlayer) {
+            if ($gamePlayer->getId() == $player->getId()) {
+                $targets = $board->getState()['players'][$index]['targets'];
+                if (count($targets) > 0) {
+                    return $targets[0];
+                }
+            }
+        }
+
+        return '';
+    }
+
     private function canPlayerPlay(Board $board, ?Player $player): bool
     {
         if ($player == null) {
@@ -186,6 +204,7 @@ class BoardController extends AbstractController
             'canPlay' => $this->canPlayerPlay($board, $player),
             'emojis' => self::TREASURE_EMOJIS,
             'colors' => self::PLAYER_COLORS,
+            'target' => $this->getPlayerTarget($board, $player),
         ]);
     }
 

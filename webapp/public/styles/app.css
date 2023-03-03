@@ -358,7 +358,7 @@ button:not([disabled]) {
 }
 
 .scores__row .scores__row__value {
-    width: 50%;
+    width: 30%;
 }
 
 .scores__row--actions {

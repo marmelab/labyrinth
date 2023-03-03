@@ -7,11 +7,6 @@
 <meta http-equiv="Refresh" content="5">
 {% endblock %}
 
-{% set target = "" %}
-{% if currentPlayer.targets|length > 0 %}
-	{% set target = currentPlayer.targets[0] %}
-{% endif %}
-
 {% block body %}
 	<div class="game">
 		<div class="game__actions game__actions--top">
@@ -79,7 +74,7 @@
 
 				<div class="scores__row">
 					<div class="scores__row__label">
-						Player
+						Current Player
 					</div>
 
 					<div class="scores__row__value">
@@ -89,7 +84,7 @@
 
 				<div class="scores__row">
 					<div class="scores__row__label">
-						Color
+						Current Color
 					</div>
 
 					<div class="scores__row__value">
@@ -97,15 +92,17 @@
 					</div>
 				</div>
 
+				{% if target != "" %}
 				<div class="scores__row">
 					<div class="scores__row__label">
-						Target
+						Your Target
 					</div>
 
 					<div class="scores__row__value">
 						{{ emojis[target] }}
 					</div>
 				</div>
+				{% endif %}
 			</div>
 		</div>
 

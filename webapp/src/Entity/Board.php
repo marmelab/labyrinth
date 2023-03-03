@@ -22,7 +22,7 @@ class Board
     #[ORM\ManyToMany(targetEntity: Player::class, inversedBy: 'boards')]
     private Collection $players;
 
-    #[ORM\Column]
+    #[ORM\Column(options: ["default" => 0])]
     private ?int $remainingSeats = null;
 
     public function __construct()
