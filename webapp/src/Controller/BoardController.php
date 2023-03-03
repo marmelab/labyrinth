@@ -88,22 +88,32 @@ class BoardController extends AbstractController
         return $currentPlayer;
     }
 
-    private function getPlayerTarget(Board $board, ?Player $player): string
+    private function getPlayerInfo(Board $board, ?Player $player): ?array
     {
         if ($player == null) {
-            return '';
+            return null;
         }
 
         foreach ($board->getPlayers() as $index => $gamePlayer) {
             if ($gamePlayer->getId() == $player->getId()) {
-                $targets = $board->getState()['players'][$index]['targets'];
+                $playerState = $board->getState()['players'][$index];
+
+                $playerInfo = [
+                    'name' => $player->getName(),
+                    'target' => '',
+                    'color' => $playerState['color'],
+                ];
+
+                $targets = $playerState['targets'];
                 if (count($targets) > 0) {
-                    return $targets[0];
+                    $playerInfo['target'] = $targets[0];
                 }
+
+                return $playerInfo;
             }
         }
 
-        return '';
+        return null;
     }
 
     private function canPlayerPlay(Board $board, ?Player $player): bool
@@ -114,6 +124,7 @@ class BoardController extends AbstractController
 
         $boardState = $board->getState();
         if ($boardState['gameState'] == 2) {
+            $this->addFlash('errors', 'Game has ended.');
             return false;
         }
 
@@ -177,9 +188,7 @@ class BoardController extends AbstractController
     {
         $entityManager = $doctrine->getManager();
         $player = $this->getPlayer($request, $entityManager);
-
         if ($board->getRemainingSeats() > 0) {
-
             $form = $this->createForm(JoinBoardType::class, null, [
                 'action' => $this->generateUrl('board_join', ['id' => $board->getId()]),
             ]);
@@ -190,7 +199,6 @@ class BoardController extends AbstractController
                 'canJoin' => $this->canPlayerJoin($player, $board),
             ]);
         }
-
 
         $players = $board->getPlayers();
         $boardState = $board->getState();
@@ -204,7 +212,7 @@ class BoardController extends AbstractController
             'canPlay' => $this->canPlayerPlay($board, $player),
             'emojis' => self::TREASURE_EMOJIS,
             'colors' => self::PLAYER_COLORS,
-            'target' => $this->getPlayerTarget($board, $player),
+            'playerInfo' => $this->getPlayerInfo($board, $player),
         ]);
     }
 
@@ -283,6 +291,7 @@ class BoardController extends AbstractController
         $entityManager = $doctrine->getManager();
         $player = $this->getPlayer($request, $entityManager);
         if (!$this->canPlayerPlay($board, $player)) {
+            $this->addFlash('errors', 'You cannot perform this action.');
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
         }
 
@@ -335,6 +344,7 @@ class BoardController extends AbstractController
         $entityManager = $doctrine->getManager();
         $player = $this->getPlayer($request, $entityManager);
         if (!$this->canPlayerPlay($board, $player)) {
+            $this->addFlash('errors', 'You cannot perform this action.');
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
         }
 

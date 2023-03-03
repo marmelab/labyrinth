@@ -2,6 +2,9 @@
 
 {% block title %}Waiting for {{ board.remainingSeats }} players{% endblock %}
 
+{% block meta %}
+<meta http-equiv="Refresh" content="5">
+{% endblock %}
 
 {% set player = app.session.get('player') %}
 
@@ -12,6 +15,14 @@
         <div class="col col-8">
             <div class="alert alert-info">
                 Waiting for {{ board.remainingSeats }} more players to start the game.
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col col-8">
+            <div class="alert alert-dark">
+                Share the game URL with other players: <a href="{{ app.request.uri }}">{{ app.request.uri }}</a>
             </div>
         </div>
     </div>
@@ -34,6 +45,5 @@
             {% endif %}
         </div>
     </div>
-
 </div>
 {% endblock %}

@@ -8,6 +8,14 @@
 {% endblock %}
 
 {% block body %}
+	{% if app.session.flashbag.peek('errors')|length > 0 %}
+		{% for message in app.flashes('errors') %}
+            <div class="alert alert-error">
+                {{ message }}
+            </div>
+		{% endfor %}
+	{% endif %}
+	
 	<div class="game">
 		<div class="game__actions game__actions--top">
 			{% include "board/components/insert_tile.html.twig" with {
@@ -59,7 +67,7 @@
 					<div class="tile">
 						{% set remainingTile = boardState.remainingTile %}
 						{% set tile = remainingTile.tile %}
-						<div class="tile__content tile--remaining tile--shape-{{ tile.shape }} tile--rotation-{{ remainingTile.rotation }} {% if target == tile.treasure %}tile--target{% endif %}">
+						<div class="tile__content tile--remaining tile--shape-{{ tile.shape }} tile--rotation-{{ remainingTile.rotation }} {% if playerInfo and playerInfo.target == tile.treasure %}tile--target{% endif %}">
 							<div class="emoji">
 								{{ emojis[tile.treasure] }}
 							</div>
@@ -72,9 +80,43 @@
 					} %}
 				</div>
 
+				{% if canPlay %}
+				<div class="alert alert-success">
+					This is Your Turn, you can: <br>
+					Rotate remaining tile,
+					{% if boardState.gameState == 0 %}
+						Place Tile.
+					{% elseif boardState.gameState == 0 %}
+						Move Pawn.
+					{% endif %}
+				</div>
+				{% endif %}
+
+				{% if playerInfo %}
 				<div class="scores__row">
 					<div class="scores__row__label">
-						Current Player
+						Your Color
+					</div>
+
+					<div class="scores__row__value">
+						{{ colors[playerInfo.color] }}
+					</div>
+				</div>
+					
+				<div class="scores__row">
+					<div class="scores__row__label">
+						Your Target
+					</div>
+
+					<div class="scores__row__value">
+						{{ emojis[playerInfo.target] }}
+					</div>
+				</div>
+				{% endif %}
+
+				<div class="scores__row scores__row--heading">
+					<div class="scores__row__label">
+						Waiting Player
 					</div>
 
 					<div class="scores__row__value">
@@ -84,7 +126,7 @@
 
 				<div class="scores__row">
 					<div class="scores__row__label">
-						Current Color
+						Player Color
 					</div>
 
 					<div class="scores__row__value">
@@ -92,17 +134,23 @@
 					</div>
 				</div>
 
-				{% if target != "" %}
-				<div class="scores__row">
+				<div class="scores__row scores__row--heading">
 					<div class="scores__row__label">
-						Your Target
-					</div>
-
-					<div class="scores__row__value">
-						{{ emojis[target] }}
+						Player Scores
 					</div>
 				</div>
-				{% endif %}
+
+				{% for boardPlayer in boardState.players %}
+					<div class="scores__row">
+						<div class="scores__row__label">
+							{{ players[boardPlayer.color].name }}
+						</div>
+
+						<div class="scores__row__value">
+							{{ boardPlayer.score  }} / {{ boardPlayer.score + boardPlayer.targets|length }}
+						</div>
+					</div>
+				{% endfor %}
 			</div>
 		</div>
 
