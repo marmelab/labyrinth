@@ -76,7 +76,7 @@ class BoardController extends AbstractController
     {
         $update = new Update(
             $this->generateUrl('board_view', ['id' => $board->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
-            json_encode(['status' => 'OutOfStock'])
+            json_encode([])
         );
 
         $this->hub->publish($update);
@@ -262,6 +262,8 @@ class BoardController extends AbstractController
 
             $entityManager->flush();
             $conn->commit();
+
+            $this->publishUpdate($board);
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
         } catch (\Exception $e) {
             $conn->rollBack();

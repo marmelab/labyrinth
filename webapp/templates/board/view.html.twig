@@ -157,6 +157,10 @@
 		</div>
 	</div>
 
+{% endblock %}
+
+{% block javascripts %}
+
 {% if not canPlay %}
 <script>
 const eventSource = new EventSource("{{ mercure(url('board_view', { 'id': board.id }))|escape('js') }}");
