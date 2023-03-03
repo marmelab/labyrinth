@@ -130,11 +130,7 @@ class BoardController extends AbstractController
 
         $stateCurrentPlayer = $this->getCurrentPlayer($boardState);
         $currentPlayer = $board->getPlayers()[$stateCurrentPlayer['color']];
-        if ($currentPlayer->getId() == $player->getId()) {
-            return true;
-        }
-
-        return false;
+        return $currentPlayer->getId() == $player->getId();
     }
 
     private function canPlayerJoin(?Player $player, Board $board): bool
