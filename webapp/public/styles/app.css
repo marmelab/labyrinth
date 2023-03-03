@@ -106,7 +106,7 @@ header form button {
 
 button[disabled] {
     color: #444444;
-    cursor: default!important;
+    cursor: default;
 }
 
 button:not([disabled]) {
@@ -157,8 +157,11 @@ button:not([disabled]) {
     border: 1px #555555 solid;
     background-color: #fff;
     padding: 0;
-    cursor: pointer;
     box-shadow: 0 0 4px rgba(0, 0, 0, .5);
+}
+
+.game button:not(.tile):not([disabled]) {
+    cursor: pointer;
 }
 
 .game button:not(.tile):hover {
