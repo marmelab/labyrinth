@@ -2,9 +2,12 @@
 
 namespace App\Repository;
 
-use App\Entity\Board;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+
+use App\Entity\Board;
+use App\Entity\Player;
+
 
 /**
  * @extends ServiceEntityRepository<Board>
@@ -16,6 +19,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class BoardRepository extends ServiceEntityRepository
 {
+    const PAGE_SIZE = 25;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Board::class);
@@ -37,5 +42,19 @@ class BoardRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function findByUser(Player $user, int $page = 1, int $pageSize = 25): array
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->select(['b.id'])
+            ->leftJoin('b.players', 'p')
+            ->where('p.id = :userId')
+            ->setParameter('userId', $user->getId())
+            ->orderBy('b.id', 'DESC')
+            ->setFirstResult(($page - 1) * $pageSize)
+            ->setMaxResults($pageSize);
+
+        return $qb->getQuery()->execute();
     }
 }
