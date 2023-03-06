@@ -11,19 +11,18 @@ services:
     ports:
       - "127.0.0.1:9001:80"
 
+  mercure:
+    command: /usr/bin/caddy run --config /etc/caddy/Caddyfile.dev
+
   webapp:
     build:
       dockerfile: ./webapp/Dockerfile
     environment:
       - APP_DEBUG=true
       - APP_ENV=dev
-
     volumes:
       - ./webapp/src:/var/www/labyrinth/src
       - ./webapp/templates:/var/www/labyrinth/templates
-
-  mercure:
-    command: /usr/bin/caddy run --config /etc/caddy/Caddyfile.dev
 
   webapp-migrations:
     build:
@@ -32,11 +31,21 @@ services:
       - APP_DEBUG=true
       - APP_ENV=dev
 
+  mobile:
+    build:
+      dockerfile: ./mobile/Dockerfile
+    volumes:
+      - ./mobile/public:/var/www/labyrinth/public
+      - ./mobile/src:/var/www/labyrinth/src
+    depends_on:
+      - webapp
+
   proxy:
     build:
-      dockerfile: ./proxy/Dockerfile
+      dockerfile: ./proxy/development/Dockerfile
     volumes:
-      - ./webapp/public/images:/var/www/labyrinth/public/images
-      - ./webapp/public/styles:/var/www/labyrinth/public/styles
+      - ./mobile/public:/var/www/labyrinth/mobile
+      - ./webapp/public/images:/var/www/labyrinth/webapp/images
+      - ./webapp/public/styles:/var/www/labyrinth/webapp/styles
     ports:
       - "127.0.0.1:9000:80"

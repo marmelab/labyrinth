@@ -74,7 +74,7 @@ production-image-build:
 		.
 	
 	docker build \
-		-f proxy/Dockerfile \
+		-f proxy/production/Dockerfile \
 		-t ${DOCKER_IMAGE_PROXY}:${COMMIT_HASH} \
 		-t ${DOCKER_IMAGE_PROXY}:latest \
 		.
@@ -104,12 +104,20 @@ production-deploy: production-image-push		## Deploy production to AWS
 	 	${SERVER_USER}@${SERVER_HOSTNAME} \
 	 	'./run-production.sh'
 
+production: production-image-build
+	docker compose \
+		--env-file=webapp/.env \
+		-f docker-compose.yml \
+		-f docker-compose.prod.yml \
+		up
+
 production-ssh-test:
 	ssh -T \
         -o StrictHostKeyChecking=no \
 		-i .secrets/labyrinth-ed25519.pem \
 		${SERVER_USER}@${SERVER_HOSTNAME} \
 		exit
+
 
 test: 											## Run unit tests
 	@(${MAKE} -C domain test)

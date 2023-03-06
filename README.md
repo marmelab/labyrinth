@@ -20,10 +20,10 @@ Note: You can clean existing saves using the following command:
 make cli-clean
 ```
 
-
 ## Web application
 
-To run the web application, you will need to create the environment files, and then set the corresponding environment variables:
+To run the web application, you will need to create the environment files, and then set the corresponding environment
+variables:
 
 ```sh
 make setup-env
@@ -32,28 +32,41 @@ make setup-env
 webapp/.env
 ```
 
-Once the env file has been set,you can either run the app in development mode using:
+Once the env file has been set,you can either run the app in development or production mode.
+
+/!\ Note: The server automatically detects mobile devices and serves the mobile app automatically. You can test mobile mode using the developper tools from your browser.
+
+### Development
 
 ```sh
 make run
 ```
 
-Or in production mode using:
+This will start the following applications:
+
+```
+webapp              127.0.0.1:9000
+api-domain          127.0.0.1:9001
+```
+
+### Production
+
 ```sh
 make production
 ```
 
 This will start the following applications:
+
 ```
-webapp              127.0.0.1:9000 (dev) / 0.0.0.0:80 (production)
-api-domain          127.0.0.1:9001
+webapp              127.0.0.1:80
 ```
 
 ## Deploy to production
 
 To deploy to production, you will need to:
-* Add the SSH key to `.secrets/labyrinth-ed25519.pem` ;
-* Create the `.secrets/.env` file:
+
+- Add the SSH key to `.secrets/labyrinth-ed25519.pem` ;
+- Create the `.secrets/.env` file:
 
 ```sh
 export SERVER_USER=<server-user>
@@ -66,7 +79,6 @@ You can the run the deploy command:
 make production-deploy
 ```
 
-
 ## Test
 
 You can run the unit tests for both domain and webapp using the following command:
@@ -74,11 +86,11 @@ You can run the unit tests for both domain and webapp using the following comman
 ```sh
 make test
 ```
+
 /!\ Warning: Running tests requires `go`, `php8.1` and `composer` installed globally.
 
-/!\ Warning: You will also need the following PHP extensions installed: `php8.1-xml`, `php8.1-mbstring`, `php8.1-zip`, 
-`php8.1-pgsql` and `php8.1-curl`. 
-
+/!\ Warning: You will also need the following PHP extensions installed: `php8.1-xml`, `php8.1-mbstring`, `php8.1-zip`,
+`php8.1-pgsql` and `php8.1-curl`.
 
 ## End to End testing
 
@@ -95,7 +107,7 @@ The you need to run the full app stack in development mod using:
 make run
 ```
 
-You can the  run end to end tests using:
+You can the run end to end tests using:
 
 ```sh
 make test-e2e
