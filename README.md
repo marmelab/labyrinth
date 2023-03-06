@@ -32,10 +32,9 @@ make setup-env
 webapp/.env
 ```
 
-Once the env file has been set,you can either run the app in development or poduction mode.
+Once the env file has been set,you can either run the app in development or production mode.
 
-/!\ Note: The server automatically detects mobile devices and serves the mobile app automatically. You can test mobile
-mode using the developper tools from your browser.
+/!\ Note: The server automatically detects mobile devices and serves the mobile app automatically. You can test mobile mode using the developper tools from your browser.
 
 ### Development
 
