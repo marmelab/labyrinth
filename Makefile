@@ -121,6 +121,7 @@ production-ssh-test:
 
 test: 											## Run unit tests
 	@(${MAKE} -C domain test)
+	@(${MAKE} -C mobile test)
 	@(${MAKE} -C webapp test)
 
 test-e2e: 										## Run e2e tests
