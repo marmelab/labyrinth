@@ -5,8 +5,8 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
 use App\Repository\PlayerRepository;
 
@@ -29,6 +29,7 @@ class Player
     private ?string $name = null;
 
     #[ORM\ManyToMany(targetEntity: Board::class, mappedBy: 'players')]
+    #[Ignore]
     private Collection $boards;
 
     public function __construct()
