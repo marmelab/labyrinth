@@ -10,8 +10,6 @@ use App\Entity\Player;
 
 class BoardService implements BoardServiceInterface
 {
-    const SESSION_PLAYER_KEY = UserServiceInterface::SESSION_PLAYER_KEY;
-
     private ObjectManager $entityManager;
 
     public function __construct(
