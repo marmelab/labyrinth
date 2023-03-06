@@ -7,7 +7,7 @@ help:
 install:					## Install dependencies
 	@(if [ -f ${HOME}/.nvm/nvm.sh ] ; \
 	then \
-		. ${HOME}/.nvm/nvm.sh && nvm use; \
+		. ${HOME}/.nvm/nvm.sh && nvm install 18 && nvm use; \
 	fi)
 
 	@npm install
