@@ -34,6 +34,9 @@ webapp/.env
 
 Once the env file has been set,you can either run the app in development or poduction mode.
 
+/!\ Note: The server automatically detects mobile devices and serves the mobile app automatically. You can test mobile
+mode using the developper tools from your browser.
+
 ### Development
 
 ```sh
@@ -44,7 +47,6 @@ This will start the following applications:
 
 ```
 webapp              127.0.0.1:9000
-mobile              127.0.0.1:9000/mobile
 api-domain          127.0.0.1:9001
 ```
 
@@ -59,8 +61,6 @@ This will start the following applications:
 ```
 webapp              127.0.0.1:80
 ```
-
-/!\ Note: In production mode, the server automatically detects mobile devices and serves the mobile app automatically.
 
 ## Deploy to production
 

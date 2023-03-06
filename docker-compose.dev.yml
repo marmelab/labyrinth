@@ -45,7 +45,7 @@ services:
       dockerfile: ./proxy/development/Dockerfile
     volumes:
       - ./mobile/public:/var/www/labyrinth/mobile
-      - ./webapp/public/images:/var/www/labyrinth/public/images
-      - ./webapp/public/styles:/var/www/labyrinth/public/styles
+      - ./webapp/public/images:/var/www/labyrinth/webapp/images
+      - ./webapp/public/styles:/var/www/labyrinth/webapp/styles
     ports:
       - "127.0.0.1:9000:80"
