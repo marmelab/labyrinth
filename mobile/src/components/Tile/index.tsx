@@ -52,6 +52,11 @@ interface TileProps {
    *
    */
   onClick: MouseEventHandler;
+
+  /**
+   *
+   */
+  children?: ReactElement[];
 }
 
 /**
@@ -64,6 +69,7 @@ const Tile: FunctionComponent<TileProps> = ({
   },
   disabled = false,
   onClick,
+  children,
 }: TileProps): ReactElement => {
   return (
     <button
@@ -73,6 +79,7 @@ const Tile: FunctionComponent<TileProps> = ({
     >
       <div className={`tile__path`}></div>
       <div className="tile__treasure">{treasures[treasure]}</div>
+      {children}
     </button>
   );
 };
