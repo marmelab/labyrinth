@@ -8,6 +8,11 @@ export enum GameState {
 }
 
 export interface Board {
+    id: number;
+    state: BoardState;
+}
+
+export interface BoardState {
     tiles: Array<Array<BoardTile>>;
     remainingTile: BoardTile;
     players: Array<Player>;

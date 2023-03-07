@@ -1,10 +1,10 @@
-import { Board as State, GameState } from "../../model/Board";
+import { BoardState, GameState } from "../../model/Board";
 import Tile from "../Tile";
 
 import "./index.css";
 
 interface BoardProps {
-  state: State;
+  state: BoardState;
 }
 
 /**

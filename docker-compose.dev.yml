@@ -48,4 +48,4 @@ services:
       - ./webapp/public/images:/var/www/labyrinth/webapp/images
       - ./webapp/public/styles:/var/www/labyrinth/webapp/styles
     ports:
-      - "127.0.0.1:9000:80"
+      - "0.0.0.0:9000:80"
