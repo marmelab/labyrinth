@@ -1,6 +1,6 @@
 import type { FunctionComponent, MouseEventHandler, ReactElement } from "react";
-import { BoardTile } from "../../model/Board";
-import type { Tile } from "../../model/Tile";
+
+import { BoardTile, Tile } from "../../entity";
 
 import "./index.css";
 
@@ -38,31 +38,13 @@ const treasures: TreasureMap = {
 };
 
 interface TileProps {
-  /**
-   *
-   */
   boardTile: BoardTile;
-
-  /**
-   * Whether the user can click on the tile.
-   */
   disabled?: boolean;
-
-  /**
-   *
-   */
   onClick: MouseEventHandler;
-
-  /**
-   *
-   */
-  children?: ReactElement[];
+  children?: ReactElement | ReactElement[];
 }
 
-/**
- *
- */
-const Tile: FunctionComponent<TileProps> = ({
+const TileView: FunctionComponent<TileProps> = ({
   boardTile: {
     tile: { treasure, shape },
     rotation,
@@ -84,4 +66,4 @@ const Tile: FunctionComponent<TileProps> = ({
   );
 };
 
-export default Tile;
+export default TileView;

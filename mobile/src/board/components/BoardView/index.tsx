@@ -1,27 +1,28 @@
-import { BoardState, GameState } from "../../model/Board";
-import { Player } from "../../model/Player";
+import { Board, Player, GameState } from "../../entity";
 
-import PlayerComponent from "../Player";
-import TileComponent from "../Tile";
+import PlayerPawnView from "../PlayerPawnView";
+import TileView from "../TileView";
 
 import "./index.css";
 
 interface BoardProps {
-  state: BoardState;
+  board: Board;
 }
 
 /**
  *
  */
-const Board = ({
-  state: { tiles, remainingTile, gameState, players },
+const BoardView = ({
+  board: {
+    state: { tiles, remainingTile, gameState, players },
+  },
 }: BoardProps) => {
   return (
     <>
       <div className="board">
         {tiles.flatMap((lineTiles, line) =>
           lineTiles.map((boardTile, row) => (
-            <TileComponent
+            <TileView
               key={`${line * tiles.length + row}`}
               boardTile={boardTile}
               disabled={gameState != GameState.MovePawn}
@@ -33,15 +34,15 @@ const Board = ({
                     position.line == line && position.row == row
                 )
                 .map(({ color }: Player) => (
-                  <PlayerComponent key={`${color}`} color={color} />
+                  <PlayerPawnView key={`${color}`} color={color} />
                 ))}
-            </TileComponent>
+            </TileView>
           ))
         )}
       </div>
-      <TileComponent boardTile={remainingTile} onClick={() => {}} />
+      <TileView boardTile={remainingTile} onClick={() => {}} />
     </>
   );
 };
 
-export default Board;
+export default BoardView;

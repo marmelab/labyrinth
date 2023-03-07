@@ -6,7 +6,7 @@ import matchers from "@testing-library/jest-dom/matchers";
 expect.extend(matchers);
 afterEach(cleanup);
 
-import Tile from "./index";
+import TileView from "./index";
 import { Rotation, Shape } from "../../model/Tile";
 import { BoardTile } from "../../model/Board";
 
@@ -42,7 +42,11 @@ describe("Tile", () => {
       "should be disabled according to disabled props",
       async ({ boardTile, disabled, callback }) => {
         render(
-          <Tile boardTile={boardTile} disabled={disabled} onClick={() => {}} />
+          <TileView
+            boardTile={boardTile}
+            disabled={disabled}
+            onClick={() => {}}
+          />
         );
 
         await screen.findByRole("button");
@@ -55,7 +59,7 @@ describe("Tile", () => {
     it("should should call on click handler", async () => {
       const mock = vi.fn(() => {});
 
-      render(<Tile boardTile={boardTile} onClick={mock} />);
+      render(<TileView boardTile={boardTile} onClick={mock} />);
 
       await screen.findByRole("button");
       const button = screen.getByRole("button");
