@@ -87,7 +87,7 @@ You can run the unit tests for both domain and webapp using the following comman
 make test
 ```
 
-/!\ Warning: Running tests requires `go`, `php8.1` and `composer` installed globally.
+/!\ Warning: Running tests requires `go`, `node`, `npm`, `php8.1` and `composer` installed globally.
 
 /!\ Warning: You will also need the following PHP extensions installed: `php8.1-xml`, `php8.1-mbstring`, `php8.1-zip`,
 `php8.1-pgsql` and `php8.1-curl`.

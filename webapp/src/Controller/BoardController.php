@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 use App\Entity\Board;
 use App\Entity\Player;
@@ -68,6 +69,7 @@ class BoardController extends AbstractController
 
     public function __construct(
         private DomainServiceInterface $domainService,
+        private SerializerInterface $serializer,
         private HubInterface $hub
     ) {
     }
@@ -76,7 +78,7 @@ class BoardController extends AbstractController
     {
         $update = new Update(
             $this->generateUrl('board_view', ['id' => $board->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
-            json_encode([])
+            $this->serializer->serialize($board, 'json')
         );
 
         $this->hub->publish($update);

@@ -5,29 +5,34 @@ name: CI / CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   unit-test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Setup Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.20.x
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.20.x
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.1'
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.4.x
 
-    - name: Unit test
-      run: make test
-  
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1"
+
+      - name: Unit test
+        run: make test
+
   deploy:
     runs-on: ubuntu-latest
     environment: Deploy
@@ -35,23 +40,23 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Setup SSH environment
-      run: mkdir -p .secrets && echo "${{ secrets.SERVER_PRIVATE_KEY }}" > .secrets/labyrinth-ed25519.pem && chmod 0400 .secrets/labyrinth-ed25519.pem
+      - name: Setup SSH environment
+        run: mkdir -p .secrets && echo "${{ secrets.SERVER_PRIVATE_KEY }}" > .secrets/labyrinth-ed25519.pem && chmod 0400 .secrets/labyrinth-ed25519.pem
 
-    - name: Setup deploy environment
-      run: echo 'SERVER_USER=${{ secrets.SERVER_USER }}' >> .secrets/.env && echo 'SERVER_HOSTNAME=${{ secrets.SERVER_HOSTNAME }}' >> .secrets/.env
-    
-    - name: Test SSH Connection
-      run: make production-ssh-test
+      - name: Setup deploy environment
+        run: echo 'SERVER_USER=${{ secrets.SERVER_USER }}' >> .secrets/.env && echo 'SERVER_HOSTNAME=${{ secrets.SERVER_HOSTNAME }}' >> .secrets/.env
 
-    - name: Deploy to Production
-      run: make production-deploy
+      - name: Test SSH Connection
+        run: make production-ssh-test
+
+      - name: Deploy to Production
+        run: make production-deploy
