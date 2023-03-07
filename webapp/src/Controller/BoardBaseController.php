@@ -20,7 +20,7 @@ use App\Service\Rotation;
 
 abstract class BoardBaseController extends AbstractController
 {
-    const SESSION_PLAYER_KEY = PlayerController::SESSION_PLAYER_KEY;
+    const SESSION_PLAYER_KEY = AuthBaseController::SESSION_PLAYER_KEY;
 
     protected function __construct(
         protected DomainServiceInterface $domainService,

@@ -11,9 +11,15 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Player;
 use App\Form\Type\SignInType;
 
-class PlayerController extends AbstractController
+class PlayerController extends AuthBaseController
 {
     const SESSION_PLAYER_KEY = 'player';
+
+    public function __construct(
+        protected ManagerRegistry $doctrine,
+    ) {
+        parent::__construct($doctrine->getManager());
+    }
 
     #[Route('/player/sign-in', name: 'player_sign_in', methods: 'POST')]
     public function postSignIn(Request $request, ManagerRegistry $doctrine): Response
@@ -27,27 +33,13 @@ class PlayerController extends AbstractController
             ]);
         }
 
-        $name = $form->getData()->getName();
-
-        $entityManager = $doctrine->getManager();
-        $playerRepository = $entityManager->getRepository(Player::class);
-
-        $player = $playerRepository->findOneByName($name);
-        if ($player == NULL) {
-            $player = new Player();
-            $player->setName($name);
-
-            $entityManager->persist($player);
-            $entityManager->flush();
-        }
-
-        $request->getSession()->set(static::SESSION_PLAYER_KEY, $player);
+        $this->signInUser($request, $form->getData()->getName());
         return $this->redirectToRoute('home');
     }
     #[Route('/player/sign-out', name: 'player_sign_out', methods: 'POST')]
     public function postSignOut(Request $request): Response
     {
-        $request->getSession()->remove(static::SESSION_PLAYER_KEY);
+        $this->signOutUser($request);
         return $this->redirectToRoute('home');
     }
 }
