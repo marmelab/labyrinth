@@ -7,8 +7,7 @@ expect.extend(matchers);
 afterEach(cleanup);
 
 import TileView from "./index";
-import { Rotation, Shape } from "../../model/Tile";
-import { BoardTile } from "../../model/Board";
+import { BoardTile, Rotation, Shape } from "../../entity";
 
 describe("Tile", () => {
   const boardTile: BoardTile = {

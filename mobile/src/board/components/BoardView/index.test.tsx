@@ -6,14 +6,13 @@ import matchers from "@testing-library/jest-dom/matchers";
 expect.extend(matchers);
 afterEach(cleanup);
 
-import { Board as State, GameState } from "../../model/Board";
 import BoardView from "./index";
 
-import state from "./index.test.json";
+import board from "./index.test.json";
 
 describe("Board", () => {
   it("Should display tiles", async () => {
-    render(<BoardView state={state} />);
+    render(<BoardView board={board} />);
 
     const buttons = await screen.findAllByRole("button");
 
