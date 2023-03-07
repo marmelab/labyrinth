@@ -15,7 +15,6 @@
 		<div class="game__actions game__actions--top">
 			{% include "board/components/insert_tile.html.twig" with {
 				"actionUrl": url("board_insert_tile_top", { "id": board.id }),
-				"gameState": boardState.gameState,
 				"label": "↓",
 			} %}
 		</div>
@@ -24,21 +23,18 @@
 			<div class="game__actions game__actions--left">
 				{% include "board/components/insert_tile.html.twig" with {
 					"actionUrl": url("board_insert_tile_left", { "id": board.id }),
-					"gameState": boardState.gameState,
 					"label": "→",
 				} %}
 			</div>
 
 			<div class="board">
-				{% for line, lineTiles in boardState.tiles %}
+				{% for line, lineTiles in board.state.tiles %}
 					{% for row, boardTile in lineTiles %}
 						{% include "board/components/tile.html.twig" with {
 							"line": line,
 							"row": row,
 							"tile": boardTile.tile,
 							"rotation": boardTile.rotation,
-							"players": boardState.players,
-							"gameState": boardState.gameState,
 						} %}
 					{% endfor %}
 				{% endfor %}
@@ -47,7 +43,6 @@
 			<div class="game__actions game__actions--right">
 				{% include "board/components/insert_tile.html.twig" with {
 					"actionUrl": url("board_insert_tile_right", { "id": board.id }),
-					"gameState": boardState.gameState,
 					"label": "←",
 				} %}
 			</div>
@@ -60,9 +55,9 @@
 					} %}
 
 					<div class="tile">
-						{% set remainingTile = boardState.remainingTile %}
+						{% set remainingTile = board.state.remainingTile %}
 						{% set tile = remainingTile.tile %}
-						<div class="tile__content tile--remaining tile--shape-{{ tile.shape }} tile--rotation-{{ remainingTile.rotation }} {% if playerInfo and playerInfo.target == tile.treasure %}tile--target{% endif %}">
+						<div class="tile__content tile--remaining tile--shape-{{ tile.shape }} tile--rotation-{{ remainingTile.rotation }} {% if board.user and board.user.currentTarget == tile.treasure %}tile--target{% endif %}">
 							<div class="emoji">
 								{{ emojis[tile.treasure] }}
 							</div>
@@ -75,25 +70,25 @@
 					} %}
 				</div>
 
-				{% if canPlay and boardState.gameState != 2 %}
+				{% if board.canPlay and board.gameState != 2 %}
 				<div class="alert alert-success">
 					Your Turn, you can:
-					{% if boardState.gameState == 0 %}
+					{% if board.gameState == 0 %}
 						Place Tile.
-					{% elseif boardState.gameState == 1 %}
+					{% elseif board.gameState == 1 %}
 						Move Pawn.
 					{% endif %}
 				</div>
 				{% endif %}
 
-				{% if playerInfo %}
+				{% if board.user %}
 				<div class="scores__row">
 					<div class="scores__row__label">
 						Your Color
 					</div>
 
 					<div class="scores__row__value">
-						{{ colors[playerInfo.color] }}
+						{{ colors[board.user.color] }}
 					</div>
 				</div>
 					
@@ -103,7 +98,7 @@
 					</div>
 
 					<div class="scores__row__value">
-						{{ emojis[playerInfo.target] }}
+						{{ emojis[board.user.currentTarget] }}
 					</div>
 				</div>
 				{% endif %}
@@ -114,7 +109,7 @@
 					</div>
 
 					<div class="scores__row__value">
-						{{ players[currentPlayer.color].name }}
+						{{ board.currentPlayer.name }}
 					</div>
 				</div>
 
@@ -124,7 +119,7 @@
 					</div>
 
 					<div class="scores__row__value">
-						{{ colors[currentPlayer.color] }}
+						{{ colors[board.currentPlayer.color] }}
 					</div>
 				</div>
 
@@ -134,14 +129,14 @@
 					</div>
 				</div>
 
-				{% for boardPlayer in boardState.players %}
+				{% for player in board.players %}
 					<div class="scores__row">
 						<div class="scores__row__label">
-							{{ players[boardPlayer.color].name }}
+							{{ player.name }}
 						</div>
 
 						<div class="scores__row__value">
-							{{ boardPlayer.score  }} / {{ boardPlayer.score + boardPlayer.targets|length }}
+							{{ player.score  }} / {{ player.totalTargets }}
 						</div>
 					</div>
 				{% endfor %}
@@ -151,7 +146,6 @@
 		<div class="game__actions game__actions--bottom">
 			{% include "board/components/insert_tile.html.twig" with {
 				"actionUrl": url("board_insert_tile_bottom", { "id": board.id }),
-				"gameState": boardState.gameState,
 				"label": "↑",
 			} %}
 		</div>
@@ -161,7 +155,7 @@
 
 {% block javascripts %}
 
-{% if not canPlay %}
+{% if not board.canPlay %}
 <script defer>
 const eventSource = new EventSource("{{ mercure(url('board_view', { 'id': board.id }))|escape('js') }}");
 eventSource.onmessage = event => {
@@ -170,7 +164,7 @@ eventSource.onmessage = event => {
 </script>
 {% endif %}
 
-{% if boardState.gameState == 2 %}
+{% if board.gameState == 2 %}
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script defer>
 	confetti({

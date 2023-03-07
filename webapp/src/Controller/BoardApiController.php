@@ -2,20 +2,29 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+namespace App\Controller;
+
+use Doctrine\Persistence\ManagerRegistry;
+
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 use App\Entity\Board;
-use App\Service\BoardServiceInterface;
+use App\Service\DomainServiceInterface;
 
 #[Route('/api/v1/board', name: 'board_api_')]
-class BoardApiController extends AbstractController
+class BoardApiController extends BoardBaseController
 {
     public function __construct(
-        private BoardServiceInterface $boardService
+        protected DomainServiceInterface $domainService,
+        protected ManagerRegistry $doctrine,
+        protected HubInterface $hub,
+        protected SerializerInterface $serializer,
     ) {
+        parent::__construct($domainService, $doctrine->getManager(), $hub, $serializer);
     }
 
     #[Route('', name: 'find', methods: 'GET')]
@@ -25,12 +34,20 @@ class BoardApiController extends AbstractController
         if ($page < 1) {
             $page = 1;
         }
-        return $this->json($this->boardService->findByCurrentUser($page));
+
+        $user = $this->getCurrentUser($request);
+        $boardRepository = $this->entityManager->getRepository(Board::class);
+        return $this->json([
+            'data' => $boardRepository->findByUser($user, $page),
+        ]);
     }
 
     #[Route('/{id}', name: 'find_by_id', methods: 'GET')]
-    public function findById(Board $board): JsonResponse
+    public function findById(Request $request, Board $board): JsonResponse
     {
-        return $this->json($board);
+        $user = $this->getCurrentUser($request);
+        return $this->json([
+            'data' => $this->createBoardViewModel($user, $board),
+        ]);
     }
 }

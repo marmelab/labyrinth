@@ -6,16 +6,16 @@ export enum GameState {
 
 export interface Board {
   id: number;
+  remainingSeats: number;
+  players: Array<Player>;
   state: BoardState;
+  canPlay: boolean;
+  gameState: GameState;
 }
 
 export interface BoardState {
   tiles: Array<Array<BoardTile>>;
   remainingTile: BoardTile;
-  players: Array<Player>;
-  remainingPlayers: Array<number>;
-  currentPlayerIndex: number;
-  gameState: GameState;
 }
 
 export interface BoardTile {
@@ -40,6 +40,7 @@ export interface Tile {
   treasure: string;
   shape: Shape;
 }
+
 export enum Color {
   Blue,
   Green,
@@ -47,14 +48,14 @@ export enum Color {
   Yellow,
 }
 
-export interface Coordinate {
+export interface Player {
+  name: string;
+  color: Color;
   line: number;
   row: number;
-}
-
-export interface Player {
-  color: Color;
-  position: Coordinate;
   targets: Array<string>;
+  currentTarget: string;
   score: number;
+  isCurrentPlayer: boolean;
+  isUser: boolean;
 }

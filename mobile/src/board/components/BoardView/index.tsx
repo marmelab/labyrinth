@@ -9,12 +9,12 @@ interface BoardProps {
   board: Board;
 }
 
-/**
- *
- */
 const BoardView = ({
   board: {
-    state: { tiles, remainingTile, gameState, players },
+    state: { tiles, remainingTile },
+    players,
+    canPlay,
+    gameState,
   },
 }: BoardProps) => {
   return (
@@ -25,17 +25,19 @@ const BoardView = ({
             <TileView
               key={`${line * tiles.length + row}`}
               boardTile={boardTile}
-              disabled={gameState != GameState.MovePawn}
+              disabled={!canPlay || gameState != GameState.MovePawn}
               onClick={() => {}}
             >
               {players
-                .filter(
-                  ({ position }: Player) =>
-                    position.line == line && position.row == row
-                )
-                .map(({ color }: Player) => (
-                  <PlayerPawnView key={`${color}`} color={color} />
-                ))}
+                .filter((player) => player.line == line && player.row == row)
+                .map((player) => {
+                  return (
+                    <PlayerPawnView
+                      key={`${player.color}`}
+                      color={player.color}
+                    />
+                  );
+                })}
             </TileView>
           ))
         )}

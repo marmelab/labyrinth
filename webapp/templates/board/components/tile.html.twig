@@ -3,14 +3,14 @@
 	<input type="hidden" name="move_player[line]" value="{{ line }}">
 	<input type="hidden" name="move_player[row]" value="{{ row }}">
 
-	<button class="tile" type="submit" {% if gameState != 1 or not canPlay %} disabled {% endif %}>
-		<div class="tile__content tile--shape-{{ tile.shape }} tile--rotation-{{ rotation }} {% if playerInfo and playerInfo.target == tile.treasure %}tile--target{% endif %}">
+	<button class="tile" type="submit" {% if board.gameState != 1 or not board.canPlay %} disabled {% endif %}>
+		<div class="tile__content tile--shape-{{ tile.shape }} tile--rotation-{{ rotation }} {% if board.user and board.user.currentTarget == tile.treasure %}tile--target{% endif %}">
 			<div class="emoji">
 				{{ emojis[tile.treasure] }}
 			</div>
 
-			{% for player in players %}
-				{% if player.position.line == line and player.position.row == row %}
+			{% for player in board.players %}
+				{% if player.line == line and player.row == row %}
 					<div class="tile__player tile__player--color-{{ player.color }}"></div>
 				{% endif %}
 			{% endfor %}

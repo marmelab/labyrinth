@@ -1,6 +1,6 @@
 <form action="{{ actionUrl }}" method="POST">
 	<input type="hidden" name="rotate_remaining[_token]" value="{{ csrf_token('rotate_remaining') }} ">
-	<button type="submit" {% if not canPlay %} disabled {% endif %}>
+	<button type="submit" {% if not board.canPlay %} disabled {% endif %}>
 		{{ label }}
 	</button>
 </form>
