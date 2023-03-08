@@ -15,11 +15,10 @@ export function useUser(): NullableUserStateType {
   return [user, setUser];
 }
 
-interface RemoteUserRepositoryContextType {
-  remoteUserRepository: UserRepository;
+interface UserRepositoryContextType {
+  userRepository: UserRepository;
 }
-export function useRemoteUserRepository(): UserRepository {
-  const { remoteUserRepository } =
-    useOutletContext<RemoteUserRepositoryContextType>();
-  return remoteUserRepository;
+export function useUserRepository(): UserRepository {
+  const { userRepository } = useOutletContext<UserRepositoryContextType>();
+  return userRepository;
 }

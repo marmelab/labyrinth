@@ -16,14 +16,14 @@ import type { UserRepository } from "../../user/UserRepository";
 import { NullableUser } from "../SharedTypes";
 
 interface LayoutProps {
-  remoteUserRepository: UserRepository;
+  userRepository: UserRepository;
 }
 
-const Layout = ({ remoteUserRepository }: LayoutProps) => {
+const Layout = ({ userRepository }: LayoutProps) => {
   const [user, setUser] = useState<NullableUser>(null);
 
   useEffect(() => {
-    remoteUserRepository.me().then((me) => {
+    userRepository.me().then((me) => {
       setUser(me);
     });
   }, []);
@@ -76,7 +76,7 @@ const Layout = ({ remoteUserRepository }: LayoutProps) => {
         </Container>
       </AppBar>
       <main>
-        <Outlet context={{ user, setUser, remoteUserRepository }} />
+        <Outlet context={{ user, setUser, userRepository }} />
       </main>
     </>
   );

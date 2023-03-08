@@ -2,11 +2,11 @@ import { FormEvent, useEffect, useState } from "react";
 import { Route, useNavigate } from "react-router-dom";
 import { Button, FormControl, TextField } from "@mui/material";
 
-import { useRemoteUserRepository, useUser } from "../shared/SharedHooks";
+import { useUserRepository, useUser } from "../shared/SharedHooks";
 
 export function SignIn() {
   const navigate = useNavigate();
-  const remoteUserRepository = useRemoteUserRepository();
+  const userRepository = useUserRepository();
   const [_, setUser] = useUser();
 
   const [name, setName] = useState<string>();
@@ -19,7 +19,7 @@ export function SignIn() {
     }
 
     try {
-      const signedInUser = await remoteUserRepository.signIn(name);
+      const signedInUser = await userRepository.signIn(name);
       setUser(signedInUser);
       navigate("/");
     } catch (e) {
@@ -47,11 +47,11 @@ export function SignIn() {
 
 export function SignOut() {
   const navigate = useNavigate();
-  const remoteUserRepository = useRemoteUserRepository();
+  const userRepository = useUserRepository();
   const [_, setUser] = useUser();
 
   useEffect(() => {
-    remoteUserRepository.signOut().then(() => {
+    userRepository.signOut().then(() => {
       setUser(null);
       navigate("/");
     });

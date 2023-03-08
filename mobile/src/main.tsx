@@ -18,7 +18,7 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route
       path="/"
-      element={<Layout remoteUserRepository={new RemoteUserRepository()} />}
+      element={<Layout userRepository={new RemoteUserRepository()} />}
     >
       {...BoardRoutes}
       {...UserRoutes}

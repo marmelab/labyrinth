@@ -6,21 +6,18 @@ import Layout from "./components/Layout";
 import type { UserRepository } from "../user/UserRepository";
 
 interface RenderRouteWithOutletContextProps {
-  remoteUserRepository: UserRepository;
+  userRepository: UserRepository;
   children: ReactNode;
 }
 
 export const RenderRouteContext = ({
-  remoteUserRepository,
+  userRepository,
   children,
 }: RenderRouteWithOutletContextProps) => {
   return (
     <MemoryRouter>
       <Routes>
-        <Route
-          path="/"
-          element={<Layout remoteUserRepository={remoteUserRepository} />}
-        >
+        <Route path="/" element={<Layout userRepository={userRepository} />}>
           <Route index element={children} />
         </Route>
       </Routes>

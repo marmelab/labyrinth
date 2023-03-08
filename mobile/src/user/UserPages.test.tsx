@@ -23,7 +23,7 @@ describe("SignIn", () => {
     userRepository.signIn.mockResolvedValueOnce({ id: 1, name: testUserName });
 
     render(
-      <RenderRouteContext remoteUserRepository={userRepository}>
+      <RenderRouteContext userRepository={userRepository}>
         <SignIn />
       </RenderRouteContext>
     );
@@ -46,7 +46,7 @@ describe("SignIn", () => {
     userRepository.me.mockResolvedValue(null);
 
     render(
-      <RenderRouteContext remoteUserRepository={userRepository}>
+      <RenderRouteContext userRepository={userRepository}>
         <SignIn />
       </RenderRouteContext>
     );
@@ -69,7 +69,7 @@ describe("SignOut", () => {
     userRepository.signOut.mockReturnValue(Promise.resolve());
 
     render(
-      <RenderRouteContext remoteUserRepository={userRepository}>
+      <RenderRouteContext userRepository={userRepository}>
         <SignOut />
       </RenderRouteContext>
     );
