@@ -26,7 +26,7 @@ const Layout = ({ remoteUserRepository }: LayoutProps) => {
     remoteUserRepository.me().then((me) => {
       setUser(me);
     });
-  });
+  }, []);
 
   return (
     <>
