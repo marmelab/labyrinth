@@ -16,10 +16,7 @@ import "./index.css";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route
-      path="/"
-      element={<Layout userRepository={new RemoteUserRepository()} />}
-    >
+    <Route path="/" element={<Layout />}>
       {...BoardRoutes}
       {...UserRoutes}
     </Route>

@@ -11,15 +11,12 @@ import {
   Typography,
 } from "@mui/material";
 
-import type { User } from "../../user/UserTypes";
-import type { UserRepository } from "../../user/UserRepository";
 import { NullableUser } from "../SharedTypes";
 
-interface LayoutProps {
-  userRepository: UserRepository;
-}
+import { useUserRepository } from "../SharedHooks";
 
-const Layout = ({ userRepository }: LayoutProps) => {
+const Layout = () => {
+  const userRepository = useUserRepository();
   const [user, setUser] = useState<NullableUser>(null);
 
   useEffect(() => {
@@ -76,7 +73,7 @@ const Layout = ({ userRepository }: LayoutProps) => {
         </Container>
       </AppBar>
       <main>
-        <Outlet context={{ user, setUser, userRepository }} />
+        <Outlet context={{ user, setUser }} />
       </main>
     </>
   );

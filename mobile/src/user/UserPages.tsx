@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import { Route, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button, FormControl, TextField } from "@mui/material";
 
 import { useUserRepository, useUser } from "../shared/SharedHooks";
@@ -59,10 +59,3 @@ export function SignOut() {
 
   return <></>;
 }
-
-export const UserRoutes = [
-  <Route path="auth">
-    <Route path="sign-in" element={<SignIn />} />
-    <Route path="sign-out" element={<SignOut />} />
-  </Route>,
-];

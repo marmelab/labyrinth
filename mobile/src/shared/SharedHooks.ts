@@ -3,7 +3,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { useOutletContext } from "react-router-dom";
 
 import type { NullableUser, NullableUserStateType } from "./SharedTypes";
-import type { UserRepository } from "../user/UserRepository";
+import { RemoteUserRepository, UserRepository } from "../user/UserRepository";
 
 interface NullableUserContextType {
   user: NullableUser;
@@ -15,10 +15,6 @@ export function useUser(): NullableUserStateType {
   return [user, setUser];
 }
 
-interface UserRepositoryContextType {
-  userRepository: UserRepository;
-}
 export function useUserRepository(): UserRepository {
-  const { userRepository } = useOutletContext<UserRepositoryContextType>();
-  return userRepository;
+  return new RemoteUserRepository();
 }
