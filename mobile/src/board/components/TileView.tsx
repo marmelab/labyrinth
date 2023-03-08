@@ -1,8 +1,8 @@
 import type { FunctionComponent, MouseEventHandler, ReactElement } from "react";
 
-import { BoardTile, Tile } from "../../entity";
+import { BoardTile, Tile } from "../BoardTypes";
 
-import "./index.css";
+import "./TileView.css";
 
 interface TreasureMap {
   [key: string]: string;
@@ -40,7 +40,7 @@ const treasures: TreasureMap = {
 interface TileProps {
   boardTile: BoardTile;
   disabled?: boolean;
-  onClick: MouseEventHandler;
+  onClick?: MouseEventHandler;
   children?: ReactElement | ReactElement[];
 }
 

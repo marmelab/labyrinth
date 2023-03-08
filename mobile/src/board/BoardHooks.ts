@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 
-import { Board } from "./entity";
-import { BoardRepository } from "./repository";
+import { Board } from "./BoardTypes";
+
+import { boardRepository } from "./BoardRepository";
 
 export function useBoard(id: number | string): [Board | null, any | null] {
   const [board, setBoard] = useState<Board | null>(null);
@@ -9,7 +10,7 @@ export function useBoard(id: number | string): [Board | null, any | null] {
 
   const fetchBoard = async function () {
     try {
-      const updatedBoard = await BoardRepository.getById(id);
+      const updatedBoard = await boardRepository.getById(id);
       setBoard(updatedBoard);
     } catch (e) {
       setError("Failed to load board");

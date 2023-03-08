@@ -6,8 +6,8 @@ import matchers from "@testing-library/jest-dom/matchers";
 expect.extend(matchers);
 afterEach(cleanup);
 
-import TileView from "./index";
-import { BoardTile, Rotation, Shape } from "../../entity";
+import TileView from "./TileView";
+import { BoardTile, Rotation, Shape } from "../BoardTypes";
 
 describe("Tile", () => {
   const boardTile: BoardTile = {

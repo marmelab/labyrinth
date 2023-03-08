@@ -59,3 +59,7 @@ export interface Player {
   isCurrentPlayer: boolean;
   isUser: boolean;
 }
+
+export interface BoardRepository {
+  getById(id: number | string): Promise<Board>;
+}

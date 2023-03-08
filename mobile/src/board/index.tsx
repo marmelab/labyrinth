@@ -1,7 +1,6 @@
 import { Route } from "react-router-dom";
 
-import { GetById } from "./pages";
-import { BoardRepository } from "./repository";
+import { GetById } from "./BoardPages";
 
 export default [
   <Route path="board">
