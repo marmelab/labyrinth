@@ -67,6 +67,6 @@ class AuthApiController extends AuthBaseController
     public function postSignOut(Request $request): JsonResponse
     {
         $this->signOutUser($request);
-        return $this->json([]);
+        return $this->json(['data' => null]);
     }
 }

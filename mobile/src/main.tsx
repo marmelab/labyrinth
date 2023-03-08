@@ -7,9 +7,6 @@ import {
   Route,
 } from "react-router-dom";
 
-import { User } from "./user/entity";
-import { UserContext } from "./user/context";
-
 import Layout from "./shared/components/Layout";
 
 import BoardRoutes from "./board";
@@ -26,18 +23,8 @@ const router = createBrowserRouter(
   )
 );
 
-const App = function (): ReactElement {
-  const [user, setUser] = useState<User | null>(null);
-
-  return (
-    <UserContext.Provider value={[user, setUser]}>
-      <RouterProvider router={router} />
-    </UserContext.Provider>
-  );
-};
-
 ReactDOM.createRoot(document.querySelector("#app") as HTMLElement).render(
   <React.StrictMode>
-    <App />
+    <RouterProvider router={router} />
   </React.StrictMode>
 );

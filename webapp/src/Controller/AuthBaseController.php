@@ -19,7 +19,7 @@ abstract class AuthBaseController extends AbstractController
     ) {
     }
 
-    protected function signInUser(Request $request, string $name)
+    protected function signInUser(Request $request, string $name): Player
     {
         $playerRepository = $this->entityManager->getRepository(Player::class);
 
@@ -33,6 +33,7 @@ abstract class AuthBaseController extends AbstractController
         }
 
         $request->getSession()->set(static::SESSION_PLAYER_KEY, $player);
+        return $player;
     }
 
     protected function signOutUser(Request $request)
