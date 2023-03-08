@@ -7,14 +7,14 @@ export enum GameState {
 export interface Board {
   id: number;
   remainingSeats: number;
-  players: Array<Player>;
+  players: Player[];
   state: BoardState;
   canPlay: boolean;
   gameState: GameState;
 }
 
 export interface BoardState {
-  tiles: Array<Array<BoardTile>>;
+  tiles: BoardTile[][];
   remainingTile: BoardTile;
 }
 
@@ -53,7 +53,7 @@ export interface Player {
   color: Color;
   line: number;
   row: number;
-  targets: Array<string>;
+  targets: string[];
   currentTarget: string;
   score: number;
   isCurrentPlayer: boolean;
