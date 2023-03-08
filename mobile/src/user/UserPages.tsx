@@ -1,15 +1,10 @@
-import type { ReactElement, FormEvent } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { Route, useNavigate } from "react-router-dom";
+import { Button, FormControl, TextField } from "@mui/material";
 
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRemoteUserRepository, useUser } from "../shared/SharedHooks";
 
-import Button from "@mui/material/Button";
-import FormControl from "@mui/material/FormControl";
-import TextField from "@mui/material/TextField";
-
-import { useRemoteUserRepository, useUser } from "../shared/hooks";
-
-export function SignIn(): ReactElement {
+export function SignIn() {
   const navigate = useNavigate();
   const remoteUserRepository = useRemoteUserRepository();
   const [_, setUser] = useUser();
@@ -50,7 +45,7 @@ export function SignIn(): ReactElement {
   );
 }
 
-export function SignOut(): ReactElement {
+export function SignOut() {
   const navigate = useNavigate();
   const remoteUserRepository = useRemoteUserRepository();
   const [_, setUser] = useUser();
@@ -64,3 +59,10 @@ export function SignOut(): ReactElement {
 
   return <></>;
 }
+
+export const UserRoutes = [
+  <Route path="auth">
+    <Route path="sign-in" element={<SignIn />} />
+    <Route path="sign-out" element={<SignOut />} />
+  </Route>,
+];

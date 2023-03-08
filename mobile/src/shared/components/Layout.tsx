@@ -1,23 +1,32 @@
-import type { FunctionComponent, ReactElement } from "react";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link as RouterLink, Outlet } from "react-router-dom";
 
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
-import Link from "@mui/material/Link";
-import MenuItem from "@mui/material/MenuItem";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
+import {
+  AppBar,
+  Box,
+  Container,
+  Link,
+  MenuItem,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 
-import type { User } from "../../user/entity";
-import { RemoteUserRepository } from "../../user/repository";
+import type { User } from "../../user/UserTypes";
+import type { UserRepository } from "../../user/UserRepository";
+import { NullableUser } from "../SharedTypes";
 
-const Layout: FunctionComponent<{}> = (): ReactElement => {
-  const [user, setUser] = useState<User | null>(null);
+interface LayoutProps {
+  remoteUserRepository: UserRepository;
+}
 
-  const remoteUserRepository = new RemoteUserRepository();
+const Layout = ({ remoteUserRepository }: LayoutProps) => {
+  const [user, setUser] = useState<NullableUser>(null);
+
+  useEffect(() => {
+    remoteUserRepository.me().then((me) => {
+      setUser(me);
+    });
+  });
 
   return (
     <>

@@ -10,13 +10,16 @@ import {
 import Layout from "./shared/components/Layout";
 
 import BoardRoutes from "./board";
-import UserRoutes from "./user";
+import { UserRoutes, RemoteUserRepository } from "./user";
 
 import "./index.css";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" element={<Layout />}>
+    <Route
+      path="/"
+      element={<Layout remoteUserRepository={new RemoteUserRepository()} />}
+    >
       {...BoardRoutes}
       {...UserRoutes}
     </Route>

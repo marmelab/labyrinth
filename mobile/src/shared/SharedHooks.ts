@@ -2,15 +2,8 @@ import type { Dispatch, SetStateAction } from "react";
 
 import { useOutletContext } from "react-router-dom";
 
-import type { User } from "../user/entity";
-import type { UserRepository } from "../user/repository";
-
-type NullableUser = User | null;
-
-type NullableUserStateType = [
-  NullableUser,
-  Dispatch<SetStateAction<NullableUser>>
-];
+import type { NullableUser, NullableUserStateType } from "./SharedTypes";
+import type { UserRepository } from "../user/UserRepository";
 
 interface NullableUserContextType {
   user: NullableUser;

@@ -1,4 +1,4 @@
-import type { User } from "./entity";
+import type { User } from "./UserTypes";
 
 export interface UserRepository {
   signIn(name: string): Promise<User>;
