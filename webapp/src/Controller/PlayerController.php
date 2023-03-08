@@ -10,11 +10,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 use App\Entity\Player;
 use App\Form\Type\SignInType;
-use App\Service\UserServiceInterface;
 
 class PlayerController extends AbstractController
 {
-    const SESSION_PLAYER_KEY = UserServiceInterface::SESSION_PLAYER_KEY;
+    const SESSION_PLAYER_KEY = 'player';
 
     #[Route('/player/sign-in', name: 'player_sign_in', methods: 'POST')]
     public function postSignIn(Request $request, ManagerRegistry $doctrine): Response

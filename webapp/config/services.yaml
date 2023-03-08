@@ -17,16 +17,8 @@ services:
       - "../src/Entity/"
       - "../src/Kernel.php"
 
-  App\Service\BoardServiceInterface:
-    class: App\Service\BoardService
-    public: true
-
   App\Service\DomainServiceInterface:
     class: App\Service\DomainService
     public: true
     arguments:
       $domainServiceUrl: "%env(string:DOMAIN_SERVICE_URL)%"
-
-  App\Service\UserServiceInterface:
-    class: App\Service\UserService
-    public: true

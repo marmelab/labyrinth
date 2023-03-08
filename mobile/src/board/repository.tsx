@@ -6,6 +6,8 @@ export class BoardRepository {
     if (response.status != 200) {
       throw response;
     }
-    return response.json();
+
+    const responseContent: { data: Board } = await response.json();
+    return responseContent.data;
   }
 }

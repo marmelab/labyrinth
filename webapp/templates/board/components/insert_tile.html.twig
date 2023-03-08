@@ -3,6 +3,6 @@
 		<input type="hidden" name="insert_tile[_token]" value="{{ csrf_token('insert_tile') }} ">
 		<input type="hidden" name="insert_tile[index]" value="{{i}}">
 
-		<button {% if gameState != 0 or not canPlay %} disabled {% endif %}>{{label}}</button>
+		<button {% if board.gameState != 0 or not board.canPlay %} disabled {% endif %}>{{label}}</button>
 	</form>
 {% endfor %}

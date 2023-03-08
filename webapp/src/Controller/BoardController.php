@@ -3,19 +3,15 @@
 namespace App\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mercure\HubInterface;
-use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
 use App\Entity\Board;
-use App\Entity\Player;
 
 use App\Form\Type\InsertTileType;
 use App\Form\Type\JoinBoardType;
@@ -25,12 +21,9 @@ use App\Form\Type\RotateRemainingType;
 use App\Service\Direction;
 use App\Service\Rotation;
 use App\Service\DomainServiceInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class BoardController extends AbstractController
+class BoardController extends BoardBaseController
 {
-    const SESSION_PLAYER_KEY = PlayerController::SESSION_PLAYER_KEY;
-
     const TREASURE_EMOJIS = [
         '' => ' ',
         '.' => ' ',
@@ -68,108 +61,20 @@ class BoardController extends AbstractController
     ];
 
     public function __construct(
-        private DomainServiceInterface $domainService,
-        private SerializerInterface $serializer,
-        private HubInterface $hub
+        protected DomainServiceInterface $domainService,
+        protected ManagerRegistry $doctrine,
+        protected HubInterface $hub,
+        protected SerializerInterface $serializer,
     ) {
-    }
-
-    private function publishUpdate(Board $board)
-    {
-        $update = new Update(
-            $this->generateUrl('board_view', ['id' => $board->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
-            $this->serializer->serialize($board, 'json')
-        );
-
-        $this->hub->publish($update);
-    }
-
-    private function getPlayer(Request $request, ObjectManager $entityManager): ?Player
-    {
-        $player = $request->getSession()->get(static::SESSION_PLAYER_KEY);
-        if ($player == NULL) {
-            return NULL;
-        }
-
-        $playerRepository = $entityManager->getRepository(Player::class);
-        return $playerRepository->find($player->getId());
-    }
-
-    private function getCurrentPlayer(array $boardState): array
-    {
-        $currentPlayer = $boardState['players'][0];
-        if (count($boardState['remainingPlayers']) > 0) {
-            $currentPlayerIndex = $boardState['remainingPlayers'][$boardState['currentPlayerIndex']];
-            $currentPlayer = $boardState['players'][$currentPlayerIndex];
-        }
-        return $currentPlayer;
-    }
-
-    private function getPlayerInfo(Board $board, ?Player $player): ?array
-    {
-        if ($player == null) {
-            return null;
-        }
-
-        foreach ($board->getPlayers() as $index => $gamePlayer) {
-            if ($gamePlayer->getId() == $player->getId()) {
-                $playerState = $board->getState()['players'][$index];
-
-                $playerInfo = [
-                    'name' => $player->getName(),
-                    'target' => '',
-                    'color' => $playerState['color'],
-                ];
-
-                $targets = $playerState['targets'];
-                if (count($targets) > 0) {
-                    $playerInfo['target'] = $targets[0];
-                }
-
-                return $playerInfo;
-            }
-        }
-
-        return null;
-    }
-
-    private function canPlayerPlay(Board $board, ?Player $player): bool
-    {
-        if ($player == null) {
-            return false;
-        }
-
-        $boardState = $board->getState();
-        if ($boardState['gameState'] == 2) {
-            $this->addFlash('errors', 'Game has ended.');
-            return false;
-        }
-
-        $stateCurrentPlayer = $this->getCurrentPlayer($boardState);
-        $currentPlayer = $board->getPlayers()[$stateCurrentPlayer['color']];
-        return $currentPlayer->getId() == $player->getId();
-    }
-
-    private function canPlayerJoin(?Player $player, Board $board): bool
-    {
-        if ($player == null) {
-            return false;
-        }
-
-        foreach ($board->getPlayers() as $gamePlayer) {
-            if ($gamePlayer->getId() == $player->getId()) {
-                return false;
-            }
-        }
-        return true;
+        parent::__construct($domainService, $doctrine->getManager(), $hub, $serializer);
     }
 
     #[Route('/board/new', name: 'board_new', methods: 'POST')]
     public function getNew(Request $request, ManagerRegistry $doctrine)
     {
         $entityManager = $doctrine->getManager();
-        $player = $this->getPlayer($request, $entityManager);
-        if ($player == NULL) {
+        $user = $this->getCurrentUser($request);
+        if ($user == NULL) {
             return $this->redirectToRoute('home');
         }
 
@@ -189,7 +94,7 @@ class BoardController extends AbstractController
 
         $board = new Board();
         $board->setState($boardState);
-        $board->addPlayer($player);
+        $board->addPlayer($user);
         $board->setRemainingSeats($playerCount - 1);
 
         $entityManager->persist($board);
@@ -204,7 +109,7 @@ class BoardController extends AbstractController
     public function getView(Request $request, ManagerRegistry $doctrine, Board $board): Response
     {
         $entityManager = $doctrine->getManager();
-        $player = $this->getPlayer($request, $entityManager);
+        $user = $this->getCurrentUser($request);
         if ($board->getRemainingSeats() > 0) {
             $form = $this->createForm(JoinBoardType::class, null, [
                 'action' => $this->generateUrl('board_join', ['id' => $board->getId()]),
@@ -213,23 +118,14 @@ class BoardController extends AbstractController
             return $this->render('board/lobby.html.twig', [
                 'board' => $board,
                 'form' => $form,
-                'canJoin' => $this->canPlayerJoin($player, $board),
+                'canJoin' => $this->canUserJoin($user, $board),
             ]);
         }
 
-        $players = $board->getPlayers();
-        $boardState = $board->getState();
-        $currentPlayer = $this->getCurrentPlayer($boardState);
-
         return $this->render('board/view.html.twig', [
-            'board' => $board,
-            'boardState' => $board->getState(),
-            'currentPlayer' => $currentPlayer,
-            'players' => $players,
-            'canPlay' => $this->canPlayerPlay($board, $player),
-            'emojis' => self::TREASURE_EMOJIS,
-            'colors' => self::PLAYER_COLORS,
-            'playerInfo' => $this->getPlayerInfo($board, $player),
+            'board' => $this->createBoardViewModel($user, $board),
+            'emojis' => static::TREASURE_EMOJIS,
+            'colors' => static::PLAYER_COLORS,
         ]);
     }
 
@@ -237,9 +133,8 @@ class BoardController extends AbstractController
     public function postJoin(Request $request, ManagerRegistry $doctrine, Board $board): Response
     {
         /** @var EntityManager $entityManager */
-        $entityManager = $doctrine->getManager();
-        $player = $this->getPlayer($request, $entityManager);
-        if (!$this->canPlayerJoin($player, $board)) {
+        $user = $this->getCurrentUser($request);
+        if (!$this->canUserJoin($user, $board)) {
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
         }
 
@@ -260,12 +155,12 @@ class BoardController extends AbstractController
             }
 
             $board->setRemainingSeats($remainingSeats - 1);
-            $board->addPlayer($player);
+            $board->addPlayer($user);
 
             $entityManager->flush();
             $conn->commit();
 
-            $this->publishUpdate($board);
+            $this->publishUpdate($user, $board);
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
         } catch (\Exception $e) {
             $conn->rollBack();
@@ -273,11 +168,10 @@ class BoardController extends AbstractController
         }
     }
 
-    private function rotateRemaining(Request $request, ManagerRegistry $doctrine, Board $board, Rotation $rotation): Response
+    private function postRotateRemaining(Request $request, Board $board, Rotation $rotation): Response
     {
-        $entityManager = $doctrine->getManager();
-        $player = $this->getPlayer($request, $entityManager);
-        if (!$this->canPlayerPlay($board, $player)) {
+        $user = $this->getCurrentUser($request);
+        if (!$this->canUserPlay($user, $board)) {
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
         }
 
@@ -285,11 +179,7 @@ class BoardController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $updatedBoard = $this->domainService->rotateRemainingTile($board->getState(), $rotation);
-            $board->setState($updatedBoard);
-
-            $entityManager->flush();
-            $this->publishUpdate($board);
+            $this->rotateRemaining($user, $board, $rotation);
         }
 
         return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
@@ -298,20 +188,19 @@ class BoardController extends AbstractController
     #[Route('/board/{id}/rotate-remaining-clockwise', name: 'board_rotate_remaining_clockwise', methods: 'POST')]
     public function postRotateRemainingClockwise(Request $request, ManagerRegistry $doctrine, Board $board): Response
     {
-        return $this->rotateRemaining($request, $doctrine, $board, Rotation::CLOCKWISE);
+        return $this->postRotateRemaining($request, $board, Rotation::CLOCKWISE);
     }
 
     #[Route('/board/{id}/rotate-remaining-anticlockwise', name: 'board_rotate_remaining_anticlockwise', methods: 'POST')]
     public function postRotateRemainingAnticlockwise(Request $request, ManagerRegistry $doctrine, Board $board): Response
     {
-        return $this->rotateRemaining($request, $doctrine, $board, Rotation::ANTICLOCKWISE);
+        return $this->postRotateRemaining($request, $board, Rotation::ANTICLOCKWISE);
     }
 
     private function insertTile(Request $request, ManagerRegistry $doctrine, Board $board, Direction $direction): Response
     {
-        $entityManager = $doctrine->getManager();
-        $player = $this->getPlayer($request, $entityManager);
-        if (!$this->canPlayerPlay($board, $player)) {
+        $user = $this->getCurrentUser($request);
+        if (!$this->canUserPlay($user, $board)) {
             $this->addFlash('errors', 'You cannot perform this action.');
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
         }
@@ -330,8 +219,8 @@ class BoardController extends AbstractController
 
             $board->setState($updatedBoard);
 
-            $entityManager->flush();
-            $this->publishUpdate($board);
+            $this->entityManager->flush();
+            $this->publishUpdate($user, $board);
         }
 
         return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
@@ -364,9 +253,8 @@ class BoardController extends AbstractController
     #[Route('/board/{id}/move-player', name: 'board_move_player', methods: 'POST')]
     public function postMovePlayer(Request $request, ManagerRegistry $doctrine, Board $board): Response
     {
-        $entityManager = $doctrine->getManager();
-        $player = $this->getPlayer($request, $entityManager);
-        if (!$this->canPlayerPlay($board, $player)) {
+        $user = $this->getCurrentUser($request);
+        if (!$this->canUserPlay($user, $board)) {
             $this->addFlash('errors', 'You cannot perform this action.');
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
         }
@@ -385,8 +273,8 @@ class BoardController extends AbstractController
 
             $board->setState($updatedBoard);
 
-            $entityManager->flush();
-            $this->publishUpdate($board);
+            $this->entityManager->flush();
+            $this->publishUpdate($user, $board);
         }
         return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
     }
