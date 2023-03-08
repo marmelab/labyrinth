@@ -1,6 +1,6 @@
 import type { FunctionComponent, MouseEventHandler, ReactElement } from "react";
 
-import { BoardTile, Tile } from "../BoardTypes";
+import { BoardTile } from "../BoardTypes";
 
 import "./TileView.css";
 

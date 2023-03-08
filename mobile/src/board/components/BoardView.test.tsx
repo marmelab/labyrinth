@@ -9,6 +9,7 @@ afterEach(cleanup);
 import BoardView from "./BoardView";
 
 import board from "../assets/board.test.json";
+import { Direction } from "../BoardTypes";
 
 describe("Board", () => {
   it("Should display tiles", async () => {
@@ -19,34 +20,49 @@ describe("Board", () => {
     expect(buttons).toHaveLength(50);
   });
 
+  it("Should support a player turn", async () => {
+    const onInsertTile = vi.fn();
+    onInsertTile.mockResolvedValueOnce({ ...board, gameState: 1 });
+
+    render(<BoardView board={board} onInsertTile={onInsertTile} />);
+
+    const buttons = await screen.findAllByRole("button");
+
+    fireEvent.click(buttons[1]);
+    expect(onInsertTile).toBeCalledWith(Direction.Top, 1, expect.anything());
+  });
+
   describe("rotateRemainingTile", function () {
     it("Should call callback when user can play and clicks on the remaining tile", async () => {
-      const rotateRemainingTile = vi.fn();
-
-      render(
-        <BoardView board={board} onRotateRemainingTile={rotateRemainingTile} />
-      );
-
-      const buttons = await screen.findAllByRole("button");
-
-      fireEvent.click(buttons[49]);
-      expect(rotateRemainingTile).toBeCalledTimes(1);
-    });
-
-    it("Should not call callback when user cannot play and clicks on the remaining tile", async () => {
-      const rotateRemainingTile = vi.fn();
+      const onRotateRemainingTile = vi.fn();
 
       render(
         <BoardView
-          board={{ ...board, canPlay: false }}
-          onRotateRemainingTile={rotateRemainingTile}
+          board={board}
+          onRotateRemainingTile={onRotateRemainingTile}
         />
       );
 
       const buttons = await screen.findAllByRole("button");
 
       fireEvent.click(buttons[49]);
-      expect(rotateRemainingTile).toBeCalledTimes(0);
+      expect(onRotateRemainingTile).toBeCalledTimes(1);
+    });
+
+    it("Should not call callback when user cannot play and clicks on the remaining tile", async () => {
+      const onRotateRemainingTile = vi.fn();
+
+      render(
+        <BoardView
+          board={{ ...board, canPlay: false }}
+          onRotateRemainingTile={onRotateRemainingTile}
+        />
+      );
+
+      const buttons = await screen.findAllByRole("button");
+
+      fireEvent.click(buttons[49]);
+      expect(onRotateRemainingTile).toBeCalledTimes(0);
     });
   });
 });

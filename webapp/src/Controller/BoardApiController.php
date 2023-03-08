@@ -14,6 +14,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 use App\Entity\Board;
 use App\Service\DomainServiceInterface;
+use App\Service\Direction;
 use App\Service\Rotation;
 
 #[Route('/api/v1/board', name: 'board_api_')]
@@ -51,12 +52,50 @@ class BoardApiController extends BoardBaseController
             'data' => $this->createBoardViewModel($user, $board),
         ]);
     }
+
     #[Route('/{id}/rotate-remaining', name: 'rotate_remaining', methods: 'POST')]
     public function postRotateRemaining(Request $request, Board $board): JsonResponse
     {
         $user = $this->getCurrentUser($request);
-        $this->rotateRemaining($user, $board, Rotation::CLOCKWISE);
+        if (!$this->canUserPlay($user, $board)) {
+            return $this->json([
+                'data' => ['message' => 'This is not your turn'],
+            ], 403);
+        }
 
+        $this->rotateRemaining($board, Rotation::CLOCKWISE);
+
+        return $this->json([
+            'data' => null,
+        ]);
+    }
+
+    #[Route('/{id}/insert-tile', name: 'insert_tile', methods: 'POST')]
+    public function postInsertTile(Request $request, Board $board): JsonResponse
+    {
+        $user = $this->getCurrentUser($request);
+        if (!$this->canUserPlay($user, $board)) {
+            return $this->json([
+                'data' => ['message' => 'This is not your turn.'],
+            ], 403);
+        }
+
+        $form = json_decode($request->getContent(), true);
+
+        $direction = Direction::tryFrom($form['direction']);
+        if (!$direction) {
+            return $this->json([
+                'data' => ['message' => 'Invalid direction.'],
+            ], 400);
+        }
+
+        if (!in_array($form['index'], [1, 3, 5])) {
+            return $this->json([
+                'data' => ['message' => 'Invalid index, expected one of [1, 3, 5].'],
+            ], 400);
+        }
+
+        $this->insertTile($board, $direction, $form['index']);
         return $this->json([
             'data' => null,
         ]);

@@ -103,6 +103,7 @@
 				</div>
 				{% endif %}
 
+				{% if board.currentPlayer %}
 				<div class="scores__row scores__row--heading">
 					<div class="scores__row__label">
 						Waiting Player
@@ -122,6 +123,7 @@
 						{{ colors[board.currentPlayer.color] }}
 					</div>
 				</div>
+				{% endif %}
 
 				<div class="scores__row scores__row--heading">
 					<div class="scores__row__label">

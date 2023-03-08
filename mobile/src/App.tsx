@@ -5,7 +5,7 @@ import Layout from "./shared/components/Layout";
 
 import type {} from "./user/UserTypes";
 
-import BoardRoutes from "./board";
+import { BoardRoutes } from "./board";
 import { UserRoutes, UserContext, NullableUser } from "./user";
 
 import "./App.css";
