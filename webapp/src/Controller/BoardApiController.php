@@ -37,8 +37,15 @@ class BoardApiController extends BoardBaseController
             $page = 1;
         }
 
-        $user = $this->getCurrentUser($request);
         $boardRepository = $this->entityManager->getRepository(Board::class);
+
+        $user = $this->getCurrentUser($request);
+        if ($user == null) {
+            return $this->json([
+                'data' => $boardRepository->findByAnonymous($page),
+            ]);
+        }
+
         return $this->json([
             'data' => $boardRepository->findByUser($user, $page),
         ]);

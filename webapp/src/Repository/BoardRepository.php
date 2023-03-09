@@ -44,10 +44,20 @@ class BoardRepository extends ServiceEntityRepository
         }
     }
 
+    public function findByAnonymous(int $page = 1, int $pageSize = 25): array
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->select(['b.id', 'b.remainingSeats'])
+            ->setFirstResult(($page - 1) * $pageSize)
+            ->setMaxResults($pageSize);
+
+        return $qb->getQuery()->execute();
+    }
+
     public function findByUser(Player $user, int $page = 1, int $pageSize = 25): array
     {
         $qb = $this->createQueryBuilder('b')
-            ->select(['b.id'])
+            ->select(['b.id', 'b.remainingSeats'])
             ->leftJoin('b.players', 'p')
             ->where('p.id = :userId')
             ->setParameter('userId', $user->getId())
