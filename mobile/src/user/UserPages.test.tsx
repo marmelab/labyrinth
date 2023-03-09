@@ -9,10 +9,17 @@ import matchers from "@testing-library/jest-dom/matchers";
 expect.extend(matchers);
 
 import { MemoryRouter } from "react-router-dom";
+import type { BoardRepository } from "../board/BoardTypes";
 import type { UserRepository } from "./UserTypes";
 
+let boardRepository = mock<BoardRepository>();
 let userRepository = mock<UserRepository>();
 
+vi.mock("../board/BoardRepository", () => {
+  return {
+    boardRepository,
+  };
+});
 vi.mock("./UserRepository", () => {
   return {
     userRepository,
@@ -44,6 +51,7 @@ describe("SignIn", () => {
   }
 
   beforeEach(() => {
+    boardRepository.list.mockResolvedValue([]);
     userRepository.getIdentity.mockResolvedValue(null);
   });
 
