@@ -46,22 +46,28 @@ export type InsertTileHandler = (
   index: number
 ) => Promise<void>;
 
-function createTileHandlerFactory(
+/**
+ * This functions creates the click handlers for the tile view
+ */
+function createClickHandlerFactory(
   rotateRemainingTileHandler?: RotateRemainingTileHandler,
   onInsertTile?: InsertTileHandler
 ): HandlerFactory {
+  // If rotateRemainingTileHandler is provided, then this is the remaining tile.
   if (rotateRemainingTileHandler) {
     return () => rotateRemainingTileHandler;
   }
 
   // First Map is (line => row)
   // Second Map is (row => listener)
-  const listeners = new Map<number, Map<number, Handler>>();
+  const handlers = new Map<number, Map<number, Handler>>();
 
   const insertableIndexes = [1, 3, 5];
 
+  // If onInsertTile is provided, the player can place a tile
   if (onInsertTile) {
-    listeners.set(
+    // Top tile listeners
+    handlers.set(
       0,
       new Map(
         insertableIndexes.map((index) => [
@@ -71,8 +77,9 @@ function createTileHandlerFactory(
       )
     );
 
+    // Lefta nd right tile listeners
     insertableIndexes.forEach((line) =>
-      listeners.set(
+      handlers.set(
         line,
         new Map([
           [0, onInsertTile?.bind(null, Direction.Left, line)],
@@ -81,7 +88,8 @@ function createTileHandlerFactory(
       )
     );
 
-    listeners.set(
+    // Bottom tile listeners
+    handlers.set(
       6,
       new Map(
         insertableIndexes.map((index) => [
@@ -92,8 +100,11 @@ function createTileHandlerFactory(
     );
   }
 
+  /**
+   * Get the handler for the given line and row.
+   */
   return (line: number, row: number): Handler => {
-    return listeners.get(line)?.get(row);
+    return handlers.get(line)?.get(row);
   };
 }
 
@@ -119,18 +130,18 @@ const TileView: FunctionComponent<TileProps> = ({
   onInsertTile,
   children,
 }: TileProps): ReactElement => {
-  const onClickFactory = createTileHandlerFactory(
+  const handleClickFactory = createClickHandlerFactory(
     onRotateRemainingTile,
     onInsertTile
   );
 
-  const onClick = onClickFactory(line, row);
+  const handleClick = handleClickFactory(line, row);
 
   return (
     <button
       className={`tile tile--shape-${shape} tile--rotation-${rotation}`}
-      disabled={!onClick}
-      onClick={onClick}
+      disabled={!handleClick}
+      onClick={handleClick}
     >
       <div className={`tile__path`}></div>
       <div className="tile__treasure">{treasures[treasure]}</div>
