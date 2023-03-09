@@ -8,7 +8,7 @@ import matchers from "@testing-library/jest-dom/matchers";
 
 expect.extend(matchers);
 
-import { createMemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router-dom";
 import type { UserRepository } from "./UserTypes";
 
 let userRepository = mock<UserRepository>();
@@ -50,7 +50,11 @@ describe("SignIn", () => {
   it("Should sign in user if name is set", async () => {
     userRepository.signIn.mockResolvedValueOnce(testUser);
 
-    render(<App createRouter={createMemoryRouter} />);
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    );
 
     const [nameField, button] = await goToSignIn();
 
@@ -64,7 +68,11 @@ describe("SignIn", () => {
   });
 
   it("Should do nothing if no username is provided", async () => {
-    render(<App createRouter={createMemoryRouter} />);
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    );
 
     const [_, button] = await goToSignIn();
 

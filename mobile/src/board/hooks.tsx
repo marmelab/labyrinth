@@ -3,22 +3,30 @@ import { useEffect, useState } from "react";
 import { Board } from "./entity";
 import { BoardRepository } from "./repository";
 
-export function useBoard(initialState: Board): Board {
-  const [board, setBoard] = useState<Board>(initialState);
+export function useBoard(id: number | string): [Board | null, any | null] {
+  const [board, setBoard] = useState<Board | null>(null);
+  const [error, setError] = useState<any | null>(null);
+
+  const fetchBoard = async function () {
+    try {
+      const updatedBoard = await BoardRepository.getById(id);
+      setBoard(updatedBoard);
+    } catch (e) {
+      setError("Failed to load board");
+      setBoard(null);
+    }
+  };
 
   useEffect(() => {
+    fetchBoard();
+
     const mercureURL = `/.well-known/mercure?topic=${encodeURI(
       window.location.href
     )}`;
 
     const eventSource = new EventSource(mercureURL);
     eventSource.onmessage = async () => {
-      try {
-        const updatedBoard = await BoardRepository.getById(board.id);
-        setBoard(updatedBoard);
-      } catch (e) {
-        console.error(e);
-      }
+      await fetchBoard();
     };
 
     return () => {
@@ -26,5 +34,5 @@ export function useBoard(initialState: Board): Board {
     };
   }, []);
 
-  return board;
+  return [board, error];
 }

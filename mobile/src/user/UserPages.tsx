@@ -2,12 +2,12 @@ import { type MouseEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, FormControl, TextField } from "@mui/material";
 
-import { useUser } from "./UserHooks";
+import { useUserContext } from "./UserHooks";
 import { userRepository } from "./UserRepository";
 
 export function SignIn() {
   const navigate = useNavigate();
-  const [user, setUser] = useUser();
+  const [user, setUser] = useUserContext();
 
   const [name, setName] = useState<string>();
 

@@ -1,42 +1,26 @@
 import { useState } from "react";
-import {
-  createBrowserRouter,
-  createRoutesFromElements,
-  RouterProvider,
-  Route,
-  type RouteObject,
-} from "react-router-dom";
-import type { Router } from "@remix-run/router";
+import { Route, Routes } from "react-router-dom";
 
 import Layout from "./shared/components/Layout";
 
-import type { NullableUser } from "./user/UserTypes";
+import type {} from "./user/UserTypes";
 
 import BoardRoutes from "./board";
-import { UserRoutes, UserContext } from "./user";
+import { UserRoutes, UserContext, NullableUser } from "./user";
 
 import "./App.css";
 
-type CreateRouterFunction = (routes: RouteObject[]) => Router;
-
-export default function App({
-  createRouter = createBrowserRouter,
-}: {
-  createRouter?: CreateRouterFunction;
-}) {
-  const router = createRouter(
-    createRoutesFromElements(
-      <Route path="/" element={<Layout />}>
-        {...BoardRoutes}
-        {...UserRoutes}
-      </Route>
-    )
-  );
+export default function App() {
   const [user, setUser] = useState<NullableUser>(null);
 
   return (
     <UserContext.Provider value={[user, setUser]}>
-      <RouterProvider router={router} />
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          {...BoardRoutes}
+          {...UserRoutes}
+        </Route>
+      </Routes>
     </UserContext.Provider>
   );
 }
