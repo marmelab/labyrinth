@@ -19,6 +19,7 @@ describe("Tile", () => {
     it("should should call on click handler", async () => {
       const onRotateRemainingTile = vi.fn();
       const onInsertTile = vi.fn();
+      const onMovePlayer = vi.fn();
 
       render(
         <TileView
@@ -27,6 +28,7 @@ describe("Tile", () => {
           gameState={GameState.PlaceTile}
           onRotateRemainingTile={onRotateRemainingTile}
           onInsertTile={onInsertTile}
+          onMovePlayer={onMovePlayer}
         />
       );
 
@@ -43,6 +45,7 @@ describe("Tile", () => {
     it("should be disabled if not on an odd index", async () => {
       const onRotateRemainingTile = vi.fn();
       const onInsertTile = vi.fn();
+      const onMovePlayer = vi.fn();
 
       render(
         <TileView
@@ -52,6 +55,7 @@ describe("Tile", () => {
           coordinates={{ line: 0, row: 0 }}
           onRotateRemainingTile={onRotateRemainingTile}
           onInsertTile={onInsertTile}
+          onMovePlayer={onMovePlayer}
         />
       );
 
@@ -63,6 +67,7 @@ describe("Tile", () => {
     it("should should call on click handler", async () => {
       const onRotateRemainingTile = vi.fn();
       const onInsertTile = vi.fn();
+      const onMovePlayer = vi.fn();
 
       render(
         <TileView
@@ -72,6 +77,7 @@ describe("Tile", () => {
           coordinates={{ line: 0, row: 1 }}
           onRotateRemainingTile={onRotateRemainingTile}
           onInsertTile={onInsertTile}
+          onMovePlayer={onMovePlayer}
         />
       );
 
@@ -81,6 +87,33 @@ describe("Tile", () => {
 
       fireEvent.click(button);
       expect(onInsertTile).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("props.onMovePlayer", () => {
+    it("should should call on click handler", async () => {
+      const onRotateRemainingTile = vi.fn();
+      const onInsertTile = vi.fn();
+      const onMovePlayer = vi.fn();
+
+      render(
+        <TileView
+          boardTile={boardTile}
+          canPlay={true}
+          gameState={GameState.MovePawn}
+          coordinates={{ line: 0, row: 1 }}
+          onRotateRemainingTile={onRotateRemainingTile}
+          onInsertTile={onInsertTile}
+          onMovePlayer={onMovePlayer}
+        />
+      );
+
+      await screen.findByRole("button");
+      const button = screen.getByRole("button");
+      expect(button).not.toBeDisabled();
+
+      fireEvent.click(button);
+      expect(onMovePlayer).toHaveBeenCalledWith(0, 1, expect.anything());
     });
   });
 });

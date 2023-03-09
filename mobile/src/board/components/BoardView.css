@@ -14,3 +14,36 @@
     grid-template-rows: repeat(7, 1fr);
     background-color: #444444;
 }
+
+.state {
+    width: 355px;
+    display: flex;
+    flex-direction: row;
+}
+
+.state__col {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.state__tile {
+    width: 25%;
+    align-items: center;
+    justify-content: center;
+}
+
+.state__info {
+    flex-grow: 1;
+}
+
+.state__row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.state__row__label {
+    width: 50%;
+    font-weight: bold;
+}

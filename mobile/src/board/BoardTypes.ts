@@ -11,6 +11,8 @@ export interface Board {
   state: BoardState;
   canPlay: boolean;
   gameState: GameState;
+  currentPlayer?: Player | null;
+  user?: Player | null;
 }
 
 export interface BoardState {
@@ -44,7 +46,7 @@ export interface Tile {
 export enum Color {
   Blue,
   Green,
-  red,
+  Red,
   Yellow,
 }
 
