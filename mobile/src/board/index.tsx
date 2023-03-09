@@ -5,10 +5,6 @@ import { BoardRepository } from "./repository";
 
 export default [
   <Route path="board">
-    <Route
-      path=":id/view"
-      loader={({ params: { id } }) => BoardRepository.getById(id as string)}
-      element={<GetById />}
-    />
+    <Route path=":id/view" element={<GetById />} />
   </Route>,
 ];

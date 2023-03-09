@@ -1,13 +1,19 @@
-import { ReactElement, useContext } from "react";
-import { useLoaderData, LoaderFunctionArgs } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
-import { Board } from "./entity";
 import BoardView from "./components/BoardView";
 import { useBoard } from "./hooks";
 
-export function GetById(): ReactElement {
-  const initialState = useLoaderData() as Board;
-  const board = useBoard(initialState);
+export function GetById() {
+  const { id } = useParams();
+  const [board, error] = useBoard(id!);
 
-  return <BoardView board={board} />;
+  if (board) {
+    return <BoardView board={board} />;
+  }
+
+  if (error) {
+    throw error;
+  }
+
+  return <p>Loading</p>;
 }
