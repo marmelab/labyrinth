@@ -1,30 +1,10 @@
-import React, { ReactElement, useCallback, useState } from "react";
-import ReactDOM from "react-dom/client";
-import {
-  createBrowserRouter,
-  createRoutesFromElements,
-  RouterProvider,
-  Route,
-} from "react-router-dom";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
 
-import Layout from "./shared/components/Layout";
+import App from "./App";
 
-import BoardRoutes from "./board";
-import { UserRoutes, RemoteUserRepository } from "./user";
-
-import "./index.css";
-
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route path="/" element={<Layout />}>
-      {...BoardRoutes}
-      {...UserRoutes}
-    </Route>
-  )
-);
-
-ReactDOM.createRoot(document.querySelector("#app") as HTMLElement).render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>
+createRoot(document.querySelector("#app") as HTMLElement).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
 );

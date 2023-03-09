@@ -2,15 +2,12 @@
 
 namespace App\Controller;
 
-namespace App\Controller;
-
 use Doctrine\Persistence\ManagerRegistry;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 use App\Entity\Player;
 

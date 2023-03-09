@@ -1,12 +1,6 @@
-import type { User } from "./UserTypes";
+import type { User, NullableUser } from "./UserTypes";
 
-export interface UserRepository {
-  signIn(name: string): Promise<User>;
-  signOut(): Promise<void>;
-  me(): Promise<User | null>;
-}
-
-export class RemoteUserRepository {
+export const userRepository = {
   async signIn(name: string): Promise<User> {
     const response = await fetch(`/api/v1/auth/sign-in`, {
       method: "POST",
@@ -24,7 +18,7 @@ export class RemoteUserRepository {
 
     const responseContent: { data: User } = await response.json();
     return responseContent.data;
-  }
+  },
   async signOut(): Promise<void> {
     const response = await fetch(`/api/v1/auth/sign-out`, {
       method: "POST",
@@ -33,16 +27,16 @@ export class RemoteUserRepository {
     if (response.status != 200) {
       throw response;
     }
-  }
-
-  async me(): Promise<User | null> {
+  },
+  async getIdentity(): Promise<NullableUser> {
     const response = await fetch(`/api/v1/auth/me`);
 
     if (response.status != 200) {
       throw response;
     }
 
-    const responseContent: { data: User | null } = await response.json();
+    const responseContent: { data: NullableUser } = await response.json();
+
     return responseContent.data;
-  }
-}
+  },
+};

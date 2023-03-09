@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link as RouterLink, Outlet } from "react-router-dom";
+import { useContext, useEffect, type ReactNode } from "react";
+import { useNavigate, Link as RouterLink, Outlet } from "react-router-dom";
 
 import {
   AppBar,
@@ -11,60 +11,70 @@ import {
   Typography,
 } from "@mui/material";
 
-import { NullableUser } from "../SharedTypes";
+import { userRepository, UserContext } from "../../user";
 
-import { useUserRepository } from "../SharedHooks";
+const NavLink = function ({
+  to,
+  onClick,
+  children,
+}: {
+  to?: string;
+  onClick?: () => Promise<void>;
+  children: ReactNode;
+}) {
+  const styles = { my: 2, color: "white", display: "block" };
+  return (
+    <>
+      {to && (
+        <Link component={RouterLink} to={to} sx={styles}>
+          {children}
+        </Link>
+      )}
+      {onClick && (
+        <Link onClick={onClick} sx={styles}>
+          {children}
+        </Link>
+      )}
+    </>
+  );
+};
 
 const Layout = () => {
-  const userRepository = useUserRepository();
-  const [user, setUser] = useState<NullableUser>(null);
+  const [user, setUser] = useContext(UserContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    userRepository.me().then((me) => {
-      setUser(me);
-    });
+    userRepository.getIdentity().then(setUser);
   }, []);
+
+  const signOut = async function () {
+    await userRepository.signOut();
+    setUser(null);
+    navigate("/");
+  };
 
   return (
     <>
       <AppBar>
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-            <Box sx={{ flexGrow: 1 }}>
+            <Box flexGrow={1}>
               <MenuItem>
-                <Link
-                  component={RouterLink}
-                  to="/"
-                  sx={{ my: 2, color: "white", display: "block" }}
-                >
-                  Home
-                </Link>
+                <NavLink to="/">Home</NavLink>
               </MenuItem>
             </Box>
 
             <Box>
               <MenuItem>
                 {!user ? (
-                  <Link
-                    component={RouterLink}
-                    to="/auth/sign-in"
-                    sx={{ my: 2, color: "white", display: "block" }}
-                  >
-                    Sign In / Sign Up
-                  </Link>
+                  <NavLink to="/auth/sign-in">Sign In / Sign Up</NavLink>
                 ) : (
                   <>
                     <Typography sx={{ m: 2, color: "white", display: "block" }}>
                       {user.name}
                     </Typography>
 
-                    <Link
-                      component={RouterLink}
-                      to="/auth/sign-out"
-                      sx={{ my: 2, color: "white", display: "block" }}
-                    >
-                      Sign Out
-                    </Link>
+                    <NavLink onClick={signOut}>Sign Out</NavLink>
                   </>
                 )}
               </MenuItem>
@@ -73,7 +83,7 @@ const Layout = () => {
         </Container>
       </AppBar>
       <main>
-        <Outlet context={{ user, setUser }} />
+        <Outlet />
       </main>
     </>
   );

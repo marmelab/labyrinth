@@ -1,19 +1,18 @@
-import { FormEvent, useEffect, useState } from "react";
+import { type MouseEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, FormControl, TextField } from "@mui/material";
 
-import { useUserRepository, useUser } from "../shared/SharedHooks";
+import { useUser } from "./UserHooks";
+import { userRepository } from "./UserRepository";
 
 export function SignIn() {
   const navigate = useNavigate();
-  const userRepository = useUserRepository();
-  const [_, setUser] = useUser();
+  const [user, setUser] = useUser();
 
   const [name, setName] = useState<string>();
 
-  const handleSubmit = async function (e: FormEvent<HTMLFormElement>) {
+  const handleSubmit = async function (e: MouseEvent) {
     e.preventDefault();
-
     if (!name) {
       return;
     }
@@ -27,35 +26,19 @@ export function SignIn() {
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit} method="POST">
-      <FormControl>
-        <TextField
-          id="filled-basic"
-          label="Username"
-          variant="filled"
-          onChange={({ target: { value } }) => setName(value)}
-          sx={{ mb: 2 }}
-        />
-        <Button type="submit" variant="contained">
-          Sign In / Sign Up
-        </Button>
-      </FormControl>
-    </form>
+  return user ? (
+    <p>You are signed in as {user.name}</p>
+  ) : (
+    <FormControl>
+      <TextField
+        label="Username"
+        variant="filled"
+        onChange={(event) => setName(event.target.value)}
+        sx={{ mb: 2 }}
+      />
+      <Button type="submit" variant="contained" onClick={handleSubmit}>
+        Sign In / Sign Up
+      </Button>
+    </FormControl>
   );
-}
-
-export function SignOut() {
-  const navigate = useNavigate();
-  const userRepository = useUserRepository();
-  const [_, setUser] = useUser();
-
-  useEffect(() => {
-    userRepository.signOut().then(() => {
-      setUser(null);
-      navigate("/");
-    });
-  });
-
-  return <></>;
 }
