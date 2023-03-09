@@ -8,7 +8,7 @@ export function GetById() {
   const { id } = useParams();
   const [board, error] = useBoard(id!);
 
-  const rotateRemainingTile = async () => {
+  const onRotateRemainingTile = async () => {
     boardRepository.rotateRemainingTile(id!);
   };
 
@@ -16,7 +16,9 @@ export function GetById() {
     return (
       <BoardView
         board={board}
-        rotateRemainingTile={board.canPlay ? rotateRemainingTile : undefined}
+        onRotateRemainingTile={
+          board.canPlay ? onRotateRemainingTile : undefined
+        }
       />
     );
   }

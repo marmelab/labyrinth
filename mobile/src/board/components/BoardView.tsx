@@ -8,7 +8,7 @@ import "./BoardView.css";
 
 interface BoardProps {
   board: Board;
-  rotateRemainingTile?: () => Promise<void>;
+  onRotateRemainingTile?: () => Promise<void>;
 }
 
 const BoardView = ({
@@ -18,7 +18,7 @@ const BoardView = ({
     canPlay,
     gameState,
   },
-  rotateRemainingTile,
+  onRotateRemainingTile,
 }: BoardProps) => {
   return (
     <>
@@ -49,7 +49,7 @@ const BoardView = ({
       <TileView
         boardTile={remainingTile}
         disabled={!canPlay}
-        onClick={rotateRemainingTile}
+        onClick={onRotateRemainingTile}
       />
     </>
   );

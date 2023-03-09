@@ -24,7 +24,7 @@ describe("Board", () => {
       const rotateRemainingTile = vi.fn();
 
       render(
-        <BoardView board={board} rotateRemainingTile={rotateRemainingTile} />
+        <BoardView board={board} onRotateRemainingTile={rotateRemainingTile} />
       );
 
       const buttons = await screen.findAllByRole("button");
@@ -39,7 +39,7 @@ describe("Board", () => {
       render(
         <BoardView
           board={{ ...board, canPlay: false }}
-          rotateRemainingTile={rotateRemainingTile}
+          onRotateRemainingTile={rotateRemainingTile}
         />
       );
 
