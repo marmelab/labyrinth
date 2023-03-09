@@ -14,6 +14,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 use App\Entity\Board;
 use App\Service\DomainServiceInterface;
+use App\Service\Rotation;
 
 #[Route('/api/v1/board', name: 'board_api_')]
 class BoardApiController extends BoardBaseController
@@ -48,6 +49,16 @@ class BoardApiController extends BoardBaseController
         $user = $this->getCurrentUser($request);
         return $this->json([
             'data' => $this->createBoardViewModel($user, $board),
+        ]);
+    }
+    #[Route('/{id}/rotate-remaining', name: 'rotate_remaining', methods: 'POST')]
+    public function postRotateRemaining(Request $request, Board $board): JsonResponse
+    {
+        $user = $this->getCurrentUser($request);
+        $this->rotateRemaining($user, $board, Rotation::CLOCKWISE);
+
+        return $this->json([
+            'data' => null,
         ]);
     }
 }

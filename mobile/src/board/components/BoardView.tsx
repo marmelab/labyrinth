@@ -1,12 +1,14 @@
-import { Board, Player, GameState } from "../../entity";
+import { Board, GameState } from "../BoardTypes";
+import type { BoardRepository } from "../BoardRepository";
 
-import PlayerPawnView from "../PlayerPawnView";
-import TileView from "../TileView";
+import PlayerPawnView from "./PlayerPawnView";
+import TileView from "./TileView";
 
-import "./index.css";
+import "./BoardView.css";
 
 interface BoardProps {
   board: Board;
+  onRotateRemainingTile?: () => Promise<void>;
 }
 
 const BoardView = ({
@@ -16,6 +18,7 @@ const BoardView = ({
     canPlay,
     gameState,
   },
+  onRotateRemainingTile,
 }: BoardProps) => {
   return (
     <>
@@ -42,7 +45,12 @@ const BoardView = ({
           ))
         )}
       </div>
-      <TileView boardTile={remainingTile} onClick={() => {}} />
+
+      <TileView
+        boardTile={remainingTile}
+        disabled={!canPlay}
+        onClick={onRotateRemainingTile}
+      />
     </>
   );
 };

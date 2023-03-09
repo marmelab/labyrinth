@@ -40,8 +40,8 @@ const NavLink = function ({
 };
 
 const Layout = () => {
-  const [user, setUser] = useContext(UserContext);
   const navigate = useNavigate();
+  const [user, setUser] = useContext(UserContext);
 
   useEffect(() => {
     userRepository.getIdentity().then(setUser);

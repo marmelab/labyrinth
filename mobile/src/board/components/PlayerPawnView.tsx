@@ -1,8 +1,8 @@
 import type { FunctionComponent, ReactElement } from "react";
 
-import { Color } from "../../entity";
+import { Color } from "../BoardTypes";
 
-import "./index.css";
+import "./PlayerPawnView.css";
 
 interface PlayerProps {
   color: Color;
