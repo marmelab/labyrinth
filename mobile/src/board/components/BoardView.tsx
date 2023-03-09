@@ -3,66 +3,16 @@ import { Board, GameState } from "../BoardTypes";
 import { Direction } from "../BoardTypes";
 
 import PlayerPawnView from "./PlayerPawnView";
-import TileView from "./TileView";
+import TileView, {
+  type InsertTileHandler,
+  type RotateRemainingTileHandler,
+} from "./TileView";
 
 import "./BoardView.css";
 
-type Listener = (() => Promise<void>) | undefined;
-type ListenerFactory = (line: number, row: number) => Listener;
-
-type RotateRemainingTypeHandler = () => Promise<void>;
-type InsertTileHandler = (direction: Direction, index: number) => Promise<void>;
-
-function createTileListenerFactory(
-  gameState: GameState,
-  onInsertTile?: InsertTileHandler
-): ListenerFactory {
-  // First Map is (line => row)
-  // Second Map is (row => listener)
-  const listeners = new Map<number, Map<number, Listener>>();
-
-  const insertableIndexes = [1, 3, 5];
-
-  if (gameState == GameState.PlaceTile) {
-    listeners.set(
-      0,
-      new Map(
-        insertableIndexes.map((index) => [
-          index,
-          onInsertTile?.bind(null, Direction.Top, index),
-        ])
-      )
-    );
-
-    insertableIndexes.forEach((line) =>
-      listeners.set(
-        line,
-        new Map([
-          [0, onInsertTile?.bind(null, Direction.Left, line)],
-          [6, onInsertTile?.bind(null, Direction.Right, line)],
-        ])
-      )
-    );
-
-    listeners.set(
-      6,
-      new Map(
-        insertableIndexes.map((index) => [
-          index,
-          onInsertTile?.bind(null, Direction.Bottom, index),
-        ])
-      )
-    );
-  }
-
-  return (line: number, row: number): Listener => {
-    return listeners.get(line)?.get(row);
-  };
-}
-
 interface BoardProps {
   board: Board;
-  onRotateRemainingTile?: RotateRemainingTypeHandler;
+  onRotateRemainingTile?: RotateRemainingTileHandler;
   onInsertTile?: InsertTileHandler;
 }
 
@@ -71,28 +21,22 @@ const BoardView = ({
     state: { tiles, remainingTile },
     players,
     canPlay,
-    gameState,
   },
   onRotateRemainingTile,
   onInsertTile,
 }: BoardProps) => {
-  const tileListenerFactory = createTileListenerFactory(
-    gameState,
-    onInsertTile
-  );
-
   return (
     <>
       <div className="board">
         {tiles.flatMap((lineTiles, line) =>
           lineTiles.map((boardTile, row) => {
-            const listener = tileListenerFactory(line, row);
             return (
               <TileView
                 key={`${line * tiles.length + row}`}
+                line={line}
+                row={row}
                 boardTile={boardTile}
-                disabled={!listener}
-                onClick={listener}
+                onInsertTile={onInsertTile}
               >
                 {players
                   .filter((player) => player.line == line && player.row == row)
@@ -111,9 +55,11 @@ const BoardView = ({
       </div>
 
       <TileView
+        line={-1}
+        row={-1}
         boardTile={remainingTile}
         disabled={!canPlay}
-        onClick={onRotateRemainingTile}
+        onRotateRemainingTile={canPlay ? onRotateRemainingTile : undefined}
       />
     </>
   );
