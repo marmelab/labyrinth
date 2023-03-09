@@ -8,9 +8,7 @@ export function GetById() {
   const { id } = useParams();
   const [board, error] = useBoard(id!);
 
-  const onRotateRemainingTile = async () => {
-    boardRepository.rotateRemainingTile(id!);
-  };
+  const onRotateRemainingTile = () => boardRepository.rotateRemainingTile(id!);
 
   if (board) {
     return (
