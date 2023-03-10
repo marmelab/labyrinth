@@ -94,6 +94,7 @@ abstract class BoardBaseController extends AbstractController
         return new BoardViewModel(
             $board->getId(),
             $board->getRemainingSeats(),
+            $this->canUserJoin($user, $board),
             $state,
             $players,
             $canPlay,
@@ -148,5 +149,49 @@ abstract class BoardBaseController extends AbstractController
 
         $this->entityManager->flush();
         $this->publishUpdate($board);
+    }
+
+    protected function joinBoard(Player $user, Board $board): bool
+    {
+        if (!$this->canUserJoin($user, $board)) {
+            return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
+        }
+
+        /** @var Doctrine\Persistence\EntityManager $entityManager */
+        $entityManager = $this->entityManager;
+
+        $conn = $entityManager->getConnection();
+        $conn->beginTransaction();
+        $conn->setAutoCommit(false);
+        try {
+            if (!$this->canUserJoin($user, $board)) {
+                $conn->rollBack();
+                return false;
+            }
+
+            // This will ensure that no concurrent updates happen on the board.
+            $boardRepository = $entityManager->getRepository(Board::class);
+
+            /** @var Board $board */
+            $board = $boardRepository->find($board->getId());
+
+            $remainingSeats = $board->getRemainingSeats();
+            if ($remainingSeats == 0) {
+                $conn->rollBack();
+                return false;
+            }
+
+            $board->setRemainingSeats($remainingSeats - 1);
+            $board->addPlayer($user);
+
+            $entityManager->flush();
+            $conn->commit();
+
+            $this->publishUpdate($board);
+            return true;
+        } catch (\Exception $e) {
+            $conn->rollBack();
+            throw $e;
+        }
     }
 }

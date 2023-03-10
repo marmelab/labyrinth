@@ -9,6 +9,7 @@ class BoardViewModel
     public function __construct(
         private int $id,
         private int $remainingSeats,
+        private bool $canJoin,
         private array $state,
         private array $players,
         private bool $canPlay,
@@ -24,6 +25,12 @@ class BoardViewModel
     {
         return $this->remainingSeats;
     }
+
+    public function getCanJoin(): bool
+    {
+        return $this->canJoin;
+    }
+
 
     public function getState(): array
     {

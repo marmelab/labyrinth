@@ -137,4 +137,18 @@ class BoardApiController extends BoardBaseController
             'data' => null,
         ]);
     }
+
+    #[Route('/{id}/join', name: 'join', methods: 'POST')]
+    public function postJoin(Request $request, Board $board): JsonResponse
+    {
+        $user = $this->getCurrentUser($request);
+        if (!$this->joinBoard($user, $board)) {
+            return $this->json([
+                'data' => ['message' => 'You cannot join this board'],
+            ], 400);
+        }
+        return $this->json([
+            'data' => null,
+        ]);
+    }
 }

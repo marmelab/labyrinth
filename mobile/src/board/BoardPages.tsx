@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 
-import { BoardListItem, Direction, GameState } from "./BoardTypes";
+import { Button } from "@mui/material";
+
+import { BoardListItem, Direction } from "./BoardTypes";
 import { boardRepository } from "./BoardRepository";
 
 import { useBoard } from "./BoardHooks";
@@ -49,6 +51,8 @@ export function GetById() {
     return boardRepository.movePlayer(id!, line, row);
   };
 
+  const handleJoin = () => boardRepository.joinBoard(id!);
+
   if (board) {
     if (board.remainingSeats > 0) {
       return (
@@ -59,6 +63,11 @@ export function GetById() {
               <li key={i}>{player?.name ?? "?"}</li>
             ))}
           </ul>
+          {board.canJoin && (
+            <Button variant="contained" onClick={handleJoin}>
+              Join Game
+            </Button>
+          )}
         </>
       );
     }

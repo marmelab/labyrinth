@@ -12,6 +12,7 @@ export interface BoardListItem {
 export interface Board {
   id: number;
   remainingSeats: number;
+  canJoin: boolean;
   players: Player[];
   state: BoardState;
   canPlay: boolean;
@@ -78,7 +79,8 @@ export enum Direction {
 
 export interface BoardRepository {
   list(page: number): Promise<BoardListItem[]>;
-  getById(id: number | string): Promise<Board>;
+  getById(id: BoardID): Promise<Board>;
   rotateRemainingTile(id: BoardID): Promise<void>;
   insertTile(id: BoardID, direction: Direction, index: number): Promise<void>;
+  joinBoard(id: BoardID): Promise<Board>;
 }

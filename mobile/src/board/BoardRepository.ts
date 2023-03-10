@@ -64,4 +64,13 @@ export const boardRepository = {
       throw response;
     }
   },
+  async joinBoard(id: BoardID) {
+    const response = await fetch(`/api/v1/board/${id}/join`, {
+      method: "POST",
+    });
+
+    if (response.status != 200) {
+      throw response;
+    }
+  },
 };
