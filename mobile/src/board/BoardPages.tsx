@@ -16,6 +16,8 @@ import { boardRepository } from "./BoardRepository";
 import { useBoard } from "./BoardHooks";
 
 import BoardView from "./components/BoardView";
+import TileView from "./components/TileView";
+import PlayerPawnView from "./components/PlayerPawnView";
 import { useUserContext } from "../user/UserHooks";
 
 export function List() {
@@ -105,13 +107,58 @@ export function GetById() {
       );
     }
 
+    const {
+      gameState,
+      canPlay,
+      state: { tiles, remainingTile },
+      players,
+      user,
+    } = board;
+
     return (
       <BoardView
-        board={board}
-        onRotateRemainingTile={onRotateRemainingTile}
-        onInsertTile={onInsertTile}
-        onMovePlayer={onMovePlayer}
-      />
+        remainingTile={
+          <TileView
+            boardTile={remainingTile}
+            canPlay={canPlay}
+            gameState={gameState}
+            playerTarget={user?.currentTarget}
+            onRotateRemainingTile={onRotateRemainingTile}
+            onInsertTile={onInsertTile}
+            onMovePlayer={onMovePlayer}
+          />
+        }
+        user={user}
+      >
+        {tiles.flatMap((lineTiles, line) =>
+          lineTiles.map((boardTile, row) => {
+            return (
+              <TileView
+                key={`${line * tiles.length + row}`}
+                canPlay={canPlay}
+                boardTile={boardTile}
+                gameState={gameState}
+                coordinates={{ line, row }}
+                playerTarget={user?.currentTarget}
+                onRotateRemainingTile={onRotateRemainingTile}
+                onInsertTile={onInsertTile}
+                onMovePlayer={onMovePlayer}
+              >
+                {players
+                  .filter((player) => player.line == line && player.row == row)
+                  .map((player) => {
+                    return (
+                      <PlayerPawnView
+                        key={`${player.color}`}
+                        color={player.color}
+                      />
+                    );
+                  })}
+              </TileView>
+            );
+          })
+        )}
+      </BoardView>
     );
   }
 

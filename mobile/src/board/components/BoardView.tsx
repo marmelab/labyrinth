@@ -1,15 +1,9 @@
-import { Board, Color } from "../BoardTypes";
-
+import type { ReactNode } from "react";
 import { Box, Grid, Typography } from "@mui/material";
 
-import PlayerPawnView from "./PlayerPawnView";
+import { type Board, Color, type Player } from "../BoardTypes";
 
-import TileView, {
-  treasures,
-  type InsertTileHandler,
-  type RotateRemainingTileHandler,
-  type MovePlayerHandler,
-} from "./TileView";
+import { treasures } from "./TileView";
 
 import "./BoardView.css";
 
@@ -21,56 +15,26 @@ const colorNames = {
 };
 
 interface BoardProps {
-  board: Board;
-  onRotateRemainingTile: RotateRemainingTileHandler;
-  onInsertTile: InsertTileHandler;
-  onMovePlayer: MovePlayerHandler;
+  remainingTile: ReactNode;
+  user?: Player | null;
+  children: ReactNode;
 }
 
-const BoardView = ({
-  board: {
-    state: { tiles, remainingTile },
-    players,
-    gameState,
-    canPlay,
-    user,
-  },
-  onRotateRemainingTile,
-  onInsertTile,
-  onMovePlayer,
-}: BoardProps) => {
+const BoardStateItem = ({ label, value }: { label: string; value: string }) => (
+  <Grid container spacing={2}>
+    <Grid item xs={6}>
+      <Typography fontWeight={700}>{label}</Typography>
+    </Grid>
+    <Grid item xs={4}>
+      {value}
+    </Grid>
+  </Grid>
+);
+
+const BoardView = ({ remainingTile, user, children }: BoardProps) => {
   return (
     <>
-      <div className="board">
-        {tiles.flatMap((lineTiles, line) =>
-          lineTiles.map((boardTile, row) => {
-            return (
-              <TileView
-                key={`${line * tiles.length + row}`}
-                canPlay={canPlay}
-                boardTile={boardTile}
-                gameState={gameState}
-                coordinates={{ line, row }}
-                onRotateRemainingTile={onRotateRemainingTile}
-                onInsertTile={onInsertTile}
-                onMovePlayer={onMovePlayer}
-                playerTarget={user?.currentTarget}
-              >
-                {players
-                  .filter((player) => player.line == line && player.row == row)
-                  .map((player) => {
-                    return (
-                      <PlayerPawnView
-                        key={`${player.color}`}
-                        color={player.color}
-                      />
-                    );
-                  })}
-              </TileView>
-            );
-          })
-        )}
-      </div>
+      <div className="board">{children}</div>
 
       <Box width={"100%"}>
         <Grid container spacing={2}>
@@ -81,43 +45,20 @@ const BoardView = ({
             alignItems={"center"}
             justifyContent={"center"}
           >
-            <TileView
-              boardTile={remainingTile}
-              canPlay={canPlay}
-              gameState={gameState}
-              onRotateRemainingTile={onRotateRemainingTile}
-              onInsertTile={onInsertTile}
-              onMovePlayer={onMovePlayer}
-              playerTarget={user?.currentTarget}
-            />
+            {remainingTile}
           </Grid>
           <Grid item xs={8}>
             {user && (
               <>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Typography fontWeight={700}>Your name</Typography>
-                  </Grid>
-                  <Grid item xs={4}>
-                    {user.name}
-                  </Grid>
-                </Grid>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Typography fontWeight={700}>Your color</Typography>
-                  </Grid>
-                  <Grid item xs={4}>
-                    {colorNames[user.color]}
-                  </Grid>
-                </Grid>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Typography fontWeight={700}>Your target</Typography>
-                  </Grid>
-                  <Grid item xs={4}>
-                    {treasures[user.currentTarget]}
-                  </Grid>
-                </Grid>
+                <BoardStateItem label={"You Name"} value={user.name} />
+                <BoardStateItem
+                  label={"You Color"}
+                  value={colorNames[user.color]}
+                />
+                <BoardStateItem
+                  label={"You Target"}
+                  value={treasures[user.currentTarget]}
+                />
               </>
             )}
           </Grid>
