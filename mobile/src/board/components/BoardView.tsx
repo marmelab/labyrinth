@@ -1,4 +1,6 @@
-import { Board, Color, GameState } from "../BoardTypes";
+import { Board, Color } from "../BoardTypes";
+
+import { Box, Grid, Typography } from "@mui/material";
 
 import PlayerPawnView from "./PlayerPawnView";
 
@@ -52,6 +54,7 @@ const BoardView = ({
                 onRotateRemainingTile={onRotateRemainingTile}
                 onInsertTile={onInsertTile}
                 onMovePlayer={onMovePlayer}
+                playerTarget={user?.currentTarget}
               >
                 {players
                   .filter((player) => player.line == line && player.row == row)
@@ -69,36 +72,57 @@ const BoardView = ({
         )}
       </div>
 
-      <div className="state">
-        <div className="state__col state__tile">
-          <TileView
-            boardTile={remainingTile}
-            canPlay={canPlay}
-            gameState={gameState}
-            onRotateRemainingTile={onRotateRemainingTile}
-            onInsertTile={onInsertTile}
-            onMovePlayer={onMovePlayer}
-          />
-        </div>
-        {user && (
-          <div className="state__col state__info">
-            <div className="state__row">
-              <div className="state__row__label">Your name</div>
-              <div className="state__row__value">{user.name}</div>
-            </div>
-            <div className="state__row">
-              <div className="state__row__label">Your color</div>
-              <div className="state__row__value">{colorNames[user.color]}</div>
-            </div>
-            <div className="state__row">
-              <div className="state__row__label">Your target</div>
-              <div className="state__row__value">
-                {treasures[user.currentTarget]}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      <Box width={"100%"}>
+        <Grid container spacing={2}>
+          <Grid
+            item
+            xs={4}
+            display={"flex"}
+            alignItems={"center"}
+            justifyContent={"center"}
+          >
+            <TileView
+              boardTile={remainingTile}
+              canPlay={canPlay}
+              gameState={gameState}
+              onRotateRemainingTile={onRotateRemainingTile}
+              onInsertTile={onInsertTile}
+              onMovePlayer={onMovePlayer}
+              playerTarget={user?.currentTarget}
+            />
+          </Grid>
+          <Grid item xs={8}>
+            {user && (
+              <>
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Typography fontWeight={700}>Your name</Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    {user.name}
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Typography fontWeight={700}>Your color</Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    {colorNames[user.color]}
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Typography fontWeight={700}>Your target</Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    {treasures[user.currentTarget]}
+                  </Grid>
+                </Grid>
+              </>
+            )}
+          </Grid>
+        </Grid>
+      </Box>
     </>
   );
 };

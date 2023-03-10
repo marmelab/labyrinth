@@ -1,6 +1,16 @@
-import { Board, BoardID, Direction } from "./BoardTypes";
+import { Board, BoardID, BoardListItem, Direction } from "./BoardTypes";
 
 export const boardRepository = {
+  async list(page: number): Promise<BoardListItem[]> {
+    const response = await fetch(`/api/v1/board?page=${page}`);
+    if (response.status != 200) {
+      throw response;
+    }
+
+    const responseContent: { data: BoardListItem[] } = await response.json();
+
+    return responseContent.data;
+  },
   async getById(id: BoardID): Promise<Board> {
     const response = await fetch(`/api/v1/board/${id}`);
     if (response.status != 200) {
@@ -48,6 +58,15 @@ export const boardRepository = {
         line,
         row,
       }),
+    });
+
+    if (response.status != 200) {
+      throw response;
+    }
+  },
+  async joinBoard(id: BoardID) {
+    const response = await fetch(`/api/v1/board/${id}/join`, {
+      method: "POST",
     });
 
     if (response.status != 200) {

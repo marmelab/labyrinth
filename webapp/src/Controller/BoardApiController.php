@@ -37,8 +37,15 @@ class BoardApiController extends BoardBaseController
             $page = 1;
         }
 
-        $user = $this->getCurrentUser($request);
         $boardRepository = $this->entityManager->getRepository(Board::class);
+
+        $user = $this->getCurrentUser($request);
+        if ($user == null) {
+            return $this->json([
+                'data' => $boardRepository->findByAnonymous($page),
+            ]);
+        }
+
         return $this->json([
             'data' => $boardRepository->findByUser($user, $page),
         ]);
@@ -126,6 +133,20 @@ class BoardApiController extends BoardBaseController
         }
 
         $this->movePlayer($board, $form['line'], $form['row']);
+        return $this->json([
+            'data' => null,
+        ]);
+    }
+
+    #[Route('/{id}/join', name: 'join', methods: 'POST')]
+    public function postJoin(Request $request, Board $board): JsonResponse
+    {
+        $user = $this->getCurrentUser($request);
+        if (!$this->joinBoard($user, $board)) {
+            return $this->json([
+                'data' => ['message' => 'You cannot join this board'],
+            ], 400);
+        }
         return $this->json([
             'data' => null,
         ]);

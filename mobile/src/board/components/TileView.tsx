@@ -93,14 +93,18 @@ const ClickableTileView = ({
   },
   onClick,
   children,
+  playerTarget,
 }: {
   boardTile: BoardTile;
   onClick: Handler;
   children: ReactNode;
+  playerTarget?: string;
 }) => {
   return (
     <button
-      className={`tile tile--shape-${shape} tile--rotation-${rotation}`}
+      className={`tile tile--shape-${shape} tile--rotation-${rotation} ${
+        playerTarget == treasure ? "tile--target" : ""
+      }`}
       onClick={onClick}
     >
       <div className={`tile__path`}></div>
@@ -115,14 +119,18 @@ const DisabledTileView = ({
     tile: { treasure, shape },
     rotation,
   },
+  playerTarget,
   children,
 }: {
   boardTile: BoardTile;
   children: ReactNode;
+  playerTarget?: string;
 }) => {
   return (
     <button
-      className={`tile tile--shape-${shape} tile--rotation-${rotation}`}
+      className={`tile tile--shape-${shape} tile--rotation-${rotation} ${
+        playerTarget == treasure ? "tile--target" : ""
+      }`}
       disabled
     >
       <div className={`tile__path`}></div>
@@ -140,6 +148,7 @@ interface TileProps {
     line: number;
     row: number;
   };
+  playerTarget?: string;
   onRotateRemainingTile: RotateRemainingTileHandler;
   onInsertTile: InsertTileHandler;
   onMovePlayer: MovePlayerHandler;
@@ -151,6 +160,7 @@ const TileView = ({
   canPlay,
   gameState,
   coordinates,
+  playerTarget,
   onRotateRemainingTile,
   onInsertTile,
   onMovePlayer,
@@ -158,13 +168,19 @@ const TileView = ({
 }: TileProps) => {
   if (!canPlay || gameState == GameState.End) {
     return (
-      <DisabledTileView boardTile={boardTile}>{children}</DisabledTileView>
+      <DisabledTileView boardTile={boardTile} playerTarget={playerTarget}>
+        {children}
+      </DisabledTileView>
     );
   }
 
   if (!coordinates) {
     return (
-      <ClickableTileView boardTile={boardTile} onClick={onRotateRemainingTile}>
+      <ClickableTileView
+        boardTile={boardTile}
+        onClick={onRotateRemainingTile}
+        playerTarget={playerTarget}
+      >
         {children}
       </ClickableTileView>
     );
@@ -178,6 +194,7 @@ const TileView = ({
       return (
         <ClickableTileView
           boardTile={boardTile}
+          playerTarget={playerTarget}
           onClick={onInsertTile.bind(null, ...direction)}
         >
           {children}
@@ -185,13 +202,16 @@ const TileView = ({
       );
     }
     return (
-      <DisabledTileView boardTile={boardTile}>{children}</DisabledTileView>
+      <DisabledTileView boardTile={boardTile} playerTarget={playerTarget}>
+        {children}
+      </DisabledTileView>
     );
   }
 
   return (
     <ClickableTileView
       boardTile={boardTile}
+      playerTarget={playerTarget}
       onClick={onMovePlayer.bind(null, coordinates.line, coordinates.row)}
     >
       {children}

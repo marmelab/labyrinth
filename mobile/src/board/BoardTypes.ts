@@ -4,9 +4,15 @@ export enum GameState {
   End,
 }
 
+export interface BoardListItem {
+  id: number;
+  remainingSeats: number;
+}
+
 export interface Board {
   id: number;
   remainingSeats: number;
+  canJoin: boolean;
   players: Player[];
   state: BoardState;
   canPlay: boolean;
@@ -72,7 +78,9 @@ export enum Direction {
 }
 
 export interface BoardRepository {
-  getById(id: number | string): Promise<Board>;
+  list(page: number): Promise<BoardListItem[]>;
+  getById(id: BoardID): Promise<Board>;
   rotateRemainingTile(id: BoardID): Promise<void>;
   insertTile(id: BoardID, direction: Direction, index: number): Promise<void>;
+  joinBoard(id: BoardID): Promise<Board>;
 }

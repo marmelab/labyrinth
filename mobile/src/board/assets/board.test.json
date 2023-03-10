@@ -478,5 +478,6 @@
     },
     "user": null,
     "canPlay": true,
-    "gameState": 0
+    "gameState": 0,
+    "canJoin": false
 }

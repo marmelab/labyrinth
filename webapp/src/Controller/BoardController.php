@@ -108,7 +108,6 @@ class BoardController extends BoardBaseController
     #[Route('/board/{id}/view', name: 'board_view', methods: 'GET')]
     public function getView(Request $request, ManagerRegistry $doctrine, Board $board): Response
     {
-        $entityManager = $doctrine->getManager();
         $user = $this->getCurrentUser($request);
         if ($board->getRemainingSeats() > 0) {
             $form = $this->createForm(JoinBoardType::class, null, [
@@ -132,40 +131,8 @@ class BoardController extends BoardBaseController
     #[Route('/board/{id}/join', name: 'board_join', methods: 'POST')]
     public function postJoin(Request $request, ManagerRegistry $doctrine, Board $board): Response
     {
-        /** @var EntityManager $entityManager */
-        $user = $this->getCurrentUser($request);
-        if (!$this->canUserJoin($user, $board)) {
-            return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
-        }
-
-        $conn = $entityManager->getConnection();
-        $conn->beginTransaction();
-        $conn->setAutoCommit(false);
-        try {
-            // This will ensure that no concurrent updates happen on the board.
-            $boardRepository = $entityManager->getRepository(Board::class);
-
-            /** @var Board $board */
-            $board = $boardRepository->find($board->getId());
-
-            $remainingSeats = $board->getRemainingSeats();
-            if ($remainingSeats == 0) {
-                $conn->rollBack();
-                return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
-            }
-
-            $board->setRemainingSeats($remainingSeats - 1);
-            $board->addPlayer($user);
-
-            $entityManager->flush();
-            $conn->commit();
-
-            $this->publishUpdate($board);
-            return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
-        } catch (\Exception $e) {
-            $conn->rollBack();
-            throw $e;
-        }
+        $this->joinBoard($this->getCurrentUser($request), $board);
+        return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
     }
 
     private function postRotateRemaining(Request $request, Board $board, Rotation $rotation): Response

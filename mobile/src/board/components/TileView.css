@@ -46,13 +46,13 @@
     background-color: #ffffff;
 }
 
-.tile--target::before,
-.tile--target::after {
+.tile--target .tile__path::before,
+.tile--target .tile__path::after {
     background-color: #ffA500;
 }
 
-.tile--target:hover::before,
-.tile--target:hover::after {
+.tile--target:hover .tile__path::before,
+.tile--target:hover .tile__path::after {
     background-color: #ff4500;
 }
 
