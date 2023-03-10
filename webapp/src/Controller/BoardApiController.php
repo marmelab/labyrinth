@@ -100,4 +100,34 @@ class BoardApiController extends BoardBaseController
             'data' => null,
         ]);
     }
+
+    #[Route('/{id}/move-player', name: 'move_player', methods: 'POST')]
+    public function postMovePawn(Request $request, Board $board): JsonResponse
+    {
+        $user = $this->getCurrentUser($request);
+        if (!$this->canUserPlay($user, $board)) {
+            return $this->json([
+                'data' => ['message' => 'This is not your turn.'],
+            ], 403);
+        }
+
+        $form = json_decode($request->getContent(), true);
+
+        if ($form['line'] < 0 || $form['line'] > 6) {
+            return $this->json([
+                'data' => ['message' => 'Invalid line'],
+            ], 400);
+        }
+
+        if ($form['row'] < 0 || $form['row'] > 6) {
+            return $this->json([
+                'data' => ['message' => 'Invalid row'],
+            ], 400);
+        }
+
+        $this->movePlayer($board, $form['line'], $form['row']);
+        return $this->json([
+            'data' => null,
+        ]);
+    }
 }

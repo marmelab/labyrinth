@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Board } from "./BoardTypes";
+
 import { boardRepository } from "./BoardRepository";
 
 export function useBoard(id: number | string): [Board | null, any | null] {

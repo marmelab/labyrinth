@@ -136,4 +136,17 @@ abstract class BoardBaseController extends AbstractController
         $this->entityManager->flush();
         $this->publishUpdate($board);
     }
+
+    protected function movePlayer(Board $board, int $line, int $row)
+    {
+        $updatedBoard = $this->domainService->movePlayer(
+            $board->getState(),
+            $line,
+            $row,
+        );
+        $board->setState($updatedBoard);
+
+        $this->entityManager->flush();
+        $this->publishUpdate($board);
+    }
 }

@@ -255,17 +255,11 @@ class BoardController extends BoardBaseController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $movePlayer = $form->getData();
-
-            $updatedBoard = $this->domainService->movePlayer(
-                $board->getState(),
+            $this->movePlayer(
+                $board,
                 intval($movePlayer['line']),
                 intval($movePlayer['row']),
             );
-
-            $board->setState($updatedBoard);
-
-            $this->entityManager->flush();
-            $this->publishUpdate($board);
         }
         return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
     }

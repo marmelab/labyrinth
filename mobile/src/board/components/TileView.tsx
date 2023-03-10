@@ -8,7 +8,7 @@ interface TreasureMap {
   [key: string]: string;
 }
 
-const treasures: TreasureMap = {
+export const treasures: TreasureMap = {
   "": " ",
   ".": " ",
   A: "💌",
@@ -38,13 +38,15 @@ const treasures: TreasureMap = {
 };
 
 type Handler = (() => Promise<void>) | undefined;
-type HandlerFactory = (line: number, row: number) => Handler;
 
 export type RotateRemainingTileHandler = () => Promise<void>;
+
 export type InsertTileHandler = (
   direction: Direction,
   index: number
 ) => Promise<void>;
+
+export type MovePlayerHandler = (line: number, row: number) => Promise<void>;
 
 const insertableIndexes = [1, 3, 5];
 
@@ -140,6 +142,7 @@ interface TileProps {
   };
   onRotateRemainingTile: RotateRemainingTileHandler;
   onInsertTile: InsertTileHandler;
+  onMovePlayer: MovePlayerHandler;
   children?: ReactNode;
 }
 
@@ -150,8 +153,9 @@ const TileView = ({
   coordinates,
   onRotateRemainingTile,
   onInsertTile,
+  onMovePlayer,
   children,
-}: TileProps): ReactElement => {
+}: TileProps) => {
   if (!canPlay || gameState == GameState.End) {
     return (
       <DisabledTileView boardTile={boardTile}>{children}</DisabledTileView>
@@ -174,7 +178,7 @@ const TileView = ({
       return (
         <ClickableTileView
           boardTile={boardTile}
-          onClick={onInsertTile?.bind(null, ...direction)}
+          onClick={onInsertTile.bind(null, ...direction)}
         >
           {children}
         </ClickableTileView>
@@ -185,7 +189,14 @@ const TileView = ({
     );
   }
 
-  return <DisabledTileView boardTile={boardTile}>{children}</DisabledTileView>;
+  return (
+    <ClickableTileView
+      boardTile={boardTile}
+      onClick={onMovePlayer.bind(null, coordinates.line, coordinates.row)}
+    >
+      {children}
+    </ClickableTileView>
+  );
 };
 
 export default TileView;
