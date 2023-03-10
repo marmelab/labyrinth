@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 
-import { Button } from "@mui/material";
+import {
+  Button,
+  List as MuiList,
+  ListSubheader,
+  ListItem,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 
 import { BoardListItem, Direction } from "./BoardTypes";
 import { boardRepository } from "./BoardRepository";
@@ -22,18 +29,31 @@ export function List() {
   return (
     <>
       {!user && (
-        <strong>
+        <Typography fontWeight={700}>
           You are not signed in! <br />
           You can spectate these games:
-        </strong>
+        </Typography>
       )}
-      <ul>
+      <MuiList
+        sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
+        component="nav"
+        aria-labelledby="nested-list-subheader"
+        subheader={
+          <ListSubheader component="div" id="nested-list-subheader">
+            Boards
+          </ListSubheader>
+        }
+      >
         {boards.map((board) => (
-          <li>
-            <Link to={`/board/${board.id}/view`}>Board #{board.id}</Link>
-          </li>
+          <ListItem>
+            <ListItemText
+              primary={
+                <Link to={`/board/${board.id}/view`}>Board #{board.id}</Link>
+              }
+            />
+          </ListItem>
         ))}
-      </ul>
+      </MuiList>
     </>
   );
 }
@@ -57,12 +77,25 @@ export function GetById() {
     if (board.remainingSeats > 0) {
       return (
         <>
-          <strong>Waiting for {board.remainingSeats} player(s)</strong>
-          <ul>
+          <Typography fontWeight={700}>
+            Waiting for {board.remainingSeats} player(s)
+          </Typography>
+          <MuiList
+            sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
+            component="nav"
+            aria-labelledby="nested-list-subheader"
+            subheader={
+              <ListSubheader component="div" id="nested-list-subheader">
+                Players
+              </ListSubheader>
+            }
+          >
             {board.players.map((player, i) => (
-              <li key={i}>{player?.name ?? "?"}</li>
+              <ListItem>
+                <ListItemText primary={player?.name ?? "?"} />
+              </ListItem>
             ))}
-          </ul>
+          </MuiList>
           {board.canJoin && (
             <Button variant="contained" onClick={handleJoin}>
               Join Game
