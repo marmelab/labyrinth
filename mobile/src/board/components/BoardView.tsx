@@ -12,14 +12,15 @@ import "./BoardView.css";
 
 interface BoardProps {
   board: Board;
-  onRotateRemainingTile?: RotateRemainingTileHandler;
-  onInsertTile?: InsertTileHandler;
+  onRotateRemainingTile: RotateRemainingTileHandler;
+  onInsertTile: InsertTileHandler;
 }
 
 const BoardView = ({
   board: {
     state: { tiles, remainingTile },
     players,
+    gameState,
     canPlay,
   },
   onRotateRemainingTile,
@@ -33,9 +34,11 @@ const BoardView = ({
             return (
               <TileView
                 key={`${line * tiles.length + row}`}
-                line={line}
-                row={row}
+                canPlay={canPlay}
                 boardTile={boardTile}
+                gameState={gameState}
+                coordinates={{ line, row }}
+                onRotateRemainingTile={onRotateRemainingTile}
                 onInsertTile={onInsertTile}
               >
                 {players
@@ -55,11 +58,11 @@ const BoardView = ({
       </div>
 
       <TileView
-        line={-1}
-        row={-1}
         boardTile={remainingTile}
-        disabled={!canPlay}
-        onRotateRemainingTile={canPlay ? onRotateRemainingTile : undefined}
+        canPlay={canPlay}
+        gameState={gameState}
+        onRotateRemainingTile={onRotateRemainingTile}
+        onInsertTile={onInsertTile}
       />
     </>
   );

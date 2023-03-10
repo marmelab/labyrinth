@@ -18,14 +18,8 @@ export function GetById() {
     return (
       <BoardView
         board={board}
-        onRotateRemainingTile={
-          board.canPlay ? onRotateRemainingTile : undefined
-        }
-        onInsertTile={
-          board.canPlay && board.gameState == GameState.PlaceTile
-            ? onInsertTile
-            : undefined
-        }
+        onRotateRemainingTile={onRotateRemainingTile}
+        onInsertTile={onInsertTile}
       />
     );
   }

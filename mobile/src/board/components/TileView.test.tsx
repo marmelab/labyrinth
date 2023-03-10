@@ -7,7 +7,7 @@ expect.extend(matchers);
 afterEach(cleanup);
 
 import TileView from "./TileView";
-import { BoardTile, Rotation, Shape } from "../BoardTypes";
+import { BoardTile, GameState, Rotation, Shape } from "../BoardTypes";
 
 describe("Tile", () => {
   const boardTile: BoardTile = {
@@ -17,14 +17,16 @@ describe("Tile", () => {
 
   describe("props.onRotateRemainingTile", () => {
     it("should should call on click handler", async () => {
-      const mock = vi.fn();
+      const onRotateRemainingTile = vi.fn();
+      const onInsertTile = vi.fn();
 
       render(
         <TileView
-          line={0}
-          row={0}
           boardTile={boardTile}
-          onRotateRemainingTile={mock}
+          canPlay={true}
+          gameState={GameState.PlaceTile}
+          onRotateRemainingTile={onRotateRemainingTile}
+          onInsertTile={onInsertTile}
         />
       );
 
@@ -33,16 +35,24 @@ describe("Tile", () => {
       expect(button).not.toBeDisabled();
 
       fireEvent.click(button);
-      expect(mock).toHaveBeenCalledTimes(1);
+      expect(onRotateRemainingTile).toHaveBeenCalledTimes(1);
     });
   });
 
   describe("props.onInsertTile", () => {
     it("should be disabled if not on an odd index", async () => {
-      const mock = vi.fn();
+      const onRotateRemainingTile = vi.fn();
+      const onInsertTile = vi.fn();
 
       render(
-        <TileView line={0} row={0} boardTile={boardTile} onInsertTile={mock} />
+        <TileView
+          boardTile={boardTile}
+          canPlay={true}
+          gameState={GameState.PlaceTile}
+          coordinates={{ line: 0, row: 0 }}
+          onRotateRemainingTile={onRotateRemainingTile}
+          onInsertTile={onInsertTile}
+        />
       );
 
       await screen.findByRole("button");
@@ -51,10 +61,18 @@ describe("Tile", () => {
     });
 
     it("should should call on click handler", async () => {
-      const mock = vi.fn();
+      const onRotateRemainingTile = vi.fn();
+      const onInsertTile = vi.fn();
 
       render(
-        <TileView line={0} row={1} boardTile={boardTile} onInsertTile={mock} />
+        <TileView
+          boardTile={boardTile}
+          canPlay={true}
+          gameState={GameState.PlaceTile}
+          coordinates={{ line: 0, row: 1 }}
+          onRotateRemainingTile={onRotateRemainingTile}
+          onInsertTile={onInsertTile}
+        />
       );
 
       await screen.findByRole("button");
@@ -62,7 +80,7 @@ describe("Tile", () => {
       expect(button).not.toBeDisabled();
 
       fireEvent.click(button);
-      expect(mock).toHaveBeenCalledTimes(1);
+      expect(onInsertTile).toHaveBeenCalledTimes(1);
     });
   });
 });

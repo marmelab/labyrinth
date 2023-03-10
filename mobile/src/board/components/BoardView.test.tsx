@@ -13,7 +13,15 @@ import { Direction } from "../BoardTypes";
 
 describe("Board", () => {
   it("Should display tiles", async () => {
-    render(<BoardView board={board} />);
+    const onRotateRemainingTile = vi.fn();
+    const onInsertTile = vi.fn();
+    render(
+      <BoardView
+        board={board}
+        onRotateRemainingTile={onRotateRemainingTile}
+        onInsertTile={onInsertTile}
+      />
+    );
 
     const buttons = await screen.findAllByRole("button");
 
@@ -21,10 +29,18 @@ describe("Board", () => {
   });
 
   it("Should support a player turn", async () => {
+    const onRotateRemainingTile = vi.fn();
     const onInsertTile = vi.fn();
+
     onInsertTile.mockResolvedValueOnce({ ...board, gameState: 1 });
 
-    render(<BoardView board={board} onInsertTile={onInsertTile} />);
+    render(
+      <BoardView
+        board={board}
+        onRotateRemainingTile={onRotateRemainingTile}
+        onInsertTile={onInsertTile}
+      />
+    );
 
     const buttons = await screen.findAllByRole("button");
 
@@ -35,11 +51,13 @@ describe("Board", () => {
   describe("rotateRemainingTile", function () {
     it("Should call callback when user can play and clicks on the remaining tile", async () => {
       const onRotateRemainingTile = vi.fn();
+      const onInsertTile = vi.fn();
 
       render(
         <BoardView
           board={board}
           onRotateRemainingTile={onRotateRemainingTile}
+          onInsertTile={onInsertTile}
         />
       );
 
@@ -51,11 +69,13 @@ describe("Board", () => {
 
     it("Should not call callback when user cannot play and clicks on the remaining tile", async () => {
       const onRotateRemainingTile = vi.fn();
+      const onInsertTile = vi.fn();
 
       render(
         <BoardView
           board={{ ...board, canPlay: false }}
           onRotateRemainingTile={onRotateRemainingTile}
+          onInsertTile={onInsertTile}
         />
       );
 
