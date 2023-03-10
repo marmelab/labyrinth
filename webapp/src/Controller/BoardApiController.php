@@ -35,7 +35,7 @@ class BoardApiController extends BoardBaseController
         $user = $this->getCurrentUser($request);
         if (!$user) {
             return $this->json([
-                'data' => null,
+                'data' => ['message' => 'You must be signed in to create a board.'],
             ], 401);
         }
 
