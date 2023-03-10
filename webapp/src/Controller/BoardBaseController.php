@@ -151,6 +151,21 @@ abstract class BoardBaseController extends AbstractController
         $this->publishUpdate($board);
     }
 
+    protected function newBoard(Player $user, int $playerCount): Board
+    {
+        $boardState = $this->domainService->newBoard(intval($playerCount));
+
+        $board = new Board();
+        $board->setState($boardState);
+        $board->addPlayer($user);
+        $board->setRemainingSeats($playerCount - 1);
+
+        $this->entityManager->persist($board);
+        $this->entityManager->flush();
+
+        return $board;
+    }
+
     protected function joinBoard(Player $user, Board $board): bool
     {
         if (!$this->canUserJoin($user, $board)) {

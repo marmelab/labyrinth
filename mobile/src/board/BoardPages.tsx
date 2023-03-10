@@ -1,26 +1,93 @@
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useEffect, useState, type MouseEvent } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 
 import {
   Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
   List as MuiList,
   ListSubheader,
   ListItem,
   ListItemText,
+  Select,
   Typography,
 } from "@mui/material";
 
 import { BoardListItem, Direction } from "./BoardTypes";
 import { boardRepository } from "./BoardRepository";
 
-import { useBoard } from "./BoardHooks";
+import { useBoard, useNewBoardMutation } from "./BoardHooks";
 
 import BoardView from "./components/BoardView";
 import TileView from "./components/TileView";
 import PlayerPawnView from "./components/PlayerPawnView";
 import { useUserContext } from "../user/UserHooks";
 
+export function New() {
+  const navigate = useNavigate();
+  const [user, _] = useUserContext();
+  const mutation = useNewBoardMutation();
+
+  const [playerCount, setPlayerCount] = useState("1");
+
+  const handlePlayerCountChange = (e: { target: { value: string } }) => {
+    setPlayerCount(e.target.value);
+  };
+
+  const handleSubmit = async (e: MouseEvent) => {
+    e.preventDefault();
+
+    const board = await mutation.mutateAsync({ playerCount: +playerCount });
+    navigate(`/board/${board.id}/view`);
+  };
+
+  if (!user) {
+    return (
+      <Typography fontWeight={700}>
+        You must be signed in to access this page.
+      </Typography>
+    );
+  }
+
+  return (
+    <>
+      {mutation.isLoading ? (
+        <Typography>Creating Board...</Typography>
+      ) : (
+        <FormControl>
+          {mutation.isError ? (
+            <Typography color={"red"}>
+              An error occurred: {mutation.error.message}
+            </Typography>
+          ) : null}
+          <FormControl fullWidth>
+            <InputLabel id="player-count">Player Count</InputLabel>
+            <Select
+              labelId="player-count"
+              value={playerCount}
+              label="Player count"
+              onChange={handlePlayerCountChange}
+              sx={{ mb: 2 }}
+            >
+              {[1, 2, 3, 4].map((count) => (
+                <MenuItem key={count} value={count}>
+                  {count}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button variant="contained" onClick={handleSubmit}>
+            Create New Game
+          </Button>
+        </FormControl>
+      )}
+    </>
+  );
+}
+
 export function List() {
+  const navigate = useNavigate();
   const [user, _] = useUserContext();
   const [boards, setBoards] = useState<BoardListItem[]>([]);
 
@@ -30,7 +97,11 @@ export function List() {
 
   return (
     <>
-      {!user && (
+      {user ? (
+        <Button onClick={() => navigate("/board/new")} variant="contained">
+          Create New Board
+        </Button>
+      ) : (
         <Typography fontWeight={700}>
           You are not signed in! <br />
           You can spectate these games:
