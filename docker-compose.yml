@@ -16,6 +16,7 @@ services:
     image: dunglas/mercure:v0.14
     env_file:
       - webapp/.env
+    command: /usr/bin/caddy run --config /etc/caddy/Caddyfile.dev
     environment:
       - SERVER_NAME=":80"
 
