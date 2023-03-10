@@ -160,7 +160,7 @@ class BoardController extends BoardBaseController
             $entityManager->flush();
             $conn->commit();
 
-            $this->publishUpdate($user, $board);
+            $this->publishUpdate($board);
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
         } catch (\Exception $e) {
             $conn->rollBack();
@@ -179,7 +179,7 @@ class BoardController extends BoardBaseController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->rotateRemaining($user, $board, $rotation);
+            $this->rotateRemaining($board, $rotation);
         }
 
         return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
@@ -197,7 +197,7 @@ class BoardController extends BoardBaseController
         return $this->postRotateRemaining($request, $board, Rotation::ANTICLOCKWISE);
     }
 
-    private function insertTile(Request $request, ManagerRegistry $doctrine, Board $board, Direction $direction): Response
+    private function postInsertTile(Request $request, Board $board, Direction $direction): Response
     {
         $user = $this->getCurrentUser($request);
         if (!$this->canUserPlay($user, $board)) {
@@ -211,16 +211,7 @@ class BoardController extends BoardBaseController
         if ($form->isSubmitted() && $form->isValid()) {
             $insertTile = $form->getData();
 
-            $updatedBoard = $this->domainService->insertTile(
-                $board->getState(),
-                $direction,
-                intval($insertTile['index'])
-            );
-
-            $board->setState($updatedBoard);
-
-            $this->entityManager->flush();
-            $this->publishUpdate($user, $board);
+            $this->insertTile($board, $direction, intval($insertTile['index']));
         }
 
         return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
@@ -229,29 +220,29 @@ class BoardController extends BoardBaseController
     #[Route('/board/{id}/insert-tile-top', name: 'board_insert_tile_top', methods: 'POST')]
     public function postInsertTileTop(Request $request, ManagerRegistry $doctrine, Board $board): Response
     {
-        return $this->insertTile($request, $doctrine, $board, Direction::TOP);
+        return $this->postInsertTile($request, $board, Direction::TOP);
     }
 
     #[Route('/board/{id}/insert-tile-right', name: 'board_insert_tile_right', methods: 'POST')]
     public function postInsertTileRight(Request $request, ManagerRegistry $doctrine, Board $board): Response
     {
-        return $this->insertTile($request, $doctrine, $board, Direction::RIGHT);
+        return $this->postInsertTile($request, $board, Direction::RIGHT);
     }
 
     #[Route('/board/{id}/insert-tile-bottom', name: 'board_insert_tile_bottom', methods: 'POST')]
-    public function postInsertTileBottom(Request $request, ManagerRegistry $doctrine, Board $board): Response
+    public function postInsertTileBottom(Request $request, Board $board): Response
     {
-        return $this->insertTile($request, $doctrine, $board, Direction::BOTTOM);
+        return $this->postInsertTile($request, $board, Direction::BOTTOM);
     }
 
     #[Route('/board/{id}/insert-tile-left', name: 'board_insert_tile_left', methods: 'POST')]
-    public function postInsertTileLeft(Request $request, ManagerRegistry $doctrine, Board $board): Response
+    public function postInsertTileLeft(Request $request, Board $board): Response
     {
-        return $this->insertTile($request, $doctrine, $board, Direction::LEFT);
+        return $this->postInsertTile($request, $board, Direction::LEFT);
     }
 
     #[Route('/board/{id}/move-player', name: 'board_move_player', methods: 'POST')]
-    public function postMovePlayer(Request $request, ManagerRegistry $doctrine, Board $board): Response
+    public function postMovePlayer(Request $request, Board $board): Response
     {
         $user = $this->getCurrentUser($request);
         if (!$this->canUserPlay($user, $board)) {
@@ -274,7 +265,7 @@ class BoardController extends BoardBaseController
             $board->setState($updatedBoard);
 
             $this->entityManager->flush();
-            $this->publishUpdate($user, $board);
+            $this->publishUpdate($board);
         }
         return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
     }

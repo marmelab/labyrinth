@@ -1,8 +1,9 @@
 import { useParams } from "react-router-dom";
 
-import BoardView from "./components/BoardView";
-import { useBoard } from "./BoardHooks";
+import { Direction, GameState } from "./BoardTypes";
 import { boardRepository } from "./BoardRepository";
+import { useBoard } from "./BoardHooks";
+import BoardView from "./components/BoardView";
 
 export function GetById() {
   const { id } = useParams();
@@ -10,13 +11,15 @@ export function GetById() {
 
   const onRotateRemainingTile = () => boardRepository.rotateRemainingTile(id!);
 
+  const onInsertTile = (direction: Direction, index: number) =>
+    boardRepository.insertTile(id!, direction, index);
+
   if (board) {
     return (
       <BoardView
         board={board}
-        onRotateRemainingTile={
-          board.canPlay ? onRotateRemainingTile : undefined
-        }
+        onRotateRemainingTile={onRotateRemainingTile}
+        onInsertTile={onInsertTile}
       />
     );
   }

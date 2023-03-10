@@ -1,11 +1,5 @@
-import { Board } from "./BoardTypes";
+import { Board, BoardID, Direction } from "./BoardTypes";
 
-export type BoardID = number | string;
-
-export interface BoardRepository {
-  getById(id: BoardID): Promise<Board>;
-  rotateRemainingTile(id: BoardID): Promise<void>;
-}
 export const boardRepository = {
   async getById(id: number | string): Promise<Board> {
     const response = await fetch(`/api/v1/board/${id}`);
@@ -19,6 +13,26 @@ export const boardRepository = {
   async rotateRemainingTile(id: BoardID): Promise<void> {
     const response = await fetch(`/api/v1/board/${id}/rotate-remaining`, {
       method: "POST",
+    });
+    if (response.status != 200) {
+      throw response;
+    }
+  },
+
+  async insertTile(
+    id: BoardID,
+    direction: Direction,
+    index: number
+  ): Promise<void> {
+    const response = await fetch(`/api/v1/board/${id}/insert-tile`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        direction,
+        index,
+      }),
     });
     if (response.status != 200) {
       throw response;

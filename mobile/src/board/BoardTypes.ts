@@ -60,6 +60,17 @@ export interface Player {
   isUser: boolean;
 }
 
+export type BoardID = number | string;
+
+export enum Direction {
+  Top = "TOP",
+  Right = "RIGHT",
+  Bottom = "BOTTOM",
+  Left = "LEFT",
+}
+
 export interface BoardRepository {
   getById(id: number | string): Promise<Board>;
+  rotateRemainingTile(id: BoardID): Promise<void>;
+  insertTile(id: BoardID, direction: Direction, index: number): Promise<void>;
 }

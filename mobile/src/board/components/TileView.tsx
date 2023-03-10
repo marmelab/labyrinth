@@ -1,6 +1,6 @@
-import type { FunctionComponent, MouseEventHandler, ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 
-import { BoardTile, Tile } from "../BoardTypes";
+import { type BoardTile, Direction, GameState } from "../BoardTypes";
 
 import "./TileView.css";
 
@@ -37,26 +37,68 @@ const treasures: TreasureMap = {
   X: "🥦",
 };
 
-interface TileProps {
-  boardTile: BoardTile;
-  disabled?: boolean;
-  onClick?: MouseEventHandler;
-  children?: ReactElement | ReactElement[];
-}
+type Handler = (() => Promise<void>) | undefined;
+type HandlerFactory = (line: number, row: number) => Handler;
 
-const TileView: FunctionComponent<TileProps> = ({
+export type RotateRemainingTileHandler = () => Promise<void>;
+export type InsertTileHandler = (
+  direction: Direction,
+  index: number
+) => Promise<void>;
+
+const insertableIndexes = [1, 3, 5];
+
+// First Map is (line => row)
+// Second Map is (row => [direction, index])
+const placeTileDirection = new Map<number, Map<number, [Direction, number]>>([
+  [
+    0,
+    new Map(insertableIndexes.map((index) => [index, [Direction.Top, index]])),
+  ],
+  [
+    1,
+    new Map([
+      [0, [Direction.Left, 1]],
+      [6, [Direction.Right, 1]],
+    ]),
+  ],
+  [
+    3,
+    new Map([
+      [0, [Direction.Left, 3]],
+      [6, [Direction.Right, 3]],
+    ]),
+  ],
+  [
+    5,
+    new Map([
+      [0, [Direction.Left, 5]],
+      [6, [Direction.Right, 5]],
+    ]),
+  ],
+  [
+    6,
+    new Map(
+      insertableIndexes.map((index) => [index, [Direction.Bottom, index]])
+    ),
+  ],
+]);
+
+const ClickableTileView = ({
   boardTile: {
     tile: { treasure, shape },
     rotation,
   },
-  disabled = false,
   onClick,
   children,
-}: TileProps): ReactElement => {
+}: {
+  boardTile: BoardTile;
+  onClick: Handler;
+  children: ReactNode;
+}) => {
   return (
     <button
       className={`tile tile--shape-${shape} tile--rotation-${rotation}`}
-      disabled={disabled}
       onClick={onClick}
     >
       <div className={`tile__path`}></div>
@@ -64,6 +106,86 @@ const TileView: FunctionComponent<TileProps> = ({
       {children}
     </button>
   );
+};
+
+const DisabledTileView = ({
+  boardTile: {
+    tile: { treasure, shape },
+    rotation,
+  },
+  children,
+}: {
+  boardTile: BoardTile;
+  children: ReactNode;
+}) => {
+  return (
+    <button
+      className={`tile tile--shape-${shape} tile--rotation-${rotation}`}
+      disabled
+    >
+      <div className={`tile__path`}></div>
+      <div className="tile__treasure">{treasures[treasure]}</div>
+      {children}
+    </button>
+  );
+};
+
+interface TileProps {
+  boardTile: BoardTile;
+  canPlay: boolean;
+  gameState: GameState;
+  coordinates?: {
+    line: number;
+    row: number;
+  };
+  onRotateRemainingTile: RotateRemainingTileHandler;
+  onInsertTile: InsertTileHandler;
+  children?: ReactNode;
+}
+
+const TileView = ({
+  boardTile,
+  canPlay,
+  gameState,
+  coordinates,
+  onRotateRemainingTile,
+  onInsertTile,
+  children,
+}: TileProps): ReactElement => {
+  if (!canPlay || gameState == GameState.End) {
+    return (
+      <DisabledTileView boardTile={boardTile}>{children}</DisabledTileView>
+    );
+  }
+
+  if (!coordinates) {
+    return (
+      <ClickableTileView boardTile={boardTile} onClick={onRotateRemainingTile}>
+        {children}
+      </ClickableTileView>
+    );
+  }
+
+  if (gameState == GameState.PlaceTile) {
+    let direction = placeTileDirection
+      .get(coordinates.line)
+      ?.get(coordinates.row);
+    if (direction) {
+      return (
+        <ClickableTileView
+          boardTile={boardTile}
+          onClick={onInsertTile?.bind(null, ...direction)}
+        >
+          {children}
+        </ClickableTileView>
+      );
+    }
+    return (
+      <DisabledTileView boardTile={boardTile}>{children}</DisabledTileView>
+    );
+  }
+
+  return <DisabledTileView boardTile={boardTile}>{children}</DisabledTileView>;
 };
 
 export default TileView;

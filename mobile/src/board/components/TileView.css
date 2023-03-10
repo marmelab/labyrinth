@@ -14,6 +14,10 @@
     padding: 0;
 }
 
+.tile:disabled {
+    background: url(../assets/background-grayscale.png) repeat;
+}
+
 .tile__path {
     position: absolute;
     display: flex;

@@ -68,7 +68,7 @@ abstract class BoardBaseController extends AbstractController
                     }
 
                     $isCurrentPlayer =
-                        $state['remainingPlayers'] > 0 &&
+                        count($state['remainingPlayers']) > 0 &&
                         $state['remainingPlayers'][$state['currentPlayerIndex']] == $index;
                     $isUser = $user && $boardUser->getId() == $user->getId();
 
@@ -88,7 +88,7 @@ abstract class BoardBaseController extends AbstractController
             );
 
         $canPlay = $user != null && $state['gameState'] != 2 && current(array_filter($players, function ($player) {
-            return $player->getIsCurrentPlayer() && $player->getIsUser();
+            return $player && $player->getIsCurrentPlayer() && $player->getIsUser();
         })) !== false;
 
         return new BoardViewModel(
@@ -105,7 +105,7 @@ abstract class BoardBaseController extends AbstractController
         return $this->createBoardViewModel($user, $board)->getCanPlay();
     }
 
-    protected function publishUpdate(?Player $user, Board $board)
+    protected function publishUpdate(Board $board)
     {
         $update = new Update(
             $this->generateUrl('board_view', ['id' => $board->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
@@ -115,12 +115,25 @@ abstract class BoardBaseController extends AbstractController
         $this->hub->publish($update);
     }
 
-    protected function rotateRemaining(?Player $user, Board $board, Rotation $rotation)
+    protected function rotateRemaining(Board $board, Rotation $rotation)
     {
         $updatedBoard = $this->domainService->rotateRemainingTile($board->getState(), $rotation);
         $board->setState($updatedBoard);
 
         $this->entityManager->flush();
-        $this->publishUpdate($user, $board);
+        $this->publishUpdate($board);
+    }
+
+    protected function insertTile(Board $board, Direction $direction, int $index)
+    {
+        $updatedBoard = $this->domainService->insertTile(
+            $board->getState(),
+            $direction,
+            $index,
+        );
+        $board->setState($updatedBoard);
+
+        $this->entityManager->flush();
+        $this->publishUpdate($board);
     }
 }

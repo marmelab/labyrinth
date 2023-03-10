@@ -1,7 +1,7 @@
 # This image is used for development purposes
 FROM node:18-bullseye as builder
 
-RUN apt update && apt upgrade
+RUN apt update && apt upgrade -y
 
 RUN mkdir -p /var/www/labyrinth
 
