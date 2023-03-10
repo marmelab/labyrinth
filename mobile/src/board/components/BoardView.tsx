@@ -1,6 +1,6 @@
 import { Board, Color } from "../BoardTypes";
 
-import { Box, List, Grid, Stack, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 
 import PlayerPawnView from "./PlayerPawnView";
 
@@ -93,7 +93,7 @@ const BoardView = ({
           </Grid>
           <Grid item xs={8}>
             {user && (
-              <Stack>
+              <>
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
                     <Typography fontWeight={700}>Your name</Typography>
@@ -118,7 +118,7 @@ const BoardView = ({
                     {treasures[user.currentTarget]}
                   </Grid>
                 </Grid>
-              </Stack>
+              </>
             )}
           </Grid>
         </Grid>
