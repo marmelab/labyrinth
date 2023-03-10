@@ -29,6 +29,31 @@ class BoardApiController extends BoardBaseController
         parent::__construct($domainService, $doctrine->getManager(), $hub, $serializer);
     }
 
+    #[Route('', name: 'create', methods: 'PUT')]
+    public function create(Request $request): JsonResponse
+    {
+        $user = $this->getCurrentUser($request);
+        if (!$user) {
+            return $this->json([
+                'data' => null,
+            ], 401);
+        }
+
+        $form = json_decode($request->getContent(), true);
+        $playerCount = $form['playerCount'];
+        if ($playerCount < 1 || $playerCount > 4) {
+            return $this->json([
+                'data' => ['message' => 'Player count must be between 1 and 4.'],
+            ], 400);
+        }
+
+        $board = $this->newBoard($user, $playerCount);
+        return $this->json([
+            'data' => $this->createBoardViewModel($user, $board),
+        ]);
+    }
+
+
     #[Route('', name: 'find', methods: 'GET')]
     public function find(Request $request): JsonResponse
     {

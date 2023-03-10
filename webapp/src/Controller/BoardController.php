@@ -72,7 +72,6 @@ class BoardController extends BoardBaseController
     #[Route('/board/new', name: 'board_new', methods: 'POST')]
     public function getNew(Request $request, ManagerRegistry $doctrine)
     {
-        $entityManager = $doctrine->getManager();
         $user = $this->getCurrentUser($request);
         if ($user == NULL) {
             return $this->redirectToRoute('home');
@@ -89,16 +88,8 @@ class BoardController extends BoardBaseController
             ]);
         }
 
-        $playerCount = $form->getData()['player_count'];
-        $boardState = $this->domainService->newBoard(intval($playerCount));
-
-        $board = new Board();
-        $board->setState($boardState);
-        $board->addPlayer($user);
-        $board->setRemainingSeats($playerCount - 1);
-
-        $entityManager->persist($board);
-        $entityManager->flush();
+        $playerCount = intval($form->getData()['player_count']);
+        $board = $this->newBoard($user, $playerCount);
 
         return $this->redirectToRoute('board_view', [
             'id' => $board->getId(),
