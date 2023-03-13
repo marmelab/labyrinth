@@ -19,4 +19,4 @@ services:
   proxy:
     image: jonathanmarmelab/labyrinth-proxy:latest
     ports:
-      - "80:80"
+      - "443:443"
