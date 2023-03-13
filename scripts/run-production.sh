@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-mkdir -p logs data/postgres
+mkdir -p logs data/postgres certbot/{conf,www}
 
 sudo docker compose \
 	--env-file=webapp/.env \
