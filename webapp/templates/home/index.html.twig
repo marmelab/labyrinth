@@ -9,8 +9,8 @@
 <div class="container">
 <div class="row">
 	<div class="col col-6">
-		{% if player == NULL %}
-			{{ form(signInForm) }}
+		{% if app.user == NULL %}
+			{% include "auth/components/sign_in_form.html.twig" with { 'error': null, 'last_username': '' } %}
 		{% else %}
 			{{ form(newBoardForm) }}
 		{% endif %}

@@ -9,20 +9,26 @@ import matchers from "@testing-library/jest-dom/matchers";
 expect.extend(matchers);
 
 import { MemoryRouter } from "react-router-dom";
+
 import type { BoardRepository } from "../board/BoardTypes";
-import type { UserRepository } from "./UserTypes";
 
 let boardRepository = mock<BoardRepository>();
-let userRepository = mock<UserRepository>();
+
+const useGetIdentityQuery = vi.fn();
+const useSignInMutation = vi.fn();
+const useSignOutMutation = vi.fn();
+const useUserContext = vi.fn();
 
 vi.mock("../board/BoardRepository", () => {
   return {
     boardRepository,
   };
 });
-vi.mock("./UserRepository", () => {
+vi.mock("./UserHooks", () => {
   return {
-    userRepository,
+    useGetIdentityQuery,
+    useSignInMutation,
+    useSignOutMutation,
   };
 });
 
@@ -37,26 +43,39 @@ describe("SignIn", () => {
   const user = userEvent.setup();
 
   const testName = "test-user";
-  const testUser = { id: 1, name: testName };
+  const testEmail = "test@example.org";
+  const testUser = {
+    id: 1,
+    username: testName,
+    email: testEmail,
+    roles: ["ROLE_USER"],
+  };
 
   async function goToSignIn() {
-    const signInLink = await screen.findByText("Sign In / Sign Up");
+    const signInLink = await screen.findByText("Sign In");
 
     await user.click(signInLink);
 
-    const signInNameField = await screen.findByLabelText("Username");
-    const signInButton = await screen.findByRole("button");
+    const signInEmailField = await screen.findByLabelText("Email");
+    const signInPasswordField = await screen.findByLabelText("Password");
+    const signInButton = await screen.findByRole("button", {
+      name: "Sign In",
+    });
 
-    return [signInNameField, signInButton];
+    return [signInEmailField, signInPasswordField, signInButton];
   }
 
   beforeEach(() => {
     boardRepository.list.mockResolvedValue([]);
-    userRepository.getIdentity.mockResolvedValue(null);
   });
 
-  it("Should sign in user if name is set", async () => {
-    userRepository.signIn.mockResolvedValueOnce(testUser);
+  it("Should sign in user if email and password are set", async () => {
+    const mutateSignInAsync = vi.fn();
+    mutateSignInAsync.mockResolvedValue(testUser);
+    useSignInMutation.mockReturnValue({
+      isError: false,
+      mutateAsync: mutateSignInAsync,
+    });
 
     render(
       <MemoryRouter>
@@ -64,10 +83,14 @@ describe("SignIn", () => {
       </MemoryRouter>
     );
 
-    const [nameField, button] = await goToSignIn();
+    const [emailField, passwordField, button] = await goToSignIn();
 
-    fireEvent.change(nameField, {
+    fireEvent.change(emailField, {
       target: { value: testName },
+    });
+
+    fireEvent.change(passwordField, {
+      target: { value: "password" },
     });
 
     await user.click(button);
@@ -82,11 +105,15 @@ describe("SignIn", () => {
       </MemoryRouter>
     );
 
+    useSignInMutation.mockReturnValue(() => ({
+      isError: false,
+    }));
+
     const [_, button] = await goToSignIn();
 
     fireEvent.click(button);
 
-    const signInText = await screen.findAllByText("Sign In / Sign Up");
+    const signInText = await screen.findAllByText("Sign In");
 
     expect(signInText).toHaveLength(2);
   });

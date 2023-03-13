@@ -11,7 +11,8 @@ import {
   Typography,
 } from "@mui/material";
 
-import { userRepository, UserContext } from "../../user";
+import { UserContext } from "../../user";
+import { useGetIdentityQuery, useSignOutMutation } from "../../user/UserHooks";
 
 const NavLink = function ({
   to,
@@ -42,13 +43,16 @@ const NavLink = function ({
 const Layout = () => {
   const navigate = useNavigate();
   const [user, setUser] = useContext(UserContext);
+  const signOutMutation = useSignOutMutation();
 
-  useEffect(() => {
-    userRepository.getIdentity().then(setUser);
-  }, []);
+  const identityQuery = useGetIdentityQuery({
+    onSuccess: (user) => {
+      setUser(user);
+    },
+  });
 
   const signOut = async function () {
-    await userRepository.signOut();
+    await signOutMutation.mutateAsync();
     setUser(null);
     navigate("/");
   };
@@ -65,13 +69,18 @@ const Layout = () => {
             </Box>
 
             <Box>
-              <MenuItem>
+              <MenuItem
+                sx={{ display: "flex", flexDirection: "row", gap: "20px" }}
+              >
                 {!user ? (
-                  <NavLink to="/auth/sign-in">Sign In / Sign Up</NavLink>
+                  <>
+                    <NavLink to="/auth/sign-in">Sign In</NavLink>
+                    <NavLink to="/auth/sign-up">Sign Up</NavLink>
+                  </>
                 ) : (
                   <>
-                    <Typography sx={{ m: 2, color: "white", display: "block" }}>
-                      {user.name}
+                    <Typography sx={{ color: "white", display: "block" }}>
+                      {user.username}
                     </Typography>
 
                     <NavLink onClick={signOut}>Sign Out</NavLink>

@@ -4,40 +4,39 @@ namespace App\Controller;
 
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-use App\Entity\Player;
-
-const SESSION_PLAYER_KEY = 'player';
+use App\Entity\User;
+use App\Form\Type\SignUpType;
 
 abstract class AuthBaseController extends AbstractController
 {
-    const SESSION_PLAYER_KEY = 'player';
-
     protected function __construct(
         protected ObjectManager $entityManager,
+        protected UserPasswordHasherInterface $passwordHasher,
     ) {
     }
 
-    protected function signInUser(Request $request, string $name): Player
+    protected function createSignUpForm(?User $user = null): FormInterface
     {
-        $playerRepository = $this->entityManager->getRepository(Player::class);
-
-        $player = $playerRepository->findOneByName($name);
-        if ($player == NULL) {
-            $player = new Player();
-            $player->setName($name);
-
-            $this->entityManager->persist($player);
-            $this->entityManager->flush();
-        }
-
-        $request->getSession()->set(static::SESSION_PLAYER_KEY, $player);
-        return $player;
+        return $this->createForm(SignUpType::class, $user, [
+            'action' => $this->generateUrl('auth_sign_up_post'),
+        ]);
     }
 
-    protected function signOutUser(Request $request)
+    protected function signUpUser(User $user): User
     {
-        $request->getSession()->remove(static::SESSION_PLAYER_KEY);
+        $hashedPassword = $this->passwordHasher->hashPassword(
+            $user,
+            $user->getPlainPassword()
+        );
+        $user->setPassword($hashedPassword);
+        $user->eraseCredentials();
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return $user;
     }
 }

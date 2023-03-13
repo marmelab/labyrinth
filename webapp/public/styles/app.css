@@ -48,60 +48,35 @@ header {
     justify-content: space-between;
 }
 
-header a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    text-decoration: none;
-    min-width: 150px;
-}
-
-header a:hover {
-    text-decoration: underline;
-}
-
-header a:visited {
-    color: #ffffff;
-}
-
+header nav,
 header form {
     display: flex;
     flex-direction: row;
-    width: 100%;
     height: 100%;
     gap: 20px;
     align-items: center;
     justify-content: flex-end;
 }
 
-header form input[type="text"] {
-    height: 100%;
-    background-color: #444444;
-    border: 0;
-    padding: 5px 20px;
-    color: #ffffff;
-    font-size: 1rem;
-}
-
-header form input[type="text"]:focus {
-    outline: none;
-    font-size: 1rem;
-}
-
-header form input[type="text"]::placeholder {
-    color: #ffffff;
-    font-style: italic;
-    font-size: 1rem;
-}
-
+header a,
 header form button {
+    display: flex;
     height: 100%;
-    background-color: #333333;
     border: 0;
     color: #ffffff;
     font-size: 1rem;
-    padding: 5px 20px;
+    padding: 0 20px;
+    text-decoration: none;
+    align-items: center;
+    justify-content: center;
+    background-color: inherit;
+}
+
+header a:hover,
+header form button:hover {
+    color: #ffffff;
+    background-color: #444444;
+    cursor: pointer;
 }
 
 button[disabled] {

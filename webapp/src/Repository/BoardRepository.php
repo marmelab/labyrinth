@@ -6,7 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 use App\Entity\Board;
-use App\Entity\Player;
+use App\Entity\User;
 
 
 /**
@@ -54,12 +54,12 @@ class BoardRepository extends ServiceEntityRepository
         return $qb->getQuery()->execute();
     }
 
-    public function findByUser(Player $user, int $page = 1, int $pageSize = 25): array
+    public function findByUser(User $user, int $page = 1, int $pageSize = 25): array
     {
         $qb = $this->createQueryBuilder('b')
             ->select(['b.id', 'b.remainingSeats'])
-            ->leftJoin('b.players', 'p')
-            ->where('p.id = :userId')
+            ->leftJoin('b.users', 'u')
+            ->where('u.id = :userId')
             ->setParameter('userId', $user->getId())
             ->orderBy('b.id', 'DESC')
             ->setFirstResult(($page - 1) * $pageSize)

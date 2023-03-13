@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 use App\Entity\Board;
-use App\Entity\Player;
+use App\Entity\User;
 use App\Service\Direction;
 use App\ViewModel\BoardViewModel;
 use App\ViewModel\PlayerViewModel;
@@ -20,7 +20,7 @@ use App\Service\Rotation;
 
 abstract class BoardBaseController extends AbstractController
 {
-    const SESSION_PLAYER_KEY = AuthBaseController::SESSION_PLAYER_KEY;
+    const SESSION_PLAYER_KEY = 'player';
 
     protected function __construct(
         protected DomainServiceInterface $domainService,
@@ -30,24 +30,13 @@ abstract class BoardBaseController extends AbstractController
     ) {
     }
 
-    protected function getCurrentUser(Request $request): ?Player
-    {
-        $player = $request->getSession()->get(static::SESSION_PLAYER_KEY);
-        if ($player == NULL) {
-            return NULL;
-        }
-
-        $playerRepository = $this->entityManager->getRepository(Player::class);
-        return $playerRepository->find($player->getId());
-    }
-
-    protected function canUserJoin(?Player $user, Board $board): bool
+    protected function canUserJoin(?User $user, Board $board): bool
     {
         if ($user == null) {
             return false;
         }
 
-        foreach ($board->getPlayers() as $gamePlayer) {
+        foreach ($board->getUsers() as $gamePlayer) {
             if ($gamePlayer->getId() == $user->getId()) {
                 return false;
             }
@@ -55,10 +44,10 @@ abstract class BoardBaseController extends AbstractController
         return true;
     }
 
-    protected function createBoardViewModel(?Player $user, Board $board): BoardViewModel
+    protected function createBoardViewModel(?User $user, Board $board): BoardViewModel
     {
         $state = $board->getState();
-        $boardPlayers = $board->getPlayers();
+        $boardPlayers = $board->getUsers();
         $players =
             array_map(
                 function ($player, $index) use ($state, $user, $boardPlayers) {
@@ -73,7 +62,7 @@ abstract class BoardBaseController extends AbstractController
                     $isUser = $user && $boardUser->getId() == $user->getId();
 
                     return new PlayerViewModel(
-                        $boardUser->getName(),
+                        $boardUser->getUsername(),
                         $player['color'],
                         $player['position']['line'],
                         $player['position']['row'],
@@ -101,7 +90,7 @@ abstract class BoardBaseController extends AbstractController
         );
     }
 
-    protected function canUserPlay(?Player $user, Board $board): bool
+    protected function canUserPlay(?User $user, Board $board): bool
     {
         return $this->createBoardViewModel($user, $board)->getCanPlay();
     }
@@ -151,13 +140,13 @@ abstract class BoardBaseController extends AbstractController
         $this->publishUpdate($board);
     }
 
-    protected function newBoard(Player $user, int $playerCount): Board
+    protected function newBoard(User $user, int $playerCount): Board
     {
         $boardState = $this->domainService->newBoard(intval($playerCount));
 
         $board = new Board();
         $board->setState($boardState);
-        $board->addPlayer($user);
+        $board->addUser($user);
         $board->setRemainingSeats($playerCount - 1);
 
         $this->entityManager->persist($board);
@@ -166,7 +155,7 @@ abstract class BoardBaseController extends AbstractController
         return $board;
     }
 
-    protected function joinBoard(Player $user, Board $board): bool
+    protected function joinBoard(User $user, Board $board): bool
     {
         if (!$this->canUserJoin($user, $board)) {
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
@@ -197,7 +186,7 @@ abstract class BoardBaseController extends AbstractController
             }
 
             $board->setRemainingSeats($remainingSeats - 1);
-            $board->addPlayer($user);
+            $board->addUser($user);
 
             $entityManager->flush();
             $conn->commit();

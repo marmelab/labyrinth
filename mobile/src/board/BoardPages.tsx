@@ -22,7 +22,7 @@ import { useBoard, useNewBoardMutation } from "./BoardHooks";
 import BoardView from "./components/BoardView";
 import TileView from "./components/TileView";
 import PlayerPawnView from "./components/PlayerPawnView";
-import { useUserContext } from "../user/UserHooks";
+import { useUserContext } from "../user/UserContext";
 
 export function New() {
   const navigate = useNavigate();

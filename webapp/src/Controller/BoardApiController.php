@@ -32,7 +32,7 @@ class BoardApiController extends BoardBaseController
     #[Route('', name: 'create', methods: 'PUT')]
     public function create(Request $request): JsonResponse
     {
-        $user = $this->getCurrentUser($request);
+        $user = $this->getUser();
         if (!$user) {
             return $this->json([
                 'data' => ['message' => 'You must be signed in to create a board.'],
@@ -64,7 +64,7 @@ class BoardApiController extends BoardBaseController
 
         $boardRepository = $this->entityManager->getRepository(Board::class);
 
-        $user = $this->getCurrentUser($request);
+        $user = $this->getUser();
         if ($user == null) {
             return $this->json([
                 'data' => $boardRepository->findByAnonymous($page),
@@ -77,9 +77,9 @@ class BoardApiController extends BoardBaseController
     }
 
     #[Route('/{id}', name: 'find_by_id', methods: 'GET')]
-    public function findById(Request $request, Board $board): JsonResponse
+    public function findById(Board $board): JsonResponse
     {
-        $user = $this->getCurrentUser($request);
+        $user = $this->getUser();
         return $this->json([
             'data' => $this->createBoardViewModel($user, $board),
         ]);
@@ -88,7 +88,7 @@ class BoardApiController extends BoardBaseController
     #[Route('/{id}/rotate-remaining', name: 'rotate_remaining', methods: 'POST')]
     public function postRotateRemaining(Request $request, Board $board): JsonResponse
     {
-        $user = $this->getCurrentUser($request);
+        $user = $this->getUser();
         if (!$this->canUserPlay($user, $board)) {
             return $this->json([
                 'data' => ['message' => 'This is not your turn'],
@@ -105,7 +105,7 @@ class BoardApiController extends BoardBaseController
     #[Route('/{id}/insert-tile', name: 'insert_tile', methods: 'POST')]
     public function postInsertTile(Request $request, Board $board): JsonResponse
     {
-        $user = $this->getCurrentUser($request);
+        $user = $this->getUser();
         if (!$this->canUserPlay($user, $board)) {
             return $this->json([
                 'data' => ['message' => 'This is not your turn.'],
@@ -136,7 +136,7 @@ class BoardApiController extends BoardBaseController
     #[Route('/{id}/move-player', name: 'move_player', methods: 'POST')]
     public function postMovePawn(Request $request, Board $board): JsonResponse
     {
-        $user = $this->getCurrentUser($request);
+        $user = $this->getUser();
         if (!$this->canUserPlay($user, $board)) {
             return $this->json([
                 'data' => ['message' => 'This is not your turn.'],
@@ -166,7 +166,7 @@ class BoardApiController extends BoardBaseController
     #[Route('/{id}/join', name: 'join', methods: 'POST')]
     public function postJoin(Request $request, Board $board): JsonResponse
     {
-        $user = $this->getCurrentUser($request);
+        $user = $this->getUser();
         if (!$this->joinBoard($user, $board)) {
             return $this->json([
                 'data' => ['message' => 'You cannot join this board'],
