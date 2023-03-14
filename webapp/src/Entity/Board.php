@@ -19,15 +19,15 @@ class Board
     #[ORM\Column(type: Types::JSON)]
     private ?array $state = null;
 
-    #[ORM\ManyToMany(targetEntity: Player::class, inversedBy: 'boards')]
-    private Collection $players;
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'boards')]
+    private Collection $users;
 
     #[ORM\Column(options: ["default" => 0])]
     private ?int $remainingSeats = null;
 
     public function __construct()
     {
-        $this->players = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -48,25 +48,25 @@ class Board
     }
 
     /**
-     * @return Collection<int, Player>
+     * @return Collection<int, User>
      */
-    public function getPlayers(): Collection
+    public function getUsers(): Collection
     {
-        return $this->players;
+        return $this->users;
     }
 
-    public function addPlayer(Player $player): self
+    public function addUser(User $user): self
     {
-        if (!$this->players->contains($player)) {
-            $this->players->add($player);
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
         }
 
         return $this;
     }
 
-    public function removePlayer(Player $player): self
+    public function removeUser(User $user): self
     {
-        $this->players->removeElement($player);
+        $this->users->removeElement($user);
 
         return $this;
     }

@@ -20,27 +20,22 @@
 	</head>
 	<body>
 		<header>
+			<a href="{{ url('home') }}">Home</a>
 
-			{% set player = app.session.get('player') %}
-			{% if player == NULL %}
-				<form action="{{ url('player_sign_in') }}" method="POST">
-					<input type="hidden" name="sign_in[_token]" value="{{ csrf_token('sign_in') }} ">
-
-					<input type="text" name="sign_in[name]" minlength="2" maxlength="50" id="sign-in-name" placeholder="Username">
-
-					<button type="submit">Sign In / Sign Up</button>
-				</form>
+			<nav>
+			{% if app.user == NULL %}
+				<a href="{{ url('auth_sign_up') }}">Sign Up</a>
+				<a href="{{ url('app_login') }}">Sign In</a>
 			{% else %}
-				<a href="{{ url('home') }}">New Game</a>
+				<form action="{{ url('auth_sign_out') }}" method="POST">
+    				<input type="hidden" name="_csrf_token"value="{{ csrf_token('logout') }}">
 
-				<form action="{{ url('player_sign_out') }}" method="POST">
-					<input type="hidden" name="sign_out[_token]" value="{{ csrf_token('sign_out') }} ">
-
-					{{ player.name }}
+					{{ app.user.username }}
 
 					<button type="submit">Sign Out</button>
 				</form>
 			{% endif %}
+			</nav>
 		</header>
 		<main>
 			{% block body %}{% endblock %}

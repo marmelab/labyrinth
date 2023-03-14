@@ -3,8 +3,6 @@
 namespace App\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mercure\HubInterface;
@@ -12,7 +10,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
 use App\Entity\Board;
-
 use App\Form\Type\InsertTileType;
 use App\Form\Type\JoinBoardType;
 use App\Form\Type\MovePlayerType;
@@ -72,7 +69,7 @@ class BoardController extends BoardBaseController
     #[Route('/board/new', name: 'board_new', methods: 'POST')]
     public function getNew(Request $request, ManagerRegistry $doctrine)
     {
-        $user = $this->getCurrentUser($request);
+        $user = $this->getUser();
         if ($user == NULL) {
             return $this->redirectToRoute('home');
         }
@@ -97,9 +94,9 @@ class BoardController extends BoardBaseController
     }
 
     #[Route('/board/{id}/view', name: 'board_view', methods: 'GET')]
-    public function getView(Request $request, ManagerRegistry $doctrine, Board $board): Response
+    public function getView(Board $board): Response
     {
-        $user = $this->getCurrentUser($request);
+        $user = $this->getUser();
         if ($board->getRemainingSeats() > 0) {
             $form = $this->createForm(JoinBoardType::class, null, [
                 'action' => $this->generateUrl('board_join', ['id' => $board->getId()]),
@@ -120,15 +117,18 @@ class BoardController extends BoardBaseController
     }
 
     #[Route('/board/{id}/join', name: 'board_join', methods: 'POST')]
-    public function postJoin(Request $request, ManagerRegistry $doctrine, Board $board): Response
+    public function postJoin(Board $board): Response
     {
-        $this->joinBoard($this->getCurrentUser($request), $board);
+        $this->joinBoard(
+            $this->getUser(),
+            $board
+        );
         return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
     }
 
     private function postRotateRemaining(Request $request, Board $board, Rotation $rotation): Response
     {
-        $user = $this->getCurrentUser($request);
+        $user =  $this->getUser();
         if (!$this->canUserPlay($user, $board)) {
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
         }
@@ -144,20 +144,20 @@ class BoardController extends BoardBaseController
     }
 
     #[Route('/board/{id}/rotate-remaining-clockwise', name: 'board_rotate_remaining_clockwise', methods: 'POST')]
-    public function postRotateRemainingClockwise(Request $request, ManagerRegistry $doctrine, Board $board): Response
+    public function postRotateRemainingClockwise(Request $request, Board $board): Response
     {
         return $this->postRotateRemaining($request, $board, Rotation::CLOCKWISE);
     }
 
     #[Route('/board/{id}/rotate-remaining-anticlockwise', name: 'board_rotate_remaining_anticlockwise', methods: 'POST')]
-    public function postRotateRemainingAnticlockwise(Request $request, ManagerRegistry $doctrine, Board $board): Response
+    public function postRotateRemainingAnticlockwise(Request $request, Board $board): Response
     {
         return $this->postRotateRemaining($request, $board, Rotation::ANTICLOCKWISE);
     }
 
     private function postInsertTile(Request $request, Board $board, Direction $direction): Response
     {
-        $user = $this->getCurrentUser($request);
+        $user = $this->getUser();
         if (!$this->canUserPlay($user, $board)) {
             $this->addFlash('errors', 'You cannot perform this action.');
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);
@@ -176,13 +176,13 @@ class BoardController extends BoardBaseController
     }
 
     #[Route('/board/{id}/insert-tile-top', name: 'board_insert_tile_top', methods: 'POST')]
-    public function postInsertTileTop(Request $request, ManagerRegistry $doctrine, Board $board): Response
+    public function postInsertTileTop(Request $request, Board $board): Response
     {
         return $this->postInsertTile($request, $board, Direction::TOP);
     }
 
     #[Route('/board/{id}/insert-tile-right', name: 'board_insert_tile_right', methods: 'POST')]
-    public function postInsertTileRight(Request $request, ManagerRegistry $doctrine, Board $board): Response
+    public function postInsertTileRight(Request $request, Board $board): Response
     {
         return $this->postInsertTile($request, $board, Direction::RIGHT);
     }
@@ -202,7 +202,7 @@ class BoardController extends BoardBaseController
     #[Route('/board/{id}/move-player', name: 'board_move_player', methods: 'POST')]
     public function postMovePlayer(Request $request, Board $board): Response
     {
-        $user = $this->getCurrentUser($request);
+        $user = $this->getUser();
         if (!$this->canUserPlay($user, $board)) {
             $this->addFlash('errors', 'You cannot perform this action.');
             return $this->redirectToRoute('board_view', ['id' => $board->getId()]);

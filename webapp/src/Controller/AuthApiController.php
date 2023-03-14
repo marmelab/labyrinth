@@ -2,68 +2,66 @@
 
 namespace App\Controller;
 
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\Persistence\ManagerRegistry;
-
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-use App\Entity\Player;
+use App\Entity\User;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/api/v1/auth', name: 'auth_api_')]
 class AuthApiController extends AuthBaseController
 {
     public function __construct(
         protected ManagerRegistry $doctrine,
+        protected UserPasswordHasherInterface $passwordHasher,
+        protected SerializerInterface $serializer,
+        protected ValidatorInterface $validator,
     ) {
-        parent::__construct($doctrine->getManager());
+        parent::__construct($doctrine->getManager(), $passwordHasher);
     }
 
-    private function getCurrentUser(Request $request): ?Player
+    #[Route('/identity', name: 'identity', methods: 'GET')]
+    public function getIdentity(): JsonResponse
     {
-        $player = $request->getSession()->get(static::SESSION_PLAYER_KEY);
-        if ($player == NULL) {
-            return NULL;
-        }
-
-        $playerRepository = $this->entityManager->getRepository(Player::class);
-        return $playerRepository->find($player->getId());
-    }
-
-    #[Route('/me', name: 'me', methods: 'GET')]
-    public function getMe(Request $request): JsonResponse
-    {
-        $user = $this->getCurrentUser($request);
         return $this->json([
-            'data' => $user,
+            'data' => $this->getUser(),
         ]);
     }
 
-    #[Route('/sign-in', name: 'sign_in', methods: 'POST')]
-    public function postSignIn(Request $request, ValidatorInterface $validator): JsonResponse
+    #[Route('/sign-up', name: 'sign_up_post', methods: 'POST')]
+    public function postSignUp(Request $request): JsonResponse
     {
-        $form = json_decode($request->getContent(), true);
-        $player = new Player();
-        $player->setName($form['name']);
-
-        $errors = $validator->validate($player);
-        if (count($errors) > 0) {
+        $user = $this->serializer->deserialize($request->getContent(),  User::class, 'json');
+        $errors = $this->validator->validate($user);
+        if ($errors->count() > 0) {
             return $this->json([
-                'errors' => $errors,
+                'error' => $errors->__toString(),
             ], 400);
         }
 
-        $user = $this->signInUser($request, $player->getName());
-        return $this->json([
-            'data' => $user,
-        ]);
+        try {
+            return $this->json([
+                'data' => $this->signUpUser($user),
+            ]);
+        } catch (UniqueConstraintViolationException) {
+            return $this->json([
+                'error' => 'Username or E-mail is already used by another user.',
+            ], 400);
+        }
     }
 
     #[Route('/sign-out', name: 'sign_out', methods: 'POST')]
-    public function postSignOut(Request $request): JsonResponse
+    public function postSignOut(Security $security): JsonResponse
     {
-        $this->signOutUser($request);
-        return $this->json(['data' => null]);
+        $security->logout(false);
+        return $this->json([
+            'data' => null,
+        ]);
     }
 }
