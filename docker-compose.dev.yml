@@ -43,6 +43,15 @@ services:
       PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:3000
       PGRST_OPENAPI_MODE: "ignore-privileges"
 
+  admin:
+    build:
+      dockerfile: ./admin/Dockerfile
+    volumes:
+      - ./admin/public:/var/www/admin/public
+      - ./admin/src:/var/www/admin/src
+    depends_on:
+      - postgrest
+
   swagger:
     image: swaggerapi/swagger-ui
     ports:
@@ -55,7 +64,11 @@ services:
       dockerfile: ./proxy/development/Dockerfile
     volumes:
       - ./mobile/public:/var/www/labyrinth/mobile
+      - ./admin/public:/var/www/labyrinth/admin
       - ./webapp/public/images:/var/www/labyrinth/webapp/images
       - ./webapp/public/styles:/var/www/labyrinth/webapp/styles
     ports:
       - "0.0.0.0:9443:443"
+    depends_on:
+      - mobile
+      - admin
