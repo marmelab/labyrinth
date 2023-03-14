@@ -17,9 +17,14 @@ class HomeController extends AbstractController
 {
 
     #[Route('/', name: 'home')]
-    public function index(Request $request, ManagerRegistry $doctrine)
+    public function index()
     {
+        /** @var User $user */
+        $user = $this->getUser();
         $boards = [];
+        if ($user) {
+            $boards = $user->getBoards();
+        }
 
         $newBoardForm = $this->createForm(NewBoardType::class, null, [
             'action' => $this->generateUrl('board_new'),
