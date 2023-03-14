@@ -32,6 +32,8 @@ abstract class AuthBaseController extends AbstractController
             $user->getPlainPassword()
         );
         $user->setPassword($hashedPassword);
+        $user->setCreatedAt();
+        $user->setUpdatedAt();
         $user->eraseCredentials();
 
         $this->entityManager->persist($user);
