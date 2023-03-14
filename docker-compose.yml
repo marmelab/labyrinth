@@ -37,8 +37,16 @@ services:
     depends_on:
       - postgres
 
+  postgrest:
+    image: postgrest/postgrest
+    environment:
+      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/labyrinth
+    depends_on:
+      - postgres
+
   proxy:
     volumes:
+      - ./certs:/certs
       - ./logs:/var/log/nginx
     depends_on:
       - webapp

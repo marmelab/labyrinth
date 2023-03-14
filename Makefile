@@ -37,13 +37,17 @@ install:										## Install dependencies
 
 run: develop									## Run the program for development, alias of develop
 
-develop: 										## Run the program for development
+
+develop: develop-certs							## Run the program for development
 	@(mkdir -p logs data/postgres)
 	docker compose \
 		--env-file webapp/.env \
 		-f docker-compose.yml \
 		-f docker-compose.dev.yml \
 		up --build
+
+develop-certs:
+	@(./scripts/dev-certs.sh)
 
 develop-config: 								## Dumps the docker development compose file with environment set
 	docker compose \
