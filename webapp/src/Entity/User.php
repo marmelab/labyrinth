@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Serializer\Annotation\VirtualProperty;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use App\Repository\UserRepository;
@@ -17,6 +19,9 @@ use App\Repository\UserRepository;
 #[ORM\Table(name: '`user`')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    const ROLE_ADMIN = 'ROLE_ADMIN';
+    const ROLE_USER = 'ROLE_USER';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -61,6 +66,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         minMessage: 'Your password must be at least {{ limit }} characters long',
         maxMessage: 'Your password cannot be longer than {{ limit }} characters',
     )]
+    #[Ignore]
     private ?string $plainPassword = null;
 
     #[ORM\Column(type: 'datetime')]
@@ -210,5 +216,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    public function getRole(): string
+    {
+        $roles = $this->getRoles();
+        if (in_array(static::ROLE_ADMIN, $roles)) {
+            return static::ROLE_ADMIN;
+        }
+        return static::ROLE_USER;
     }
 }

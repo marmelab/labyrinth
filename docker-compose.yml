@@ -28,6 +28,8 @@ services:
       - MERCURE_URL=http://mercure:80/.well-known/mercure
       - MERCURE_PUBLIC_URL=/.well-known/mercure
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/labyrinth?serverVersion=15&charset=utf8
+    volumes:
+      - ./webapp/config/jwt:/var/www/labyrinth/config/jwt
 
   webapp-migrations:
     env_file:
@@ -41,13 +43,23 @@ services:
     image: postgrest/postgrest
     environment:
       PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/labyrinth
+      PGRST_JWT_SECRET: "@/jwk/jwk.pub"
     depends_on:
       - postgres
+    volumes:
+      - ./webapp/config/jwt/jwk.pub:/jwk/jwk.pub
+
+  admin-proxy:
+    environment:
+      - POSTGREST_URL=http://postgrest:3000
+    depends_on:
+      - postgrest
 
   proxy:
     volumes:
       - ./certs:/certs
       - ./logs:/var/log/nginx
     depends_on:
+      - admin-proxy
       - webapp
       - mercure
