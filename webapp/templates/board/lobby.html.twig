@@ -2,8 +2,6 @@
 
 {% block title %}Waiting for {{ board.remainingSeats }} players{% endblock %}
 
-{% set player = app.session.get('player') %}
-
 {% block body %}
 <div class="container">
 
@@ -27,8 +25,8 @@
         <div class="col col-8 justify-content-center">
             <h1>Current players</h1>
             <ul>
-                {% for gamePlayer in board.players %}
-                    <li>{{ gamePlayer.name }}</li>
+                {% for gamePlayer in board.users %}
+                    <li>{{ gamePlayer.username }}</li>
                 {% endfor %}
             </ul>
         </div>

@@ -2,11 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\BoardRepository;
+use DateTime;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+
+use App\Repository\BoardRepository;
 
 #[ORM\Entity(repositoryClass: BoardRepository::class)]
 class Board
@@ -24,6 +27,12 @@ class Board
 
     #[ORM\Column(options: ["default" => 0])]
     private ?int $remainingSeats = null;
+
+    #[ORM\Column(type: 'datetime')]
+    private DateTime $createdAt;
+
+    #[ORM\Column(type: 'datetime')]
+    private DateTime $updatedAt;
 
     public function __construct()
     {
@@ -79,6 +88,29 @@ class Board
     public function setRemainingSeats(int $remainingSeats): self
     {
         $this->remainingSeats = $remainingSeats;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(): self
+    {
+        $this->createdAt = new DateTime("now");
+        return $this;
+    }
+
+    public function getUpdatedAt(): DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(): self
+    {
+        $this->updatedAt = new DateTime("now");
 
         return $this;
     }

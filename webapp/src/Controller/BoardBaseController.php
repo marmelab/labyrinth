@@ -148,6 +148,8 @@ abstract class BoardBaseController extends AbstractController
         $board->setState($boardState);
         $board->addUser($user);
         $board->setRemainingSeats($playerCount - 1);
+        $board->setCreatedAt();
+        $board->setUpdatedAt();
 
         $this->entityManager->persist($board);
         $this->entityManager->flush();
