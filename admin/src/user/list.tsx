@@ -1,4 +1,3 @@
-// in src/users.tsx
 import {
   List,
   Datagrid,
