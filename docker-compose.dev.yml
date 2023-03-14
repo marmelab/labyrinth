@@ -52,6 +52,10 @@ services:
     depends_on:
       - postgrest
 
+  admin-proxy:
+    build:
+      dockerfile: ./admin-proxy/Dockerfile
+
   swagger:
     image: swaggerapi/swagger-ui
     environment:

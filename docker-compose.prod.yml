@@ -16,6 +16,9 @@ services:
       - APP_DEBUG=false
       - APP_ENV=prod
 
+  admin-proxy:
+    image: jonathanmarmelab/labyrinth-admin-proxy:latest
+
   proxy:
     image: jonathanmarmelab/labyrinth-proxy:latest
     ports:

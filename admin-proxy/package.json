@@ -1,0 +1,15 @@
+{
+  "name": "admin-proxy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "author": "",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "express": "^4.18.2",
+    "express-http-proxy": "^1.6.3"
+  }
+}
