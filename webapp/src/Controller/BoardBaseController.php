@@ -115,7 +115,7 @@ abstract class BoardBaseController extends AbstractController
     protected function updateBoard(Board $board, array $newState)
     {
         $board->setState($newState);
-        $board->setGameState($newState['gameState']);
+        $board->setGameState($newState['gameState'])->setUpdatedAt();
 
         $players = $board->getPlayers()->toArray();
 

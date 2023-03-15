@@ -14,13 +14,18 @@ const listFilters = [
 
 export const UserList = () => (
   <List filters={listFilters}>
-    <Datagrid>
+    <Datagrid rowClick="show">
       <TextField source="id" />
       <TextField source="username" />
       <EmailField source="email" />
       <ReferenceManyCount
         label="Games"
         reference="player"
+        target="attendee_id"
+      />
+      <ReferenceManyCount
+        label="Ongoing Games"
+        reference="ongoing_game"
         target="attendee_id"
       />
     </Datagrid>
