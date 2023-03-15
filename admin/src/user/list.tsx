@@ -1,11 +1,6 @@
-import {
-  List,
-  Datagrid,
-  TextField,
-  EmailField,
-  TextInput,
-  ReferenceInput,
-} from "react-admin";
+import { List, Datagrid, TextField, EmailField, TextInput } from "react-admin";
+
+import { CustomManyCount } from "../shared/CustomManyCount";
 
 const listFilters = [
   <TextInput source="username@ilike" label="Username" alwaysOn />,
@@ -18,6 +13,13 @@ export const UserList = () => (
       <TextField source="id" />
       <TextField source="username" />
       <EmailField source="email" />
+      <CustomManyCount
+        label="Games"
+        reference="board_user"
+        target="user_id"
+        sortBy="board_id"
+        sortByOrder="ASC"
+      />
     </Datagrid>
   </List>
 );
