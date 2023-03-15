@@ -1,6 +1,6 @@
-FROM node:18-bullseye
+FROM node:18-alpine
 
-RUN apt update && apt upgrade -y
+RUN apk update
 
 RUN mkdir -p /var/www/labyrinth/admin-proxy
 
