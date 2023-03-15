@@ -14,50 +14,62 @@ type UserResponse = {
   token?: string;
 };
 
-async function fetchUser(url: string, body?: string) {
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body,
-  });
-
-  const responseContent: UserResponse = await response.json();
-  if (response.status != 200) {
-    throw { message: responseContent.error! };
+async function storeUser(user: User | null) {
+  if (!user) {
+    localStorage.removeItem(localStorageUserKey);
+    throw { status: 401, message: "User not logged in" };
+  } else {
+    localStorage.setItem(localStorageUserKey, JSON.stringify(user));
   }
-
-  localStorage.setItem(
-    localStorageUserKey,
-    JSON.stringify(responseContent.data!)
-  );
-
-  return responseContent.data!;
 }
 
 export const authProvider: AuthProvider = {
   // authentication
-  login: async ({ username, password }) =>
-    fetchUser("/api/v1/auth/sign-in", JSON.stringify({ username, password })),
+  login: async ({ username, password }) => {
+    const response = await fetch("/api/v1/auth/sign-in", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({ username, password }),
+    });
+
+    const responseContent: UserResponse = await response.json();
+    console.log(responseContent);
+
+    if (response.status != 200) {
+      throw { message: responseContent.error! };
+    }
+
+    storeUser(responseContent.data!);
+  },
   checkError: (error) => {
     const status = error.status;
+    console.log(error);
     if (status !== 200) {
       localStorage.removeItem(localStorageUserKey);
       return Promise.reject();
     }
     return Promise.resolve();
   },
-  checkAuth: async (params) => {
-    const user = await fetchUser("/api/v1/auth/check");
-    if (!user) {
-      localStorage.removeItem(localStorageUserKey);
-      throw new Error("User not logged in");
+  checkAuth: async () => {
+    const response = await fetch("/api/v1/auth/check");
+
+    const responseContent: UserResponse = await response.json();
+    if (response.status != 200) {
+      throw { message: responseContent.error! };
     }
+
+    storeUser(responseContent.data!);
   },
   logout: async () => {
-    await fetchUser("/api/v1/auth/sign-out");
-    localStorage.removeItem(localStorageUserKey);
+    try {
+      await fetch("/api/v1/auth/sign-out", {
+        method: "POST",
+      });
+    } finally {
+      localStorage.removeItem(localStorageUserKey);
+    }
   },
   getIdentity: () => {
     try {
@@ -72,7 +84,7 @@ export const authProvider: AuthProvider = {
         fullName: user.username,
       });
     } catch (error) {
-      return Promise.reject(error);
+      return Promise.reject({ status: 500, message: error });
     }
   },
   getPermissions: () => {
