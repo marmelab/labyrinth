@@ -5,12 +5,25 @@ import {
   DeleteButton,
   FunctionField,
   ReferenceManyCount,
+  SelectInput,
 } from "react-admin";
 
 import { renderGameState } from "./commons";
 
+const listFilters = [
+  <SelectInput
+    label="Game State"
+    source="game_state@in"
+    choices={[
+      { id: "(0, 1)", name: "On Going" },
+      { id: "(2)", name: "Completed" },
+    ]}
+    alwaysOn
+  />,
+];
+
 export const BoardList = () => (
-  <List>
+  <List filters={listFilters}>
     <Datagrid rowClick="show">
       <TextField source="id" />
       <ReferenceManyCount
