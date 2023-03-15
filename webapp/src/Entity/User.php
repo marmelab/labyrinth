@@ -4,13 +4,12 @@ namespace App\Entity;
 
 use DateTime;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Ignore;
-use Symfony\Component\Serializer\Annotation\SerializedName;
-use Symfony\Component\Serializer\Annotation\VirtualProperty;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use App\Repository\UserRepository;
@@ -45,10 +44,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private array $roles = [];
 
-    #[ORM\ManyToMany(targetEntity: Board::class, mappedBy: 'users')]
-    #[Ignore]
-    private Collection $boards;
-
     /**
      * @var string The hashed password
      */
@@ -74,6 +69,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'datetime')]
     private DateTime $updatedAt;
+
+    #[ORM\OneToMany(mappedBy: 'attendee', targetEntity: Player::class, orphanRemoval: true)]
+    #[Ignore]
+    private Collection $games;
+
+    public function __construct()
+    {
+        $this->games = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -191,33 +195,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->plainPassword = null;
     }
 
-    /**
-     * @return Collection<int, Board>
-     */
-    public function getBoards(): Collection
-    {
-        return $this->boards;
-    }
-
-    public function addBoard(Board $board): self
-    {
-        if (!$this->boards->contains($board)) {
-            $this->boards->add($board);
-            $board->addUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBoard(Board $board): self
-    {
-        if ($this->boards->removeElement($board)) {
-            $board->removeUser($this);
-        }
-
-        return $this;
-    }
-
     public function getRole(): string
     {
         $roles = $this->getRoles();
@@ -225,5 +202,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             return static::ROLE_ADMIN;
         }
         return static::ROLE_USER;
+    }
+
+    /**
+     * @return Collection<int, Player>
+     */
+    public function getGames(): Collection
+    {
+        return $this->games;
+    }
+
+    public function addGame(Player $game): self
+    {
+        if (!$this->games->contains($game)) {
+            $this->games->add($game);
+            $game->setAttendee($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGame(Player $game): self
+    {
+        if ($this->games->removeElement($game)) {
+            // set the owning side to null (unless already changed)
+            if ($game->getAttendee() === $this) {
+                $game->setAttendee(null);
+            }
+        }
+
+        return $this;
     }
 }

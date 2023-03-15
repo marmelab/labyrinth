@@ -2,16 +2,10 @@
 
 namespace App\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
-
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-use App\Entity\Player;
-
 use App\Form\Type\NewBoardType;
-use App\Form\Type\SignInType;
 
 class HomeController extends AbstractController
 {
@@ -23,7 +17,9 @@ class HomeController extends AbstractController
         $user = $this->getUser();
         $boards = [];
         if ($user) {
-            $boards = $user->getBoards();
+            $boards = array_map(function ($game) {
+                return $game->getBoard();
+            }, $user->getGames()->toArray());
         }
 
         $newBoardForm = $this->createForm(NewBoardType::class, null, [

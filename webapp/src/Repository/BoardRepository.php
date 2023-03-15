@@ -44,6 +44,19 @@ class BoardRepository extends ServiceEntityRepository
         }
     }
 
+    public function find($id, $lockMode = null, $lockVersion = null): ?Board
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->select(['b', 'p', 'u'])
+            ->leftJoin('b.players', 'p')
+            ->leftJoin('p.attendee', 'u')
+            ->where('b.id = :boardId')
+            ->orderBy('p.color')
+            ->setParameter('boardId', $id);
+
+        return $qb->getQuery()->getSingleResult();
+    }
+
     public function findByAnonymous(int $page = 1, int $pageSize = 25): array
     {
         $qb = $this->createQueryBuilder('b')
@@ -58,8 +71,9 @@ class BoardRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('b')
             ->select(['b.id', 'b.remainingSeats'])
-            ->leftJoin('b.users', 'u')
-            ->where('u.id = :userId')
+            ->leftJoin('b.players', 'p')
+            ->leftJoin('p.attendee', 'a')
+            ->where('a.id = :userId')
             ->setParameter('userId', $user->getId())
             ->orderBy('b.id', 'DESC')
             ->setFirstResult(($page - 1) * $pageSize)

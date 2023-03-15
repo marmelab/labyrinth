@@ -25,8 +25,8 @@
         <div class="col col-8 justify-content-center">
             <h1>Current players</h1>
             <ul>
-                {% for gamePlayer in board.users %}
-                    <li>{{ gamePlayer.username }}</li>
+                {% for player in board.players %}
+                    <li>{{ player.attendee.username }}</li>
                 {% endfor %}
             </ul>
         </div>
