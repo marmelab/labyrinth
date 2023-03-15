@@ -9,7 +9,7 @@ const listFilters = [
 
 export const UserList = () => (
   <List filters={listFilters}>
-    <Datagrid rowClick="edit">
+    <Datagrid>
       <TextField source="id" />
       <TextField source="username" />
       <EmailField source="email" />

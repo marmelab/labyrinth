@@ -2,7 +2,7 @@ import { List, Datagrid, TextField, DeleteButton } from "react-admin";
 
 export const BoardList = () => (
   <List>
-    <Datagrid rowClick="edit">
+    <Datagrid>
       <TextField source="id" />
       <DeleteButton />
     </Datagrid>
