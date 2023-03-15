@@ -14,7 +14,7 @@ abstract class AuthBaseController extends AbstractController
 {
     protected function __construct(
         protected ObjectManager $entityManager,
-        protected UserPasswordHasherInterface $passwordHasher,
+        protected UserPasswordHasherInterface $passwordHasher
     ) {
     }
 

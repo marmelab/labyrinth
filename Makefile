@@ -14,6 +14,7 @@ DOCKER_IMAGE_NAMESPACE=jonathanmarmelab
 DOCKER_IMAGE_DOMAIN_API=${DOCKER_IMAGE_NAMESPACE}/labyrinth-domain-api
 DOCKER_IMAGE_WEBAPP=${DOCKER_IMAGE_NAMESPACE}/labyrinth-webapp
 DOCKER_IMAGE_WEBAPP_MIGRATIONS=${DOCKER_IMAGE_NAMESPACE}/labyrinth-webapp-migrations
+DOCKER_IMAGE_ADMIN_PROXY=${DOCKER_IMAGE_NAMESPACE}/labyrinth-admin-proxy
 DOCKER_IMAGE_PROXY=${DOCKER_IMAGE_NAMESPACE}/labyrinth-proxy
 
 SERVER_USER=""
@@ -63,6 +64,12 @@ production-image-build:
 		-f domain/api/Dockerfile \
 		-t ${DOCKER_IMAGE_DOMAIN_API}:${COMMIT_HASH} \
 		-t ${DOCKER_IMAGE_DOMAIN_API}:latest \
+		.
+
+	docker build \
+		-f admin-proxy/Dockerfile \
+		-t ${DOCKER_IMAGE_ADMIN_PROXY}:${COMMIT_HASH} \
+		-t ${DOCKER_IMAGE_ADMIN_PROXY}:latest \
 		.
 
 	docker build \

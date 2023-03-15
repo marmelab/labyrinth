@@ -22,3 +22,7 @@ services:
     public: true
     arguments:
       $domainServiceUrl: "%env(string:DOMAIN_SERVICE_URL)%"
+
+  App\Security\TokenServiceInterface:
+    class: App\Security\TokenService
+    public: true

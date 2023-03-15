@@ -9,12 +9,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-
-use App\Entity\User;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-#[Route('/api/v1/auth', name: 'auth_api_')]
+use App\Entity\User;
+use App\Security\TokenServiceInterface;
+
+#[Route('/api/v1/auth')]
 class AuthApiController extends AuthBaseController
 {
     public function __construct(
@@ -22,11 +23,12 @@ class AuthApiController extends AuthBaseController
         protected UserPasswordHasherInterface $passwordHasher,
         protected SerializerInterface $serializer,
         protected ValidatorInterface $validator,
+        protected TokenServiceInterface $tokenService,
     ) {
-        parent::__construct($doctrine->getManager(), $passwordHasher);
+        parent::__construct($doctrine->getManager(), $passwordHasher, $tokenService);
     }
 
-    #[Route('/identity', name: 'identity', methods: 'GET')]
+    #[Route('/identity', name: 'auth_api_identity', methods: 'GET')]
     public function getIdentity(): JsonResponse
     {
         return $this->json([
@@ -34,7 +36,7 @@ class AuthApiController extends AuthBaseController
         ]);
     }
 
-    #[Route('/sign-up', name: 'sign_up_post', methods: 'POST')]
+    #[Route('/sign-up', name: 'auth_api_sign_up_post', methods: 'POST')]
     public function postSignUp(Request $request): JsonResponse
     {
         $user = $this->serializer->deserialize($request->getContent(),  User::class, 'json');
@@ -56,12 +58,49 @@ class AuthApiController extends AuthBaseController
         }
     }
 
-    #[Route('/sign-out', name: 'sign_out', methods: 'POST')]
+    #[Route('/sign-out', name: 'auth_api_sign_out', methods: 'POST')]
     public function postSignOut(Security $security): JsonResponse
     {
-        $security->logout(false);
+        $user = $this->getUser();
+        if ($user) {
+            $security->logout(false);
+        }
         return $this->json([
             'data' => null,
         ]);
+    }
+
+    #[Route(path: '/sign-in', name: 'api_login', methods: 'POST')]
+    public function login(): JsonResponse
+    {
+        /** @var User */
+        $user = $this->getUser();
+        if ($user) {
+            $reponse = $this->json([
+                'data' => $user,
+            ]);
+            return $this->tokenService->setToken($reponse, $user);
+        }
+
+        return $this->json([
+            'data' => null,
+        ]);
+    }
+
+    #[Route(path: '/check', methods: 'GET')]
+    public function check(): JsonResponse
+    {
+        /** @var User */
+        $user = $this->getUser();
+        if ($user) {
+            $reponse = $this->json([
+                'data' => $user,
+            ]);
+            return $this->tokenService->setToken($reponse, $user);
+        }
+
+        return $this->json([
+            'data' => null,
+        ], 401);
     }
 }

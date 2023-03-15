@@ -22,6 +22,11 @@ make cli-clean
 
 ## Web application
 
+/!\ Warning: Running webapplication requires `php8.1` and `composer` installed globally.
+
+/!\ Warning: You will also need the following PHP extensions installed: `php8.1-xml`, `php8.1-mbstring`, `php8.1-zip`,
+`php8.1-pgsql` and `php8.1-curl`.
+
 To run the web application, you will need to create the environment files, and then set the corresponding environment
 variables:
 
@@ -32,7 +37,9 @@ make setup-env
 webapp/.env
 ```
 
-Once the env file has been set,you can either run the app in development or production mode.
+Once the env file has been set, you will need to create the `webapp/config/jwt/jwk.pub` file using [this tool](https://russelldavies.github.io/jwk-creator/) and the `webapp/config/jwt/public.pem` key.
+
+You can now either run the app in development or production mode.
 
 /!\ Note: The server automatically detects mobile devices and serves the mobile app automatically. You can test mobile mode using the developper tools from your browser.
 
