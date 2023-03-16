@@ -4,13 +4,13 @@ namespace App\Controller;
 
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 use App\Entity\Board;
+use App\Entity\Player;
 use App\Entity\User;
 use App\Service\Direction;
 use App\ViewModel\BoardViewModel;
@@ -20,8 +20,6 @@ use App\Service\Rotation;
 
 abstract class BoardBaseController extends AbstractController
 {
-    const SESSION_PLAYER_KEY = 'player';
-
     protected function __construct(
         protected DomainServiceInterface $domainService,
         protected ObjectManager $entityManager,
@@ -36,8 +34,8 @@ abstract class BoardBaseController extends AbstractController
             return false;
         }
 
-        foreach ($board->getUsers() as $gamePlayer) {
-            if ($gamePlayer->getId() == $user->getId()) {
+        foreach ($board->getPlayers() as $player) {
+            if ($player->getAttendee()->getId() == $user->getId()) {
                 return false;
             }
         }
@@ -47,33 +45,24 @@ abstract class BoardBaseController extends AbstractController
     protected function createBoardViewModel(?User $user, Board $board): BoardViewModel
     {
         $state = $board->getState();
-        $boardPlayers = $board->getUsers();
         $players =
             array_map(
-                function ($player, $index) use ($state, $user, $boardPlayers) {
-                    $boardUser = $boardPlayers[$index];
-                    if (!$boardUser) {
-                        return null;
-                    }
-
-                    $isCurrentPlayer =
-                        count($state['remainingPlayers']) > 0 &&
-                        $state['remainingPlayers'][$state['currentPlayerIndex']] == $index;
-                    $isUser = $user && $boardUser->getId() == $user->getId();
+                /** @var Player $player */
+                function ($player) use ($user) {
+                    $isUser = $user && $player->getAttendee()->getId() == $user->getId();
 
                     return new PlayerViewModel(
-                        $boardUser->getUsername(),
-                        $player['color'],
-                        $player['position']['line'],
-                        $player['position']['row'],
-                        $player['targets'],
-                        $player['score'],
-                        $isCurrentPlayer,
+                        $player->getAttendee()->getUsername(),
+                        $player->getColor(),
+                        $player->getLine(),
+                        $player->getRow(),
+                        $player->getTargets(),
+                        $player->getScore(),
+                        $player->isCurrentPlayer(),
                         $isUser
                     );
                 },
-                $state['players'],
-                array_keys($state['players'])
+                $board->getPlayers()->toArray()
             );
 
         $canPlay = $user != null && $state['gameState'] != 2 && current(array_filter($players, function ($player) {
@@ -105,10 +94,56 @@ abstract class BoardBaseController extends AbstractController
         $this->hub->publish($update);
     }
 
+
+    protected function bindPlayerFromState(Player $player, array $state, int $playerIndex): Player
+    {
+        $remainingPlayers = $state['remainingPlayers'];
+        $isCurrentPlayer =
+            count($remainingPlayers) > 0 &&
+            $remainingPlayers[$state['currentPlayerIndex']] == $playerIndex;
+
+        $playerState = $state['players'][$playerIndex];
+        return $player
+            ->setColor($playerState['color'])
+            ->setTargets($playerState['targets'])
+            ->setScore($playerState['score'])
+            ->setLine($playerState['position']['line'])
+            ->setRow($playerState['position']['row'])
+            ->setCurrentPlayer($isCurrentPlayer);
+    }
+
+    protected function updateBoard(Board $board, array $newState)
+    {
+        $board->setState($newState);
+        $board->setGameState($newState['gameState'])->setUpdatedAt();
+
+        $players = $board->getPlayers()->toArray();
+
+        $maxWinOrder = array_reduce($players, function ($current, $player) {
+            /** @var Player $player */
+
+            $winOrder = $player->getWinOrder();
+            if ($winOrder != null && $winOrder > $current) {
+                return $winOrder;
+            }
+            return $current;
+        }, 0);
+
+        foreach ($players as $index => $player) {
+            /** @var Player $player */
+
+            $this->bindPlayerFromState($player, $board->getState(), $index);
+            if ($player->getWinOrder() == null && count($player->getTargets()) == 0) {
+                $player->setWinOrder(++$maxWinOrder);
+            }
+        }
+    }
+
+
     protected function rotateRemaining(Board $board, Rotation $rotation)
     {
-        $updatedBoard = $this->domainService->rotateRemainingTile($board->getState(), $rotation);
-        $board->setState($updatedBoard);
+        $newState = $this->domainService->rotateRemainingTile($board->getState(), $rotation);
+        $this->updateBoard($board, $newState);
 
         $this->entityManager->flush();
         $this->publishUpdate($board);
@@ -116,12 +151,13 @@ abstract class BoardBaseController extends AbstractController
 
     protected function insertTile(Board $board, Direction $direction, int $index)
     {
-        $updatedBoard = $this->domainService->insertTile(
+        $newState = $this->domainService->insertTile(
             $board->getState(),
             $direction,
             $index,
         );
-        $board->setState($updatedBoard);
+        $this->updateBoard($board, $newState);
+
 
         $this->entityManager->flush();
         $this->publishUpdate($board);
@@ -129,12 +165,12 @@ abstract class BoardBaseController extends AbstractController
 
     protected function movePlayer(Board $board, int $line, int $row)
     {
-        $updatedBoard = $this->domainService->movePlayer(
+        $newState = $this->domainService->movePlayer(
             $board->getState(),
             $line,
             $row,
         );
-        $board->setState($updatedBoard);
+        $this->updateBoard($board, $newState);
 
         $this->entityManager->flush();
         $this->publishUpdate($board);
@@ -144,12 +180,18 @@ abstract class BoardBaseController extends AbstractController
     {
         $boardState = $this->domainService->newBoard(intval($playerCount));
 
-        $board = new Board();
-        $board->setState($boardState);
-        $board->addUser($user);
-        $board->setRemainingSeats($playerCount - 1);
-        $board->setCreatedAt();
-        $board->setUpdatedAt();
+        $player = $this->bindPlayerFromState(new Player(), $boardState, 0);
+        $player
+            ->setAttendee($user);
+        $this->entityManager->persist($player);
+
+        $board = (new Board())
+            ->setState($boardState)
+            ->setGameState(0)
+            ->addPlayer($player)
+            ->setRemainingSeats($playerCount - 1)
+            ->setCreatedAt()
+            ->setUpdatedAt();
 
         $this->entityManager->persist($board);
         $this->entityManager->flush();
@@ -187,8 +229,14 @@ abstract class BoardBaseController extends AbstractController
                 return false;
             }
 
+            $playerCount = $board->getPlayers()->count();
+            $player = $this->bindPlayerFromState(new Player(), $board->getState(), $playerCount);
+            $player
+                ->setAttendee($user);
+            $entityManager->persist($player);
+
             $board->setRemainingSeats($remainingSeats - 1);
-            $board->addUser($user);
+            $board->addPlayer($player);
 
             $entityManager->flush();
             $conn->commit();

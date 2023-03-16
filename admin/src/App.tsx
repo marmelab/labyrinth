@@ -2,8 +2,8 @@ import { Admin, Resource } from "react-admin";
 
 import postgrestRestProvider from "@promitheus/ra-data-postgrest";
 
-import { BoardList } from "./board";
-import { UserList } from "./user";
+import { BoardList, BoardShow } from "./board";
+import { UserList, UserShow } from "./user";
 import { authProvider } from "./auth";
 
 function App() {
@@ -12,8 +12,8 @@ function App() {
       authProvider={authProvider}
       dataProvider={postgrestRestProvider("/admin/api/v1/")}
     >
-      <Resource name="board" list={BoardList}></Resource>
-      <Resource name="user" list={UserList}></Resource>
+      <Resource name="board" list={BoardList} show={BoardShow}></Resource>
+      <Resource name="user" list={UserList} show={UserShow}></Resource>
     </Admin>
   );
 }

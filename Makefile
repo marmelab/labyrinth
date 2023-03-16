@@ -26,7 +26,7 @@ include .secrets/.env
 endif
 
 help:
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(firstword $(MAKEFILE_LIST)) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 setup-env:										## Setup the environment
 	
@@ -94,6 +94,7 @@ production-image-push: production-image-build	## Push production images to Docke
 	docker image push --all-tags ${DOCKER_IMAGE_DOMAIN_API}
 	docker image push --all-tags ${DOCKER_IMAGE_WEBAPP}
 	docker image push --all-tags ${DOCKER_IMAGE_WEBAPP_MIGRATIONS}
+	docker image push --all-tags ${DOCKER_IMAGE_ADMIN_PROXY}
 	docker image push --all-tags ${DOCKER_IMAGE_PROXY}
 
 production-deploy: production-image-push		## Deploy production to AWS
@@ -128,7 +129,6 @@ production-ssh-test:
 		-i .secrets/labyrinth-ed25519.pem \
 		${SERVER_USER}@${SERVER_HOSTNAME} \
 		exit
-
 
 test: 											## Run unit tests
 	@(${MAKE} -C domain test)

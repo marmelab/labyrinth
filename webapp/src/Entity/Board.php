@@ -22,9 +22,6 @@ class Board
     #[ORM\Column(type: Types::JSON)]
     private ?array $state = null;
 
-    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'boards')]
-    private Collection $users;
-
     #[ORM\Column(options: ["default" => 0])]
     private ?int $remainingSeats = null;
 
@@ -34,9 +31,15 @@ class Board
     #[ORM\Column(type: 'datetime')]
     private DateTime $updatedAt;
 
+    #[ORM\OneToMany(mappedBy: 'board', targetEntity: Player::class, cascade: ["all"])]
+    private Collection $players;
+
+    #[ORM\Column]
+    private ?int $gameState = null;
+
     public function __construct()
     {
-        $this->users = new ArrayCollection();
+        $this->players = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -52,30 +55,6 @@ class Board
     public function setState(array $state): self
     {
         $this->state = $state;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, User>
-     */
-    public function getUsers(): Collection
-    {
-        return $this->users;
-    }
-
-    public function addUser(User $user): self
-    {
-        if (!$this->users->contains($user)) {
-            $this->users->add($user);
-        }
-
-        return $this;
-    }
-
-    public function removeUser(User $user): self
-    {
-        $this->users->removeElement($user);
 
         return $this;
     }
@@ -111,6 +90,48 @@ class Board
     public function setUpdatedAt(): self
     {
         $this->updatedAt = new DateTime("now");
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Player>
+     */
+    public function getPlayers(): Collection
+    {
+        return $this->players;
+    }
+
+    public function addPlayer(Player $player): self
+    {
+        if (!$this->players->contains($player)) {
+            $this->players->add($player);
+            $player->setBoard($this);
+        }
+
+        return $this;
+    }
+
+    public function removePlayer(Player $player): self
+    {
+        if ($this->players->removeElement($player)) {
+            // set the owning side to null (unless already changed)
+            if ($player->getBoard() === $this) {
+                $player->setBoard(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getGameState(): ?int
+    {
+        return $this->gameState;
+    }
+
+    public function setGameState(int $gameState): self
+    {
+        $this->gameState = $gameState;
 
         return $this;
     }
