@@ -1,0 +1,71 @@
+package main
+
+import "github.com/marmelab/labyrinth/domain/internal/model"
+
+type ActionKind string
+
+const (
+	ActionKindRotateRemining   ActionKind = "ROTATE_REMAINING"
+	ActionKindPlaceTile        ActionKind = "PLACE_TILE"
+	ActionKindMovePawn         ActionKind = "MOVE_PAWN"
+	ActionKindGameStateChange  ActionKind = "GAME_STATE_CHANGE"
+	ActionKindPlayerTurnChange ActionKind = "PLAYER_TURN_CHANGE"
+)
+
+type Action struct {
+	Kind     ActionKind  `json:"kind"`
+	Playload interface{} `json:"payload"`
+}
+
+type BoardResponse struct {
+	Board *model.Board `json:"board"`
+
+	Actions []*Action `json:"actions"`
+}
+
+func newRotateRemainingAction(rotation Rotation) *Action {
+	return &Action{
+		Kind:     ActionKindRotateRemining,
+		Playload: rotation,
+	}
+}
+
+func newPlaceTileAction(direction Direction, index int) *Action {
+	return &Action{
+		Kind: ActionKindPlaceTile,
+		Playload: &struct {
+			Direction Direction `json:"direction"`
+			Index     int       `json:"index"`
+		}{
+			Direction: direction,
+			Index:     index,
+		},
+	}
+}
+
+func newMovePawnAction(line, row int) *Action {
+	return &Action{
+		Kind: ActionKindMovePawn,
+		Playload: &struct {
+			Line int `json:"line"`
+			Row  int `json:"row"`
+		}{
+			Line: line,
+			Row:  row,
+		},
+	}
+}
+
+func newGameStateChangeAction(gameState model.GameState) *Action {
+	return &Action{
+		Kind:     ActionKindGameStateChange,
+		Playload: gameState,
+	}
+}
+
+func newPlayerTurnChangeAction() *Action {
+	return &Action{
+		Kind:     ActionKindPlayerTurnChange,
+		Playload: nil,
+	}
+}

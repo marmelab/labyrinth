@@ -23,7 +23,7 @@ export function useBoard(id: number | string): [Board | null, any | null] {
     fetchBoard();
 
     const mercureURL = `/.well-known/mercure?topic=${encodeURI(
-      window.location.href
+      window.location.pathname
     )}`;
 
     const eventSource = new EventSource(mercureURL);

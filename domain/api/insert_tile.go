@@ -8,18 +8,20 @@ import (
 	"github.com/marmelab/labyrinth/domain/internal/model"
 )
 
-type insertTileRequestBody struct {
-	Board     *model.Board `json:"board"`
-	Direction string       `json:"direction"`
-	Index     int          `json:"index"`
-}
+type Direction string
 
 const (
-	DirectionTop    = "TOP"
-	DirectionRight  = "RIGHT"
-	DirectionBottom = "BOTTOM"
-	DirectionLeft   = "LEFT"
+	DirectionTop    Direction = "TOP"
+	DirectionRight  Direction = "RIGHT"
+	DirectionBottom Direction = "BOTTOM"
+	DirectionLeft   Direction = "LEFT"
 )
+
+type insertTileRequestBody struct {
+	Board     *model.Board `json:"board"`
+	Direction Direction    `json:"direction"`
+	Index     int          `json:"index"`
+}
 
 func insertTileHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
@@ -34,19 +36,30 @@ func insertTileHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to decode body", http.StatusInternalServerError)
 	}
 
+	var err error = nil
 	switch requestBody.Direction {
 	case DirectionTop:
-		requestBody.Board.InsertTileTopAt(requestBody.Index)
+		err = requestBody.Board.InsertTileTopAt(requestBody.Index)
 	case DirectionRight:
-		requestBody.Board.InsertTileRightAt(requestBody.Index)
+		err = requestBody.Board.InsertTileRightAt(requestBody.Index)
 	case DirectionBottom:
-		requestBody.Board.InsertTileBottomAt(requestBody.Index)
+		err = requestBody.Board.InsertTileBottomAt(requestBody.Index)
 	case DirectionLeft:
-		requestBody.Board.InsertTileLeftAt(requestBody.Index)
+		err = requestBody.Board.InsertTileLeftAt(requestBody.Index)
 	default:
 		log.Printf("POST '/insert-tile' - Unsupported direction: %v", requestBody.Direction)
 		http.Error(w, fmt.Sprintf("unsupported direction: %v", requestBody.Direction), http.StatusInternalServerError)
 	}
 
-	writeJsonResponse(w, http.StatusOK, requestBody.Board)
+	actions := make([]*Action, 0, 1)
+	if err == nil {
+		actions = append(actions,
+			newPlaceTileAction(requestBody.Direction, requestBody.Index),
+			newGameStateChangeAction(requestBody.Board.State))
+	}
+
+	writeJsonResponse(w, http.StatusOK, &BoardResponse{
+		Board:   requestBody.Board,
+		Actions: actions,
+	})
 }

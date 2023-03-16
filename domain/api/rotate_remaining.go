@@ -8,15 +8,17 @@ import (
 	"github.com/marmelab/labyrinth/domain/internal/model"
 )
 
-type rotateRemainingRequestBody struct {
-	Board    *model.Board `json:"board"`
-	Rotation string       `json:"rotation"`
-}
+type Rotation string
 
 const (
-	Clockwise     = "CLOCKWISE"
-	AntiClockwise = "ANTICLOCKWISE"
+	Clockwise     Rotation = "CLOCKWISE"
+	AntiClockwise Rotation = "ANTICLOCKWISE"
 )
+
+type rotateRemainingRequestBody struct {
+	Board    *model.Board `json:"board"`
+	Rotation Rotation     `json:"rotation"`
+}
 
 func rotateRemainingHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
@@ -41,5 +43,10 @@ func rotateRemainingHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("unsupported direction: %v", requestBody.Rotation), http.StatusInternalServerError)
 	}
 
-	writeJsonResponse(w, http.StatusOK, requestBody.Board)
+	writeJsonResponse(w, http.StatusOK, &BoardResponse{
+		Board: requestBody.Board,
+		Actions: []*Action{
+			newRotateRemainingAction(requestBody.Rotation),
+		},
+	})
 }
