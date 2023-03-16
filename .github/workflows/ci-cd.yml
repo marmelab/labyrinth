@@ -12,6 +12,7 @@ on:
 jobs:
   unit-test:
     runs-on: ubuntu-latest
+    environment: Test
     steps:
       - uses: actions/checkout@v3
 
@@ -30,17 +31,22 @@ jobs:
         with:
           php-version: "8.1"
 
-      - name: Starts the services as a dameon
-        run: make develop-daemon
-
       - name: Unit test
         run: make test
 
-      - name: Setup Cypress environment
-        run: echo 'export CYPRESS_ADMIN_USER=${{ secrets.CYPRESS_ADMIN_USER }}' >> cypress.env && echo 'export CYPRESS_ADMIN_PASSWORD=${{ secrets.CYPRESS_ADMIN_PASSWORD }}' >> cypress.env
+      - name: Starts the services as a dameon
+        run: make develop-daemon
 
       - name: Run Cypress tests
         uses: cypress-io/github-action@v5.1.0
+        with:
+          record: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
+          CYPRESS_ADMIN_USER: ${{ secrets.CYPRESS_ADMIN_USER }}
+          CYPRESS_ADMIN_PASSWORD: ${{ secrets.CYPRESS_ADMIN_PASSWORD }}
 
       - name: Stop the services
         run: make develop-daemon-stop
