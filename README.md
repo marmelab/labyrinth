@@ -104,20 +104,15 @@ make test
 
 ## End to End testing
 
-You will need to have `Firefox` installed and add the following configuration lines to the `webapp/.env` file:
+To run nd-to-End tests, you will need to install Cypress dependencies, please see the [system requirements](https://docs.cypress.io/guides/getting-started/installing-cypress#System-requirements).
+
+You will also need to setup the environment variables used by the test runner using an environment file and configure the user and password accordingly to your local configuration.
 
 ```sh
-# The webapp URL
-WEBAPP_URL="https://localhost:9443"
+cp -n cypress.env.dist cypress.env
 ```
 
-The you need to run the full app stack in development mod using:
-
-```sh
-make run
-```
-
-You can the run end to end tests using:
+You then can the run end to end tests using:
 
 ```sh
 make test-e2e

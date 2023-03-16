@@ -151,7 +151,9 @@ test: 											## Run unit tests
 	@(${MAKE} -C webapp test)
 
 test-e2e: 										## Run e2e tests
-	@(${MAKE} E2E_NO_HEADLESS=${E2E_NO_HEADLESS} E2E_DEVTOOLS=${E2E_DEVTOOLS} -C webapp test-e2e)
+	@(cp -n cypress.env.dist cypress.env)
+	@(npm install)
+	@(npm run cypress:e2e)
 
 cli-run: 										## Run the CLI version of the labyrinth.
 	@(${MAKE} -C domain run)

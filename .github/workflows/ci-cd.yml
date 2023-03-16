@@ -36,6 +36,12 @@ jobs:
       - name: Unit test
         run: make test
 
+      - name: Setup Cypress environment
+        run: echo 'export CYPRESS_ADMIN_USER=${{ secrets.CYPRESS_ADMIN_USER }}' >> cypress.env && echo 'export CYPRESS_ADMIN_PASSWORD=${{ secrets.CYPRESS_ADMIN_PASSWORD }}' >> cypress.env
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v5.1.0
+
       - name: Stop the services
         run: make develop-daemon-stop
 
