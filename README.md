@@ -53,6 +53,8 @@ This will start the following applications:
 
 ```
 webapp              https://localhost:9443
+admin               https://localhost:9443/admin/
+swagger             https://localhost:9443/admin/swagger
 ```
 
 ### Production
@@ -66,6 +68,7 @@ This will start the following applications:
 ```
 webapp              http://0.0.0.0:80
 webapp              https://0.0.0.0:443
+admin               https://0.0.0.0:443/admin/
 ```
 
 ## Deploy to production
