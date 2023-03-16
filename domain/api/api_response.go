@@ -23,10 +23,16 @@ type BoardResponse struct {
 	Actions []*Action `json:"actions"`
 }
 
-func newRotateRemainingAction(rotation Rotation) *Action {
+func newRotateRemainingAction(direction RotationDirection, rotation model.Rotation) *Action {
 	return &Action{
-		Kind:     ActionKindRotateRemining,
-		Playload: rotation,
+		Kind: ActionKindRotateRemining,
+		Playload: &struct {
+			Direction RotationDirection `json:"direction"`
+			Rotation  model.Rotation    `json:"rotation"`
+		}{
+			Direction: direction,
+			Rotation:  rotation,
+		},
 	}
 }
 

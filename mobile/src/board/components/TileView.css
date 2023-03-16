@@ -12,6 +12,7 @@
     background: url(../assets/background.png) repeat;
     margin: 0;
     padding: 0;
+    transition: transform 1s;
 }
 
 .tile:disabled {
@@ -27,6 +28,7 @@
     right: 0;
     align-items: center;
     justify-content: center;
+    transition: transform 1s;
 }
 
 .tile__path::before,
@@ -93,16 +95,4 @@
     right: calc(var(--tile-path-size) - 1px);
     bottom: 0px;
     left: calc(var(--tile-path-size) - 1px);
-}
-
-.tile--rotation-90 .tile__path{
-    transform: rotate(90deg);
-}
-
-.tile--rotation-180 .tile__path {
-    transform: rotate(180deg);
-}
-
-.tile--rotation-270 .tile__path {
-    transform: rotate(270deg);
 }
