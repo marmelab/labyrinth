@@ -1,45 +1,35 @@
 import '@testing-library/cypress/add-commands';
 
+const adminSignIn = function(username, password) {
+    cy.visit('https://localhost:9443/admin/');
+    
+    cy.findByLabelText(/Username/i)
+        .should('be.visible')
+        .type(username);
+
+    cy.findByLabelText(/Password/i)
+        .should('be.visible')
+        .type(password);
+
+    cy.findByRole("button", {name: "Sign in"})
+        .should('be.visible')
+        .click();
+}
+
 describe('Admin Login', () => {
     it('Should display and error if invalid credentials are provided', () => {
-        cy.visit('https://localhost:9443/admin/');
+        adminSignIn("testuser@example.org", "invalid")
 
-        cy.findByLabelText(/Username/i, {timeout: 3000})
-            .should('be.visible')
-            .type("testuser@example.org");
-
-        cy.findByLabelText(/Password/i, {timeout: 3000})
-            .should('be.visible')
-            .type("invalid");
-
-            cy.findByRole("button", {name: "Sign in", timeout: 3000})
-            .should('be.visible')
-            .click();
-
-
-        cy.findByText("Invalid credentials.", {timeout: 15000})
+        cy.findByText("Invalid credentials.")
             .should('be.visible');
     });
 
     it('Should display the admin if creadentials are valid', () => {
-        cy.visit('https://localhost:9443/admin/');
+        adminSignIn(Cypress.env("ADMIN_USER"), Cypress.env("ADMIN_PASSWORD"));
 
-        cy.findByLabelText(/Username/i, {timeout: 7000})
-            .should('be.visible')
-            .type(Cypress.env("ADMIN_USER"));
-
-        cy.findByLabelText(/Password/i, {timeout: 3000})
-            .should('be.visible')
-            .type(Cypress.env("ADMIN_PASSWORD"));
-
-        cy.findByRole("button", {name: "Sign in", timeout: 3000})
-            .should('be.visible')
-            .click();
-
-        cy.findByRole("menuitem", {name: /Boards/, timeout: 15000})
-            .should('be.visible');
-
-        cy.findByRole("menuitem", {name: /Users/, timeout: 15000})
-            .should('be.visible');
+        [/Boards/, /Users/].forEach((name) => {
+            cy.findByRole("menuitem", {name})
+                .should('be.visible');
+        });
     });
 });

@@ -104,7 +104,7 @@ make test
 
 ## End to End testing
 
-To run nd-to-End tests, you will need to install Cypress dependencies, please see the [system requirements](https://docs.cypress.io/guides/getting-started/installing-cypress#System-requirements).
+To run End-to-End tests, you will need to install Cypress dependencies, please see the [system requirements](https://docs.cypress.io/guides/getting-started/installing-cypress#System-requirements).
 
 You will also need to setup the environment variables used by the test runner using an environment file and configure the user and password accordingly to your local configuration.
 
