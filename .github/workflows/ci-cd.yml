@@ -30,8 +30,14 @@ jobs:
         with:
           php-version: "8.1"
 
+      - name: Starts the services as a dameon
+        run: make develop-daemon
+
       - name: Unit test
         run: make test
+
+      - name: Stop the services
+        run: make develop-daemon-stop
 
   deploy:
     runs-on: ubuntu-latest

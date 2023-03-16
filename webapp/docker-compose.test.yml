@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  postgres:
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  api-domain:
+    build:
+      dockerfile: ./domain/api/Dockerfile
+    ports:
+      - "127.0.0.1:9001:80"
+
+  webapp:
+    build:
+      dockerfile: ./webapp/Dockerfile
+    environment:
+      - APP_DEBUG=true
+      - APP_ENV=dev
+    volumes:
+      - ./webapp/src:/var/www/labyrinth/src
+      - ./webapp/templates:/var/www/labyrinth/templates
+
+  webapp-migrations:
+    build:
+      dockerfile: ./webapp/migrations/Dockerfile
+    environment:
+      - APP_DEBUG=true
+      - APP_ENV=dev
+
+  mobile:
+    build:
+      dockerfile: ./mobile/Dockerfile
+    volumes:
+      - ./mobile/public:/var/www/labyrinth/public
+      - ./mobile/src:/var/www/labyrinth/src
+    depends_on:
+      - webapp
+
+  postgrest:
+    environment:
+      PGRST_DB_ANON_ROLE: anonymous
+      PGRST_OPENAPI_SERVER_PROXY_URI: https://localhost:9443/admin/api/v1/
+      PGRST_OPENAPI_MODE: "ignore-privileges"
+
+  admin:
+    build:
+      dockerfile: ./admin/Dockerfile
+    volumes:
+      - ./admin/public:/var/www/admin/public
+      - ./admin/src:/var/www/admin/src
+    depends_on:
+      - postgrest
+
+  admin-proxy:
+    build:
+      dockerfile: ./admin-proxy/Dockerfile
+
+  swagger:
+    image: swaggerapi/swagger-ui
+    environment:
+      API_URL: https://localhost:9443/admin/api/v1/
+
+  proxy:
+    build:
+      dockerfile: ./proxy/development/Dockerfile
+    volumes:
+      - ./mobile/public:/var/www/labyrinth/mobile
+      - ./webapp/public/images:/var/www/labyrinth/webapp/images
+      - ./webapp/public/styles:/var/www/labyrinth/webapp/styles
+    ports:
+      - "0.0.0.0:9443:443"
+    depends_on:
+      - mobile
+      - admin

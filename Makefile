@@ -38,7 +38,6 @@ install:										## Install dependencies
 
 run: develop									## Run the program for development, alias of develop
 
-
 develop: develop-certs							## Run the program for development
 	@(mkdir -p logs data/postgres)
 	docker compose \
@@ -46,6 +45,22 @@ develop: develop-certs							## Run the program for development
 		-f docker-compose.yml \
 		-f docker-compose.dev.yml \
 		up --build
+
+develop-daemon: install develop-certs			## Run the program for development as a background service
+	@(mkdir -p logs data/postgres)
+	docker compose \
+		--env-file webapp/.env \
+		-f docker-compose.yml \
+		-f docker-compose.dev.yml \
+		up -d
+
+develop-daemon-stop: develop-certs				## Stops the development background service
+	@(mkdir -p logs data/postgres)
+	docker compose \
+		--env-file webapp/.env \
+		-f docker-compose.yml \
+		-f docker-compose.dev.yml \
+		down
 
 develop-certs:
 	@(./scripts/dev-certs.sh)

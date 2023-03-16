@@ -29,6 +29,7 @@ services:
       - MERCURE_PUBLIC_URL=/.well-known/mercure
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/labyrinth?serverVersion=15&charset=utf8
     volumes:
+      - ./webapp/.env:/var/www/labyrinth/.env
       - ./webapp/config/jwt:/var/www/labyrinth/config/jwt
 
   webapp-migrations:
