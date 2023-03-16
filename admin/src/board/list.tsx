@@ -10,13 +10,22 @@ import {
 
 import { renderGameState } from "./commons";
 
+const gameState = {
+  placeTile: 0,
+  movePawn: 1,
+  completed: 2,
+};
+
 const listFilters = [
   <SelectInput
     label="Game State"
     source="game_state@in"
     choices={[
-      { id: "(0, 1)", name: "On Going" },
-      { id: "(2)", name: "Completed" },
+      {
+        id: `(${gameState.placeTile}, ${gameState.movePawn})`,
+        name: "On Going",
+      },
+      { id: `(${gameState.completed})`, name: "Completed" },
     ]}
     alwaysOn
   />,
