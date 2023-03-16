@@ -54,7 +54,7 @@ This will start the following applications:
 ```
 webapp              https://localhost:9443
 admin               https://localhost:9443/admin/
-swagger             https://localhost:9443/admin/swagger
+swagger             https://localhost:9443/admin/swagger/
 ```
 
 ### Production
