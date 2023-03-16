@@ -13,7 +13,10 @@ setup-env:					## Setup the environment
 	php bin/console lexik:jwt:generate-keypair
 
 install: setup-env			## Install dependencies
-	
+
+create-admin:
+	php bin/console security:hash-password
+	php bin/console run:psql
 
 test: install				## Run PHP tests
 	SYMFONY_DEPRECATIONS_HELPER=weak php bin/phpunit tests/Unit

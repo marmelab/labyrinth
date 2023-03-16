@@ -31,7 +31,7 @@ class Board
     #[ORM\Column(type: 'datetime')]
     private DateTime $updatedAt;
 
-    #[ORM\OneToMany(mappedBy: 'board', targetEntity: Player::class)]
+    #[ORM\OneToMany(mappedBy: 'board', targetEntity: Player::class, cascade: ["all"])]
     private Collection $players;
 
     #[ORM\Column]
