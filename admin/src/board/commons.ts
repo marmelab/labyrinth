@@ -1,40 +1,11 @@
-const GameState = {
-  placeTile: 0,
-  movePawn: 1,
-  completed: 2,
-};
-
+const gameStates = ["Place Tile", "Move Pawn", "Completed"];
 export const renderGameState = ({ game_state }: { game_state: number }) => {
-  switch (game_state) {
-    case GameState.placeTile:
-      return "Place Tile";
-    case GameState.movePawn:
-      return "Move Pawn";
-    case GameState.completed:
-      return "Completed";
-  }
-  return "";
+  return gameStates[game_state];
 };
 
-const Colors = {
-  blue: 0,
-  green: 1,
-  red: 2,
-  yellow: 3,
-};
-
+const colors = ["Blue", "Green", "Red", "Yellow"];
 export const renderPlayerColor = ({ color }: { color: number }) => {
-  switch (color) {
-    case Colors.blue:
-      return "Blue";
-    case Colors.green:
-      return "Green";
-    case Colors.red:
-      return "Red";
-    case Colors.yellow:
-      return "Yellow";
-  }
-  return "";
+  return colors[color];
 };
 
 export const renderScore = ({
