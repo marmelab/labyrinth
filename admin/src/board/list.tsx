@@ -8,13 +8,7 @@ import {
   SelectInput,
 } from "react-admin";
 
-import { renderGameState } from "./commons";
-
-const gameState = {
-  placeTile: 0,
-  movePawn: 1,
-  completed: 2,
-};
+import { gameState, renderGameState } from "./commons";
 
 const listFilters = [
   <SelectInput
