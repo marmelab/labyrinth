@@ -52,8 +52,7 @@ make run
 This will start the following applications:
 
 ```
-webapp              127.0.0.1:9000
-api-domain          127.0.0.1:9001
+webapp              https://localhost:9443
 ```
 
 ### Production
@@ -65,7 +64,8 @@ make production
 This will start the following applications:
 
 ```
-webapp              127.0.0.1:80
+webapp              http://0.0.0.0:80
+webapp              https://0.0.0.0:443
 ```
 
 ## Deploy to production
@@ -105,7 +105,7 @@ You will need to have `Firefox` installed and add the following configuration li
 
 ```sh
 # The webapp URL
-WEBAPP_URL="http://localhost:9000"
+WEBAPP_URL="https://localhost:9443"
 ```
 
 The you need to run the full app stack in development mod using:
