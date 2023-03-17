@@ -84,14 +84,17 @@ abstract class BoardBaseController extends AbstractController
         return $this->createBoardViewModel($user, $board)->getCanPlay();
     }
 
-    protected function publishUpdate(Board $board)
+    protected function publishUpdate(Board $board, array $actions)
     {
-        $update = new Update(
-            $this->generateUrl('board_view', ['id' => $board->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
-            $this->serializer->serialize([], 'json')
-        );
+        if (count($actions) > 0) {
 
-        $this->hub->publish($update);
+            $update = new Update(
+                $this->generateUrl('board_view', ['id' => $board->getId()]),
+                $this->serializer->serialize($actions, 'json')
+            );
+
+            $this->hub->publish($update);
+        }
     }
 
 
@@ -143,10 +146,10 @@ abstract class BoardBaseController extends AbstractController
     protected function rotateRemaining(Board $board, Rotation $rotation)
     {
         $newState = $this->domainService->rotateRemainingTile($board->getState(), $rotation);
-        $this->updateBoard($board, $newState);
+        $this->updateBoard($board, $newState['board']);
 
         $this->entityManager->flush();
-        $this->publishUpdate($board);
+        $this->publishUpdate($board, $newState['actions']);
     }
 
     protected function insertTile(Board $board, Direction $direction, int $index)
@@ -156,11 +159,11 @@ abstract class BoardBaseController extends AbstractController
             $direction,
             $index,
         );
-        $this->updateBoard($board, $newState);
+        $this->updateBoard($board, $newState['board']);
 
 
         $this->entityManager->flush();
-        $this->publishUpdate($board);
+        $this->publishUpdate($board, $newState['actions']);
     }
 
     protected function movePlayer(Board $board, int $line, int $row)
@@ -170,10 +173,10 @@ abstract class BoardBaseController extends AbstractController
             $line,
             $row,
         );
-        $this->updateBoard($board, $newState);
+        $this->updateBoard($board, $newState['board']);
 
         $this->entityManager->flush();
-        $this->publishUpdate($board);
+        $this->publishUpdate($board, $newState['actions']);
     }
 
     protected function newBoard(User $user, int $playerCount): Board
@@ -241,7 +244,10 @@ abstract class BoardBaseController extends AbstractController
             $entityManager->flush();
             $conn->commit();
 
-            $this->publishUpdate($board);
+            $this->publishUpdate($board, [[
+                'kind' => 'NEW_PLAYER',
+                'payload' => $player,
+            ]]);
             return true;
         } catch (\Exception $e) {
             $conn->rollBack();

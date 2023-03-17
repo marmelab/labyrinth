@@ -27,7 +27,18 @@ func movePlayerHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to decode body", http.StatusInternalServerError)
 	}
 
-	requestBody.Board.MoveCurrentPlayerTo(requestBody.Line, requestBody.Row)
+	err := requestBody.Board.MoveCurrentPlayerTo(requestBody.Line, requestBody.Row)
 
-	writeJsonResponse(w, http.StatusOK, requestBody.Board)
+	actions := make([]*Action, 0, 1)
+	if err == nil {
+		actions = append(actions,
+			newMovePawnAction(requestBody.Line, requestBody.Row),
+			newGameStateChangeAction(requestBody.Board.State),
+			newPlayerTurnChangeAction())
+	}
+
+	writeJsonResponse(w, http.StatusOK, &BoardResponse{
+		Board:   requestBody.Board,
+		Actions: actions,
+	})
 }

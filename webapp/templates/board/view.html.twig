@@ -159,7 +159,7 @@
 
 {% if not board.canPlay %}
 <script defer>
-const eventSource = new EventSource("{{ mercure(url('board_view', { 'id': board.id }))|escape('js') }}");
+const eventSource = new EventSource("{{ mercure(path('board_view', { 'id': board.id }))|escape('js') }}");
 eventSource.onmessage = event => {
     window.location.reload();
 }

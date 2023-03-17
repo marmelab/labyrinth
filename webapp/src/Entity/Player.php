@@ -2,8 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\PlayerRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Ignore;
+
+use App\Repository\PlayerRepository;
 
 #[ORM\Entity(repositoryClass: PlayerRepository::class)]
 class Player
@@ -33,6 +35,7 @@ class Player
 
     #[ORM\ManyToOne(inversedBy: 'players')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Ignore]
     private ?Board $board = null;
 
     #[ORM\ManyToOne(inversedBy: 'games')]
