@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useMutation } from "react-query";
 
-import { Board } from "./BoardTypes";
+import { Board, UserAction } from "./BoardTypes";
 
 import { boardRepository } from "./BoardRepository";
 
@@ -19,18 +19,57 @@ export function useBoard(id: number | string): [Board | null, any | null] {
     }
   };
 
+  const handleMercureMessage = async ({ data }: { data: string }) => {
+    const actions: UserAction[] = JSON.parse(data);
+
+    for (const { kind, payload } of actions) {
+      const resolver = actionResolvers.get(kind);
+      if (resolver) {
+        resolver(payload);
+      }
+    }
+    //await fetchBoard();
+  };
+
+  const actionResolvers = new Map<String, (payload: any) => void>([
+    [
+      "ROTATE_REMAINING",
+      ({ direction }: { direction: string }) => {
+        setBoard((board) => {
+          if (!board) {
+            return null;
+          }
+          const remainingTile = board.state.remainingTile;
+
+          const newRotation =
+            direction == "CLOCKWISE"
+              ? remainingTile.rotation + 90
+              : remainingTile.rotation - 90;
+
+          return {
+            ...board,
+            state: {
+              ...board.state,
+              remainingTile: {
+                tile: remainingTile.tile,
+                rotation: newRotation,
+              },
+            },
+          };
+        });
+      },
+    ],
+  ]);
+
   useEffect(() => {
     fetchBoard();
 
     const mercureURL = `/.well-known/mercure?topic=${encodeURI(
       window.location.pathname
     )}`;
-
     const eventSource = new EventSource(mercureURL);
-    eventSource.onmessage = async () => {
-      await fetchBoard();
-    };
 
+    eventSource.onmessage = handleMercureMessage;
     return () => {
       eventSource.close();
     };

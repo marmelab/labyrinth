@@ -9,6 +9,11 @@ export interface BoardListItem {
   remainingSeats: number;
 }
 
+export interface UserAction {
+  kind: string;
+  payload: any;
+}
+
 export interface Board {
   id: number;
   remainingSeats: number;
