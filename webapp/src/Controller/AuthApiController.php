@@ -39,7 +39,10 @@ class AuthApiController extends AuthBaseController
     #[Route('/sign-up', name: 'auth_api_sign_up_post', methods: 'POST')]
     public function postSignUp(Request $request): JsonResponse
     {
-        $user = $this->serializer->deserialize($request->getContent(),  User::class, 'json');
+        $content = $request->getContent();
+        $plainPassword = json_decode($content, true)['plainPassword'];
+        $user = $this->serializer->deserialize($content,  User::class, 'json');
+        $user->setPlainPassword($plainPassword);
         $errors = $this->validator->validate($user);
         if ($errors->count() > 0) {
             return $this->json([
