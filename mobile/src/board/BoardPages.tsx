@@ -190,6 +190,7 @@ export function GetById() {
       <BoardView
         remainingTile={
           <TileView
+            remainingTile
             boardTile={remainingTile}
             canPlay={canPlay}
             gameState={gameState}

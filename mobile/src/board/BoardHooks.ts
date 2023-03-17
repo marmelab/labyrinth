@@ -25,40 +25,65 @@ export function useBoard(id: number | string): [Board | null, any | null] {
     for (const { kind, payload } of actions) {
       const resolver = actionResolvers.get(kind);
       if (resolver) {
-        resolver(payload);
+        await resolver(payload);
       }
     }
-    //await fetchBoard();
   };
 
-  const actionResolvers = new Map<String, (payload: any) => void>([
+  const actionResolvers = new Map<String, (payload: any) => Promise<void>>([
     [
       "ROTATE_REMAINING",
-      ({ direction }: { direction: string }) => {
-        setBoard((board) => {
-          if (!board) {
-            return null;
-          }
-          const remainingTile = board.state.remainingTile;
+      ({ direction }: { direction: string }) =>
+        new Promise((resolve) => {
+          setBoard((board) => {
+            if (!board) {
+              return null;
+            }
+            const remainingTile = board.state.remainingTile;
 
-          const newRotation =
-            direction == "CLOCKWISE"
-              ? remainingTile.rotation + 90
-              : remainingTile.rotation - 90;
+            const newRotation =
+              direction == "CLOCKWISE"
+                ? remainingTile.rotation + 90
+                : remainingTile.rotation - 90;
 
-          return {
-            ...board,
-            state: {
-              ...board.state,
-              remainingTile: {
-                tile: remainingTile.tile,
-                rotation: newRotation,
+            return {
+              ...board,
+              state: {
+                ...board.state,
+                remainingTile: {
+                  tile: remainingTile.tile,
+                  rotation: newRotation,
+                },
               },
-            },
-          };
-        });
-      },
+            };
+          });
+
+          setTimeout(resolve, 1000);
+        }),
     ],
+    [
+      "GAME_STATE_CHANGE",
+      (gameState: number) =>
+        new Promise((resolve) => {
+          console.log(gameState);
+          setBoard((board) => {
+            if (!board) {
+              return null;
+            }
+            return {
+              ...board,
+              state: {
+                ...board.state,
+                gameState,
+              },
+            };
+          });
+
+          setTimeout(resolve, 0);
+        }),
+    ],
+    ["PLACE_TILE", () => fetchBoard()],
+    ["PLAYER_TURN_CHANGE", () => fetchBoard()],
   ]);
 
   useEffect(() => {

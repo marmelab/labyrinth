@@ -87,6 +87,7 @@ const placeTileDirection = new Map<number, Map<number, [Direction, number]>>([
 ]);
 
 const Tile = ({
+  remainingTile,
   boardTile: {
     tile: { treasure, shape },
     rotation,
@@ -96,6 +97,7 @@ const Tile = ({
   disabled,
   onClick,
 }: {
+  remainingTile: boolean;
   boardTile: BoardTile;
   children: ReactNode;
   playerTarget?: string;
@@ -106,7 +108,7 @@ const Tile = ({
     <button
       className={`tile tile--shape-${shape} ${
         playerTarget == treasure ? "tile--target" : ""
-      }`}
+      } ${remainingTile ? "tile--remaining" : ""}`}
       disabled={disabled}
       onClick={onClick}
       style={{ transform: `rotate(${rotation}deg)` }}
@@ -119,6 +121,7 @@ const Tile = ({
 };
 
 interface TileProps {
+  remainingTile?: boolean;
   boardTile: BoardTile;
   canPlay: boolean;
   gameState: GameState;
@@ -134,6 +137,7 @@ interface TileProps {
 }
 
 const TileView = ({
+  remainingTile = false,
   boardTile,
   canPlay,
   gameState,
@@ -146,7 +150,12 @@ const TileView = ({
 }: TileProps) => {
   if (!canPlay || gameState == GameState.End) {
     return (
-      <Tile disabled boardTile={boardTile} playerTarget={playerTarget}>
+      <Tile
+        disabled
+        boardTile={boardTile}
+        playerTarget={playerTarget}
+        remainingTile={remainingTile}
+      >
         {children}
       </Tile>
     );
@@ -158,6 +167,7 @@ const TileView = ({
         boardTile={boardTile}
         onClick={onRotateRemainingTile}
         playerTarget={playerTarget}
+        remainingTile={remainingTile}
       >
         {children}
       </Tile>
@@ -174,13 +184,19 @@ const TileView = ({
           boardTile={boardTile}
           playerTarget={playerTarget}
           onClick={onInsertTile.bind(null, ...direction)}
+          remainingTile={remainingTile}
         >
           {children}
         </Tile>
       );
     }
     return (
-      <Tile disabled boardTile={boardTile} playerTarget={playerTarget}>
+      <Tile
+        disabled
+        boardTile={boardTile}
+        playerTarget={playerTarget}
+        remainingTile={remainingTile}
+      >
         {children}
       </Tile>
     );
@@ -191,6 +207,7 @@ const TileView = ({
       boardTile={boardTile}
       playerTarget={playerTarget}
       onClick={onMovePlayer.bind(null, coordinates.line, coordinates.row)}
+      remainingTile={remainingTile}
     >
       {children}
     </Tile>

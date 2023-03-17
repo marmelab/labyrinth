@@ -12,6 +12,9 @@
     background: url(../assets/background.png) repeat;
     margin: 0;
     padding: 0;
+}
+
+.tile--remaining {
     transition: transform 1s;
 }
 
