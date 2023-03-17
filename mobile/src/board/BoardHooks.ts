@@ -65,7 +65,6 @@ export function useBoard(id: number | string): [Board | null, any | null] {
       "GAME_STATE_CHANGE",
       (gameState: number) =>
         new Promise((resolve) => {
-          console.log(gameState);
           setBoard((board) => {
             if (!board) {
               return null;
@@ -82,8 +81,8 @@ export function useBoard(id: number | string): [Board | null, any | null] {
           setTimeout(resolve, 0);
         }),
     ],
-    ["PLACE_TILE", () => fetchBoard()],
-    ["PLAYER_TURN_CHANGE", () => fetchBoard()],
+    ["PLACE_TILE", fetchBoard],
+    ["PLAYER_TURN_CHANGE", fetchBoard],
   ]);
 
   useEffect(() => {
