@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 use App\Form\Type\NewBoardType;
+use App\Form\Type\SignUpType;
 
 class HomeController extends AbstractController
 {
@@ -26,8 +27,13 @@ class HomeController extends AbstractController
             'action' => $this->generateUrl('board_new'),
         ]);
 
+        $signUpForm = $this->createForm(SignUpType::class, null, [
+            'action' => $this->generateUrl('auth_sign_up_post'),
+        ]);
+
         return $this->render('home/index.html.twig', [
             'newBoardForm' => $newBoardForm,
+            'signUpForm' => $signUpForm,
             'boards' => $boards,
         ]);
     }
