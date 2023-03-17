@@ -1,0 +1,109 @@
+.tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  width: var(--tile-size);
+  height: var(--tile-size);
+  border: 1px #d0d0d0 solid;
+  border-radius: 4px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 1);
+  background: url(../assets/background.png) repeat;
+  margin: 0;
+  padding: 0;
+  top: 0;
+  left: 0;
+  opacity: 1;
+}
+
+.tile--remaining {
+  transition: transform 1s, opacity 1s;
+  position: absolute;
+}
+
+.tile--animate {
+  transition: transform 1s, opacity 1s, top 1s, left 1s;
+}
+
+.tile:disabled {
+  background: url(../assets/background-grayscale.png) repeat;
+}
+
+.tile__path {
+  position: absolute;
+  display: flex;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  align-items: center;
+  justify-content: center;
+  transition: transform 1s;
+}
+
+.tile__path::before,
+.tile__path::after {
+  position: absolute;
+  content: "";
+  background-color: #d0d0d0;
+  z-index: 0;
+}
+
+.tile:not[disabled] .tile__path:hover {
+  border-color: #ffffff;
+}
+
+.tile:not[disabled] .tile__path:hover::before,
+.tile:not[disabled] .tile__path:hover::after {
+  background-color: #ffffff;
+}
+
+.tile--target .tile__path::before,
+.tile--target .tile__path::after {
+  background-color: #ffa500;
+}
+
+.tile--target:hover .tile__path::before,
+.tile--target:hover .tile__path::after {
+  background-color: #ff4500;
+}
+
+.tile .tile__treasure {
+  z-index: 1;
+}
+
+.tile--shape-0 .tile__path::before {
+  top: calc(var(--tile-path-size) - 1px);
+  right: 0;
+  bottom: calc(var(--tile-path-size) - 1px);
+  left: 0;
+}
+
+.tile--shape-1 .tile__path::before {
+  top: calc(var(--tile-path-size) - 1px);
+  right: 0;
+  bottom: calc(var(--tile-path-size) - 1px);
+  left: 0;
+}
+
+.tile--shape-1 .tile__path::after {
+  top: 0;
+  right: calc(var(--tile-path-size) - 1px);
+  bottom: calc(2 * var(--tile-path-size) - 1px);
+  left: calc(var(--tile-path-size) - 1px);
+}
+
+.tile--shape-2 .tile__path::before {
+  top: calc(var(--tile-path-size) - 1px);
+  right: calc(var(--tile-path-size) - 1px);
+  bottom: calc(var(--tile-path-size) - 1px);
+  left: 0;
+}
+
+.tile--shape-2 .tile__path::after {
+  top: calc(2 * var(--tile-path-size) - 1px);
+  right: calc(var(--tile-path-size) - 1px);
+  bottom: 0px;
+  left: calc(var(--tile-path-size) - 1px);
+}

@@ -1,16 +1,17 @@
 :root {
-    --board-gap: 5px;
+  --board-gap: 5px;
 }
 
 .board {
-    display: grid;
-    padding: var(--board-gap);
-    border-radius: 8px;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 1);
+  position: relative;
+  display: grid;
+  padding: var(--board-gap);
+  border-radius: 8px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 1);
 
-    gap: var(--board-gap);
-    
-    grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: repeat(7, 1fr);
-    background-color: #444444;
+  gap: var(--board-gap);
+
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(7, 1fr);
+  background-color: #444444;
 }

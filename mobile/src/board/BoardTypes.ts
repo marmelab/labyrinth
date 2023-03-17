@@ -1,41 +1,13 @@
 export enum GameState {
-  PlaceTile,
-  MovePawn,
-  End,
+  PlaceTile = 0,
+  MovePawn = 1,
+  End = 2,
+  Animating = -1,
 }
 
 export interface BoardListItem {
   id: number;
   remainingSeats: number;
-}
-
-export interface RotationPayload {
-  direction: "CLOCKWISE" | "ANTICLOCKWISE";
-  rotation: Rotation;
-}
-
-export interface PlaceTilePayload {
-  direction: Direction;
-  index: number;
-}
-
-export interface MovePawnPayload {
-  line: number;
-  row: number;
-}
-
-export type GameStateChangePayload = GameState;
-
-export type NewPlayerTurnPayload = null;
-
-export interface UserAction {
-  kind: string;
-  payload:
-    | RotationPayload
-    | PlaceTilePayload
-    | MovePawnPayload
-    | GameStateChangePayload
-    | NewPlayerTurnPayload;
 }
 
 export interface Board {
@@ -58,6 +30,9 @@ export interface BoardState {
 export interface BoardTile {
   tile: Tile;
   rotation: Rotation;
+  top?: number;
+  left?: number;
+  opacity?: number;
 }
 
 export enum Shape {
