@@ -6,6 +6,8 @@ import { BoardList, BoardShow } from "./board";
 import { UserList, UserShow } from "./user";
 import { authProvider } from "./auth";
 
+import "./App.css";
+
 function App() {
   return (
     <Admin
