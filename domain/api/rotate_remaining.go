@@ -8,16 +8,16 @@ import (
 	"github.com/marmelab/labyrinth/domain/internal/model"
 )
 
-type Rotation string
+type RotationDirection string
 
 const (
-	Clockwise     Rotation = "CLOCKWISE"
-	AntiClockwise Rotation = "ANTICLOCKWISE"
+	Clockwise     RotationDirection = "CLOCKWISE"
+	AntiClockwise RotationDirection = "ANTICLOCKWISE"
 )
 
 type rotateRemainingRequestBody struct {
-	Board    *model.Board `json:"board"`
-	Rotation Rotation     `json:"rotation"`
+	Board    *model.Board      `json:"board"`
+	Rotation RotationDirection `json:"rotation"`
 }
 
 func rotateRemainingHandler(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +46,7 @@ func rotateRemainingHandler(w http.ResponseWriter, r *http.Request) {
 	writeJsonResponse(w, http.StatusOK, &BoardResponse{
 		Board: requestBody.Board,
 		Actions: []*Action{
-			newRotateRemainingAction(requestBody.Rotation),
+			newRotateRemainingAction(requestBody.Rotation, requestBody.Board.RemainingTile.Rotation),
 		},
 	})
 }

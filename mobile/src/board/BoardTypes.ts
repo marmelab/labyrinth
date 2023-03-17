@@ -9,6 +9,35 @@ export interface BoardListItem {
   remainingSeats: number;
 }
 
+export interface RotationPayload {
+  direction: "CLOCKWISE" | "ANTICLOCKWISE";
+  rotation: Rotation;
+}
+
+export interface PlaceTilePayload {
+  direction: Direction;
+  index: number;
+}
+
+export interface MovePawnPayload {
+  line: number;
+  row: number;
+}
+
+export type GameStateChangePayload = GameState;
+
+export type NewPlayerTurnPayload = null;
+
+export interface UserAction {
+  kind: string;
+  payload:
+    | RotationPayload
+    | PlaceTilePayload
+    | MovePawnPayload
+    | GameStateChangePayload
+    | NewPlayerTurnPayload;
+}
+
 export interface Board {
   id: number;
   remainingSeats: number;

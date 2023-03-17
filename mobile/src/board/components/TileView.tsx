@@ -86,52 +86,32 @@ const placeTileDirection = new Map<number, Map<number, [Direction, number]>>([
   ],
 ]);
 
-const ClickableTileView = ({
+const Tile = ({
+  remainingTile,
   boardTile: {
     tile: { treasure, shape },
     rotation,
   },
+  playerTarget,
+  children,
+  disabled,
   onClick,
-  children,
-  playerTarget,
 }: {
+  remainingTile: boolean;
   boardTile: BoardTile;
-  onClick: Handler;
   children: ReactNode;
   playerTarget?: string;
+  disabled?: boolean;
+  onClick?: Handler;
 }) => {
   return (
     <button
-      className={`tile tile--shape-${shape} tile--rotation-${rotation} ${
+      className={`tile tile--shape-${shape} ${
         playerTarget == treasure ? "tile--target" : ""
-      }`}
+      } ${remainingTile ? "tile--remaining" : ""}`}
+      disabled={disabled}
       onClick={onClick}
-    >
-      <div className={`tile__path`}></div>
-      <div className="tile__treasure">{treasures[treasure]}</div>
-      {children}
-    </button>
-  );
-};
-
-const DisabledTileView = ({
-  boardTile: {
-    tile: { treasure, shape },
-    rotation,
-  },
-  playerTarget,
-  children,
-}: {
-  boardTile: BoardTile;
-  children: ReactNode;
-  playerTarget?: string;
-}) => {
-  return (
-    <button
-      className={`tile tile--shape-${shape} tile--rotation-${rotation} ${
-        playerTarget == treasure ? "tile--target" : ""
-      }`}
-      disabled
+      style={{ transform: `rotate(${rotation}deg)` }}
     >
       <div className={`tile__path`}></div>
       <div className="tile__treasure">{treasures[treasure]}</div>
@@ -141,6 +121,7 @@ const DisabledTileView = ({
 };
 
 interface TileProps {
+  remainingTile?: boolean;
   boardTile: BoardTile;
   canPlay: boolean;
   gameState: GameState;
@@ -156,6 +137,7 @@ interface TileProps {
 }
 
 const TileView = ({
+  remainingTile = false,
   boardTile,
   canPlay,
   gameState,
@@ -168,21 +150,27 @@ const TileView = ({
 }: TileProps) => {
   if (!canPlay || gameState == GameState.End) {
     return (
-      <DisabledTileView boardTile={boardTile} playerTarget={playerTarget}>
+      <Tile
+        disabled
+        boardTile={boardTile}
+        playerTarget={playerTarget}
+        remainingTile={remainingTile}
+      >
         {children}
-      </DisabledTileView>
+      </Tile>
     );
   }
 
   if (!coordinates) {
     return (
-      <ClickableTileView
+      <Tile
         boardTile={boardTile}
         onClick={onRotateRemainingTile}
         playerTarget={playerTarget}
+        remainingTile={remainingTile}
       >
         {children}
-      </ClickableTileView>
+      </Tile>
     );
   }
 
@@ -192,30 +180,37 @@ const TileView = ({
       ?.get(coordinates.row);
     if (direction) {
       return (
-        <ClickableTileView
+        <Tile
           boardTile={boardTile}
           playerTarget={playerTarget}
           onClick={onInsertTile.bind(null, ...direction)}
+          remainingTile={remainingTile}
         >
           {children}
-        </ClickableTileView>
+        </Tile>
       );
     }
     return (
-      <DisabledTileView boardTile={boardTile} playerTarget={playerTarget}>
+      <Tile
+        disabled
+        boardTile={boardTile}
+        playerTarget={playerTarget}
+        remainingTile={remainingTile}
+      >
         {children}
-      </DisabledTileView>
+      </Tile>
     );
   }
 
   return (
-    <ClickableTileView
+    <Tile
       boardTile={boardTile}
       playerTarget={playerTarget}
       onClick={onMovePlayer.bind(null, coordinates.line, coordinates.row)}
+      remainingTile={remainingTile}
     >
       {children}
-    </ClickableTileView>
+    </Tile>
   );
 };
 
