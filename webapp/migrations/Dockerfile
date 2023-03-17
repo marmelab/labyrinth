@@ -3,7 +3,7 @@ FROM php:8.1-cli as base
 
 RUN apt update && apt upgrade -y
 
-RUN apt install -y zlib1g-dev g++ git libicu-dev zip libpq-dev libzip-dev zip \
+RUN apt install -y zlib1g-dev g++ git libicu-dev zip libpq-dev libzip-dev zip netcat \
     && docker-php-ext-install intl opcache pdo pdo_pgsql \
     && pecl install apcu \
     && docker-php-ext-enable apcu \
@@ -20,4 +20,4 @@ ADD webapp  .
 
 RUN /usr/local/bin/composer install
 
-ENTRYPOINT [ "php", "bin/console", "doctrine:migrations:migrate", "--no-interaction" ]
+ENTRYPOINT [ "./run-migrations.sh" ]

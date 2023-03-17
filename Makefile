@@ -38,7 +38,6 @@ install:										## Install dependencies
 
 run: develop									## Run the program for development, alias of develop
 
-
 develop: develop-certs							## Run the program for development
 	@(mkdir -p logs data/postgres)
 	docker compose \
@@ -46,6 +45,22 @@ develop: develop-certs							## Run the program for development
 		-f docker-compose.yml \
 		-f docker-compose.dev.yml \
 		up --build
+
+develop-daemon: install develop-certs			## Run the program for development as a background service
+	@(mkdir -p logs data/postgres)
+	docker compose \
+		--env-file webapp/.env \
+		-f docker-compose.yml \
+		-f docker-compose.dev.yml \
+		up -d
+
+develop-daemon-stop: develop-certs				## Stops the development background service
+	@(mkdir -p logs data/postgres)
+	docker compose \
+		--env-file webapp/.env \
+		-f docker-compose.yml \
+		-f docker-compose.dev.yml \
+		down
 
 develop-certs:
 	@(./scripts/dev-certs.sh)
@@ -136,7 +151,9 @@ test: 											## Run unit tests
 	@(${MAKE} -C webapp test)
 
 test-e2e: 										## Run e2e tests
-	@(${MAKE} E2E_NO_HEADLESS=${E2E_NO_HEADLESS} E2E_DEVTOOLS=${E2E_DEVTOOLS} -C webapp test-e2e)
+	@(cp -n cypress.env.dist cypress.env)
+	@(npm install)
+	@(npm run cypress:e2e)
 
 cli-run: 										## Run the CLI version of the labyrinth.
 	@(${MAKE} -C domain run)
