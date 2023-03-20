@@ -3,7 +3,7 @@ import { Box, Grid, Typography } from "@mui/material";
 
 import { Color, type Player } from "../BoardTypes";
 
-import { treasures } from "./Tile";
+import { TREASURES } from "./Tile";
 
 import "./BoardView.css";
 
@@ -52,7 +52,7 @@ const BoardView = ({ remainingTile, user, children }: BoardProps) => {
                 />
                 <BoardStateItem
                   label={"You Target"}
-                  value={treasures[user.currentTarget]}
+                  value={TREASURES[user.currentTarget]}
                 />
               </>
             )}

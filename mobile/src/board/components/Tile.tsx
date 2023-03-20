@@ -8,7 +8,7 @@ interface TreasureMap {
   [key: string]: string;
 }
 
-export const treasures: TreasureMap = {
+export const TREASURES: TreasureMap = {
   "": " ",
   ".": " ",
   A: "💌",
@@ -83,7 +83,7 @@ export const Tile = ({
       style={{ transform: `rotate(${rotation}deg)`, top, left, opacity }}
     >
       <div className={`tile__path`}></div>
-      <div className="tile__treasure">{treasures[treasure]}</div>
+      <div className="tile__treasure">{TREASURES[treasure]}</div>
       {children}
     </button>
   );

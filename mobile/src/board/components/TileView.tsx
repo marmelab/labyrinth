@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { type BoardTile, Direction, GameState } from "../BoardTypes";
 import { type InsertTileHandler, type MovePlayerHandler, Tile } from "./Tile";
