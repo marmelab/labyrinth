@@ -16,9 +16,8 @@ type Action struct {
 }
 
 type BoardResponse struct {
-	Board *model.Board `json:"board"`
-
-	Actions []*Action `json:"actions"`
+	Board   *model.Board `json:"board"`
+	Actions []*Action    `json:"actions"`
 }
 
 func newRotateRemainingAction(direction RotationDirection, rotation model.Rotation) *Action {

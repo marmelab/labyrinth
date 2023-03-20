@@ -12,12 +12,18 @@ import {
   ListItemText,
   Select,
   Typography,
+  Alert,
+  AlertColor,
 } from "@mui/material";
 
-import { BoardListItem, Direction } from "./BoardTypes";
+import { type Error, BoardListItem, Direction } from "./BoardTypes";
 import { boardRepository } from "./BoardRepository";
 
-import { useBoard, useNewBoardMutation } from "./hooks";
+import {
+  useBoard,
+  useNewBoardMutation,
+  useGetPlaceTileHintMutation,
+} from "./hooks";
 
 import BoardView from "./components/BoardView";
 import { RemainingTileView, TileView } from "./components/TileView";
@@ -118,7 +124,7 @@ export function List() {
         }
       >
         {boards.map((board) => (
-          <ListItem>
+          <ListItem key={board.id}>
             <ListItemText
               primary={
                 <Link to={`/board/${board.id}/view`}>Board #{board.id}</Link>
@@ -134,17 +140,23 @@ export function List() {
 export function GetById() {
   const { id } = useParams();
   const [board, error] = useBoard(id!);
+  const placeTileHint = useGetPlaceTileHintMutation();
 
   const onRotateRemainingTile = () => boardRepository.rotateRemainingTile(id!);
 
-  const onInsertTile = (direction: Direction, index: number) =>
-    boardRepository.insertTile(id!, direction, index);
+  const onInsertTile = async (direction: Direction, index: number) => {
+    placeTileHint.reset();
+    await boardRepository.insertTile(id!, direction, index);
+  };
 
   const onMovePlayer = (line: number, row: number) => {
+    placeTileHint.reset();
     return boardRepository.movePlayer(id!, line, row);
   };
 
   const handleJoin = () => boardRepository.joinBoard(id!);
+
+  const handleGetPlaceTileHint = () => board && placeTileHint.mutate(board);
 
   if (board) {
     if (board.remainingSeats > 0) {
@@ -186,8 +198,18 @@ export function GetById() {
       user,
     } = board;
 
+    const errors: Error[] = [];
+    if (error) {
+      errors.push(error);
+    }
+
+    if (placeTileHint.isError) {
+      errors.push(placeTileHint.error);
+    }
+
     return (
       <BoardView
+        gameState={gameState}
         remainingTile={
           <RemainingTileView
             boardTile={remainingTile}
@@ -198,6 +220,9 @@ export function GetById() {
           />
         }
         user={user}
+        errors={errors}
+        placeTileHint={placeTileHint.data}
+        handleGetPlaceTileHint={handleGetPlaceTileHint}
       >
         {tiles.flatMap((lineTiles, line) =>
           lineTiles.map((boardTile, row) => {
@@ -228,11 +253,9 @@ export function GetById() {
         )}
       </BoardView>
     );
+  } else if (error) {
+    return <Alert severity={error.severity}>{error.message}</Alert>;
   }
 
-  if (error) {
-    throw error;
-  }
-
-  return <p>Loading</p>;
+  return <Alert severity="info">Loading</Alert>;
 }

@@ -210,7 +210,7 @@ export enum RotationDirection {
 }
 
 export interface RotationPayload {
-  direction: RotationDirection;
+  direction: RotationDirection | "";
   rotation: Rotation;
 }
 

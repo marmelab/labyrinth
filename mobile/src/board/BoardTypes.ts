@@ -1,3 +1,5 @@
+import type { AlertColor } from "@mui/material";
+
 export enum GameState {
   PlaceTile = 0,
   MovePawn = 1,
@@ -87,4 +89,12 @@ export interface BoardRepository {
   rotateRemainingTile(id: BoardID): Promise<void>;
   insertTile(id: BoardID, direction: Direction, index: number): Promise<void>;
   joinBoard(id: BoardID): Promise<Board>;
+}
+
+export type Error = { severity: AlertColor; message: string };
+
+export interface PlaceTileHint {
+  direction: Direction;
+  index: number;
+  rotation: Rotation;
 }

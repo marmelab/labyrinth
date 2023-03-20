@@ -1,7 +1,20 @@
 import type { ReactNode } from "react";
-import { Box, Grid, Typography } from "@mui/material";
+import {
+  Alert,
+  AlertColor,
+  Box,
+  Button,
+  Grid,
+  Typography,
+} from "@mui/material";
 
-import { Color, type Player } from "../BoardTypes";
+import {
+  Color,
+  type Error,
+  PlaceTileHint,
+  type Player,
+  GameState,
+} from "../BoardTypes";
 
 import { TREASURES } from "./Tile";
 
@@ -15,9 +28,13 @@ const colorNames = {
 };
 
 interface BoardProps {
+  gameState: GameState;
   remainingTile: ReactNode;
   user?: Player | null;
   children: ReactNode;
+  errors: Error[];
+  placeTileHint?: PlaceTileHint | null;
+  handleGetPlaceTileHint: () => void;
 }
 
 const BoardStateItem = ({ label, value }: { label: string; value: string }) => (
@@ -31,7 +48,14 @@ const BoardStateItem = ({ label, value }: { label: string; value: string }) => (
   </Grid>
 );
 
-const BoardView = ({ remainingTile, user, children }: BoardProps) => {
+const BoardView = ({
+  gameState,
+  remainingTile,
+  user,
+  children,
+  errors,
+  handleGetPlaceTileHint,
+}: BoardProps) => {
   return (
     <>
       <div className="board">
@@ -40,7 +64,7 @@ const BoardView = ({ remainingTile, user, children }: BoardProps) => {
         {remainingTile}
       </div>
 
-      <Box width={"100%"}>
+      <Box width="355px">
         <Grid container spacing={2}>
           <Grid item xs={8} ml={"auto"}>
             {user && (
@@ -59,6 +83,26 @@ const BoardView = ({ remainingTile, user, children }: BoardProps) => {
           </Grid>
         </Grid>
       </Box>
+
+      {user?.isCurrentPlayer && (
+        <Box width="355px">
+          <Grid container>
+            <Grid item xs={12} display="flex" justifyContent="flex-end">
+              {gameState == GameState.PlaceTile && (
+                <Button variant="outlined" onClick={handleGetPlaceTileHint}>
+                  Get Hint
+                </Button>
+              )}
+            </Grid>
+
+            {errors.map((error, i) => (
+              <Grid item xs={12} mt={2} key={i}>
+                <Alert severity={error.severity}>{error.message}</Alert>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+      )}
     </>
   );
 };

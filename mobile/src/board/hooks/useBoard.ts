@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
-import { type Board, GameState, Direction } from "../BoardTypes";
+import { type Error, type Board, GameState, Direction } from "../BoardTypes";
 
 import { boardRepository } from "../BoardRepository";
+
 import {
   Action,
   animationFrame,
@@ -16,16 +17,17 @@ import {
   type UserAction,
 } from "./useBoardTypes";
 
-export function useBoard(id: number | string): [Board | null, any | null] {
+export function useBoard(id: number | string): [Board | null, Error | null] {
   const [board, setBoard] = useState<Board | null>(null);
-  const [error, setError] = useState<any | null>(null);
+  const [error, setError] = useState<Error | null>(null);
 
   const fetchBoard = async function () {
+    setError(null);
     try {
       const updatedBoard = await boardRepository.getById(id);
       setBoard(updatedBoard);
     } catch (e) {
-      setError("Failed to load board");
+      setError({ message: "Failed to load board", severity: "error" });
       setBoard(null);
     }
   };
@@ -43,6 +45,13 @@ export function useBoard(id: number | string): [Board | null, any | null] {
 
   const handleMercureMessage = async ({ data }: { data: string }) => {
     const actions: UserAction[] = JSON.parse(data);
+    if (actions.length == 0) {
+      setError({
+        severity: "warning",
+        message: "You cannot perform this action",
+      });
+      return;
+    }
 
     for (const { kind, payload } of actions) {
       const resolver = actionResolvers.get(kind);
@@ -104,7 +113,7 @@ export function useBoard(id: number | string): [Board | null, any | null] {
   const actionResolvers = new Map<Action, (payload: any) => Promise<void>>([
     [
       Action.RotateRemaining,
-      ({ direction }: RotationPayload) =>
+      ({ direction, rotation }: RotationPayload) =>
         new Promise((resolve) => {
           setBoard((board) => {
             if (!board) {
@@ -112,10 +121,18 @@ export function useBoard(id: number | string): [Board | null, any | null] {
             }
             const remainingTile = board.state.remainingTile;
 
-            const newRotation =
-              direction == RotationDirection.Clockwise
-                ? remainingTile.rotation + 90
-                : remainingTile.rotation - 90;
+            if (direction == "") {
+              return {
+                ...board,
+                state: {
+                  ...board.state,
+                  remainingTile: {
+                    tile: remainingTile.tile,
+                    rotation: rotation,
+                  },
+                },
+              };
+            }
 
             return {
               ...board,
@@ -123,7 +140,10 @@ export function useBoard(id: number | string): [Board | null, any | null] {
                 ...board.state,
                 remainingTile: {
                   tile: remainingTile.tile,
-                  rotation: newRotation,
+                  rotation:
+                    direction == RotationDirection.Clockwise
+                      ? remainingTile.rotation + 90
+                      : remainingTile.rotation - 90,
                 },
               },
             };

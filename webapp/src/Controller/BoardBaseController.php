@@ -88,15 +88,12 @@ abstract class BoardBaseController extends AbstractController
 
     protected function publishUpdate(Board $board, array $actions)
     {
-        if (count($actions) > 0) {
+        $update = new Update(
+            $this->generateUrl('board_view', ['id' => $board->getId()]),
+            $this->serializer->serialize($actions, 'json')
+        );
 
-            $update = new Update(
-                $this->generateUrl('board_view', ['id' => $board->getId()]),
-                $this->serializer->serialize($actions, 'json')
-            );
-
-            $this->hub->publish($update);
-        }
+        $this->hub->publish($update);
     }
 
 
