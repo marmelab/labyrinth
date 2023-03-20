@@ -17,10 +17,10 @@ import {
 import { BoardListItem, Direction } from "./BoardTypes";
 import { boardRepository } from "./BoardRepository";
 
-import { useBoard, useNewBoardMutation } from "./BoardHooks";
+import { useBoard, useNewBoardMutation } from "./hooks";
 
 import BoardView from "./components/BoardView";
-import TileView from "./components/TileView";
+import { RemainingTileView, TileView } from "./components/TileView";
 import PlayerPawnView from "./components/PlayerPawnView";
 import { useUserContext } from "../user/UserContext";
 
@@ -189,15 +189,12 @@ export function GetById() {
     return (
       <BoardView
         remainingTile={
-          <TileView
-            remainingTile
+          <RemainingTileView
             boardTile={remainingTile}
             canPlay={canPlay}
             gameState={gameState}
             playerTarget={user?.currentTarget}
             onRotateRemainingTile={onRotateRemainingTile}
-            onInsertTile={onInsertTile}
-            onMovePlayer={onMovePlayer}
           />
         }
         user={user}
@@ -212,7 +209,6 @@ export function GetById() {
                 gameState={gameState}
                 coordinates={{ line, row }}
                 playerTarget={user?.currentTarget}
-                onRotateRemainingTile={onRotateRemainingTile}
                 onInsertTile={onInsertTile}
                 onMovePlayer={onMovePlayer}
               >

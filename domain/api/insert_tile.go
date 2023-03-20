@@ -54,8 +54,7 @@ func insertTileHandler(w http.ResponseWriter, r *http.Request) {
 	actions := make([]*Action, 0, 1)
 	if err == nil {
 		actions = append(actions,
-			newPlaceTileAction(requestBody.Direction, requestBody.Index),
-			newGameStateChangeAction(requestBody.Board.State))
+			newPlaceTileAction(requestBody.Direction, requestBody.Index))
 	}
 
 	writeJsonResponse(w, http.StatusOK, &BoardResponse{

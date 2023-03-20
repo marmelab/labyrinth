@@ -32,9 +32,7 @@ func movePlayerHandler(w http.ResponseWriter, r *http.Request) {
 	actions := make([]*Action, 0, 1)
 	if err == nil {
 		actions = append(actions,
-			newMovePawnAction(requestBody.Line, requestBody.Row),
-			newGameStateChangeAction(requestBody.Board.State),
-			newPlayerTurnChangeAction())
+			newMovePawnAction(requestBody.Line, requestBody.Row))
 	}
 
 	writeJsonResponse(w, http.StatusOK, &BoardResponse{

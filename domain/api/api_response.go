@@ -5,11 +5,9 @@ import "github.com/marmelab/labyrinth/domain/internal/model"
 type ActionKind string
 
 const (
-	ActionKindRotateRemining   ActionKind = "ROTATE_REMAINING"
-	ActionKindPlaceTile        ActionKind = "PLACE_TILE"
-	ActionKindMovePawn         ActionKind = "MOVE_PAWN"
-	ActionKindGameStateChange  ActionKind = "GAME_STATE_CHANGE"
-	ActionKindPlayerTurnChange ActionKind = "PLAYER_TURN_CHANGE"
+	ActionKindRotateRemining ActionKind = "ROTATE_REMAINING"
+	ActionKindPlaceTile      ActionKind = "PLACE_TILE"
+	ActionKindMovePawn       ActionKind = "MOVE_PAWN"
 )
 
 type Action struct {
@@ -59,19 +57,5 @@ func newMovePawnAction(line, row int) *Action {
 			Line: line,
 			Row:  row,
 		},
-	}
-}
-
-func newGameStateChangeAction(gameState model.GameState) *Action {
-	return &Action{
-		Kind:     ActionKindGameStateChange,
-		Playload: gameState,
-	}
-}
-
-func newPlayerTurnChangeAction() *Action {
-	return &Action{
-		Kind:     ActionKindPlayerTurnChange,
-		Playload: nil,
 	}
 }

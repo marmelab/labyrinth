@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 import { Box, Grid, Typography } from "@mui/material";
 
-import { type Board, Color, type Player } from "../BoardTypes";
+import { Color, type Player } from "../BoardTypes";
 
-import { treasures } from "./TileView";
+import { TREASURES } from "./Tile";
 
 import "./BoardView.css";
 
@@ -34,20 +34,15 @@ const BoardStateItem = ({ label, value }: { label: string; value: string }) => (
 const BoardView = ({ remainingTile, user, children }: BoardProps) => {
   return (
     <>
-      <div className="board">{children}</div>
+      <div className="board">
+        {children}
+
+        {remainingTile}
+      </div>
 
       <Box width={"100%"}>
         <Grid container spacing={2}>
-          <Grid
-            item
-            xs={4}
-            display={"flex"}
-            alignItems={"center"}
-            justifyContent={"center"}
-          >
-            {remainingTile}
-          </Grid>
-          <Grid item xs={8}>
+          <Grid item xs={8} ml={"auto"}>
             {user && (
               <>
                 <BoardStateItem label={"You Name"} value={user.name} />
@@ -57,7 +52,7 @@ const BoardView = ({ remainingTile, user, children }: BoardProps) => {
                 />
                 <BoardStateItem
                   label={"You Target"}
-                  value={treasures[user.currentTarget]}
+                  value={TREASURES[user.currentTarget]}
                 />
               </>
             )}
