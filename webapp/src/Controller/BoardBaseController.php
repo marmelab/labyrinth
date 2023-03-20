@@ -13,6 +13,7 @@ use App\Entity\Board;
 use App\Entity\Player;
 use App\Entity\User;
 use App\Service\Direction;
+use App\ViewModel\AccessibleTilesViewModel;
 use App\ViewModel\BoardViewModel;
 use App\ViewModel\PlayerViewModel;
 use App\Service\DomainServiceInterface;
@@ -21,6 +22,7 @@ use App\Service\Rotation;
 abstract class BoardBaseController extends AbstractController
 {
     const GAME_STATE_PLACE_TILE = 0;
+    const GAME_STATE_MOVE_PAWN = 1;
 
     protected function __construct(
         protected DomainServiceInterface $domainService,
@@ -71,6 +73,16 @@ abstract class BoardBaseController extends AbstractController
             return $player && $player->getIsCurrentPlayer() && $player->getIsUser();
         })) !== false;
 
+        /** @var ?AccessibleTilesViewModel */
+        $accessibleTiles = null;
+        if ($canPlay && $state['gameState'] == static::GAME_STATE_MOVE_PAWN) {
+            $accessibleTilesData = $this->domainService->getAccessibleTiles($state);
+            $accessibleTiles = new AccessibleTilesViewModel(
+                $accessibleTilesData['isShortestPath'],
+                $accessibleTilesData['coordinates']
+            );
+        }
+
         return new BoardViewModel(
             $board->getId(),
             $board->getRemainingSeats(),
@@ -78,6 +90,7 @@ abstract class BoardBaseController extends AbstractController
             $state,
             $players,
             $canPlay,
+            $accessibleTiles,
         );
     }
 
