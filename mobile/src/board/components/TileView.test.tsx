@@ -28,6 +28,8 @@ describe("Tile", () => {
           coordinates={{ line: 0, row: 0 }}
           onInsertTile={onInsertTile}
           onMovePlayer={onMovePlayer}
+          isAccessible={true}
+          hint={false}
         />
       );
 
@@ -48,6 +50,8 @@ describe("Tile", () => {
           coordinates={{ line: 0, row: 1 }}
           onInsertTile={onInsertTile}
           onMovePlayer={onMovePlayer}
+          isAccessible={true}
+          hint={false}
         />
       );
 
@@ -73,6 +77,8 @@ describe("Tile", () => {
           coordinates={{ line: 0, row: 1 }}
           onInsertTile={onInsertTile}
           onMovePlayer={onMovePlayer}
+          isAccessible={true}
+          hint={false}
         />
       );
 

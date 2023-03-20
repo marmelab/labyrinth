@@ -53,6 +53,7 @@ interface TileViewProps {
   playerTarget?: string;
   onInsertTile: InsertTileHandler;
   onMovePlayer: MovePlayerHandler;
+  isAccessible: boolean;
   children?: ReactNode;
 }
 
@@ -65,6 +66,7 @@ export const TileView = ({
   playerTarget,
   onInsertTile,
   onMovePlayer,
+  isAccessible,
   children,
 }: TileViewProps) => {
   if (!canPlay || gameState == GameState.End) {
@@ -108,6 +110,7 @@ export const TileView = ({
 
   return (
     <Tile
+      disabled={!isAccessible}
       boardTile={boardTile}
       playerTarget={playerTarget}
       onClick={onMovePlayer.bind(null, coordinates.line, coordinates.row)}

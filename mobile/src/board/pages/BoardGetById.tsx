@@ -170,6 +170,12 @@ export function GetById() {
                 playerTarget={user?.currentTarget}
                 onInsertTile={onInsertTile}
                 onMovePlayer={onMovePlayer}
+                isAccessible={
+                  !!board.accessibleTiles?.coordinates?.find(
+                    (coordinate) =>
+                      coordinate.line === line && coordinate.row === row
+                  )
+                }
               >
                 {players
                   .filter((player) => player.line == line && player.row == row)
