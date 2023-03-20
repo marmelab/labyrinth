@@ -18,12 +18,12 @@
 }
 
 .tile--remaining {
-  transition: transform 1s, opacity 1s;
+  transition: transform 0.25s ease-out, opacity 0.5s ease-out;
   position: absolute;
 }
 
 .tile--animate {
-  transition: transform 1s, opacity 1s, top 1s, left 1s;
+  transition: all 0.25s ease-out;
 }
 
 .tile:disabled {

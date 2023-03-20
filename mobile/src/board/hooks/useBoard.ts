@@ -306,7 +306,7 @@ export function useBoard(id: number | string): [Board | null, any | null] {
       });
     });
 
-    await timeout(1500);
+    await timeout(500);
   };
 
   const moveTilesHandlers = new Map<
@@ -367,7 +367,7 @@ export function useBoard(id: number | string): [Board | null, any | null] {
             };
           });
 
-          setTimeout(resolve, 1000);
+          setTimeout(resolve, 500);
         }),
     ],
     [
@@ -407,7 +407,7 @@ export function useBoard(id: number | string): [Board | null, any | null] {
         });
 
         // Let first animation play.
-        await timeout(1500);
+        await timeout(500);
 
         // Move tiles
         const animateMoveTiles = moveTilesHandlers.get(payload.direction);
