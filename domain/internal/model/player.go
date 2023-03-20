@@ -37,3 +37,17 @@ func (p Player) Name() string {
 		return "Yellow"
 	}
 }
+
+func (p *Player) Copy() *Player {
+	playerCopy := &Player{
+		Color: p.Color,
+		Position: &Coordinate{
+			Line: p.Position.Line,
+			Row:  p.Position.Row,
+		},
+		Targets: make([]Treasure, len(p.Targets)),
+		Score:   p.Score,
+	}
+	copy(playerCopy.Targets, p.Targets)
+	return playerCopy
+}

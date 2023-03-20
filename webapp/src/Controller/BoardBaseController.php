@@ -20,6 +20,8 @@ use App\Service\Rotation;
 
 abstract class BoardBaseController extends AbstractController
 {
+    const GAME_STATE_PLACE_TILE = 0;
+
     protected function __construct(
         protected DomainServiceInterface $domainService,
         protected ObjectManager $entityManager,

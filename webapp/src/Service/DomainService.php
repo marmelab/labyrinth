@@ -74,4 +74,18 @@ class DomainService implements DomainServiceInterface
 
         return $response->toArray();
     }
+
+    function getPlaceTileHint(array $board): array
+    {
+        $response = $this->httpClient->request("POST", "{$this->domainServiceUrl}/place-tile-hint", [
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+            'body' => json_encode([
+                'board' => $board,
+            ]),
+        ]);
+
+        return $response->toArray();
+    }
 }

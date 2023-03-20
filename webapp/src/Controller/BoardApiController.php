@@ -91,7 +91,7 @@ class BoardApiController extends BoardBaseController
         $user = $this->getUser();
         if (!$this->canUserPlay($user, $board)) {
             return $this->json([
-                'data' => ['message' => 'This is not your turn'],
+                'data' => ['message' => 'This is not your turn', 'severity' => 'warning'],
             ], 403);
         }
 
@@ -108,7 +108,7 @@ class BoardApiController extends BoardBaseController
         $user = $this->getUser();
         if (!$this->canUserPlay($user, $board)) {
             return $this->json([
-                'data' => ['message' => 'This is not your turn.'],
+                'data' => ['message' => 'This is not your turn.', 'severity' => 'warning'],
             ], 403);
         }
 
@@ -117,13 +117,13 @@ class BoardApiController extends BoardBaseController
         $direction = Direction::tryFrom($form['direction']);
         if (!$direction) {
             return $this->json([
-                'data' => ['message' => 'Invalid direction.'],
+                'data' => ['message' => 'Invalid direction.', 'severity' => 'warning'],
             ], 400);
         }
 
         if (!in_array($form['index'], [1, 3, 5])) {
             return $this->json([
-                'data' => ['message' => 'Invalid index, expected one of [1, 3, 5].'],
+                'data' => ['message' => 'Invalid index, expected one of [1, 3, 5].', 'severity' => 'warning'],
             ], 400);
         }
 
@@ -139,7 +139,7 @@ class BoardApiController extends BoardBaseController
         $user = $this->getUser();
         if (!$this->canUserPlay($user, $board)) {
             return $this->json([
-                'data' => ['message' => 'This is not your turn.'],
+                'data' => ['message' => 'This is not your turn.', 'severity' => 'warning'],
             ], 403);
         }
 
@@ -147,13 +147,13 @@ class BoardApiController extends BoardBaseController
 
         if ($form['line'] < 0 || $form['line'] > 6) {
             return $this->json([
-                'data' => ['message' => 'Invalid line'],
+                'data' => ['message' => 'Invalid line', 'severity' => 'warning'],
             ], 400);
         }
 
         if ($form['row'] < 0 || $form['row'] > 6) {
             return $this->json([
-                'data' => ['message' => 'Invalid row'],
+                'data' => ['message' => 'Invalid row', 'severity' => 'warning'],
             ], 400);
         }
 
@@ -164,7 +164,7 @@ class BoardApiController extends BoardBaseController
     }
 
     #[Route('/{id}/join', name: 'join', methods: 'POST')]
-    public function postJoin(Request $request, Board $board): JsonResponse
+    public function postJoin(Board $board): JsonResponse
     {
         $user = $this->getUser();
         if (!$this->joinBoard($user, $board)) {
@@ -175,5 +175,39 @@ class BoardApiController extends BoardBaseController
         return $this->json([
             'data' => null,
         ]);
+    }
+
+    #[Route('/{id}/place-tile-hint', name: 'place_tile_hint', methods: 'PUT')]
+    public function getPlaceTileHint(Board $board): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$this->canUserPlay($user, $board)) {
+            return $this->json([
+                'data' => ['message' => 'This is not your turn.', 'severity' => 'warning'],
+            ], 403);
+        }
+
+        if ($board->getGameState() != static::GAME_STATE_PLACE_TILE) {
+            return $this->json([
+                'data' => ['message' => 'You cannot place a tile now.', 'severity' => 'warning'],
+            ], 400);
+        }
+
+        $hint = $this->domainService->getPlaceTileHint($board->getState());
+
+        if (count($hint['actions']) > 0) {
+            $this->updateBoard($board, $hint['board']);
+
+            $this->entityManager->flush();
+            $this->publishUpdate($board, $hint['actions']);
+
+            return $this->json([
+                'data' => [],
+            ], 200);
+        }
+
+        return $this->json([
+            'data' => ['message' => 'No hint has been found.', 'severity' => 'info'],
+        ], 409);
     }
 }

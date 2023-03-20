@@ -8,19 +8,10 @@ import (
 	"github.com/marmelab/labyrinth/domain/internal/model"
 )
 
-type Direction string
-
-const (
-	DirectionTop    Direction = "TOP"
-	DirectionRight  Direction = "RIGHT"
-	DirectionBottom Direction = "BOTTOM"
-	DirectionLeft   Direction = "LEFT"
-)
-
 type insertTileRequestBody struct {
-	Board     *model.Board `json:"board"`
-	Direction Direction    `json:"direction"`
-	Index     int          `json:"index"`
+	Board     *model.Board    `json:"board"`
+	Direction model.Direction `json:"direction"`
+	Index     int             `json:"index"`
 }
 
 func insertTileHandler(w http.ResponseWriter, r *http.Request) {
@@ -36,23 +27,13 @@ func insertTileHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to decode body", http.StatusInternalServerError)
 	}
 
-	var err error = nil
-	switch requestBody.Direction {
-	case DirectionTop:
-		err = requestBody.Board.InsertTileTopAt(requestBody.Index)
-	case DirectionRight:
-		err = requestBody.Board.InsertTileRightAt(requestBody.Index)
-	case DirectionBottom:
-		err = requestBody.Board.InsertTileBottomAt(requestBody.Index)
-	case DirectionLeft:
-		err = requestBody.Board.InsertTileLeftAt(requestBody.Index)
-	default:
+	actions := make([]*Action, 0, 1)
+	err := requestBody.Board.InsertTileAt(requestBody.Direction, requestBody.Index)
+	if err == model.ErrUnsupportedDirection {
 		log.Printf("POST '/insert-tile' - Unsupported direction: %v", requestBody.Direction)
 		http.Error(w, fmt.Sprintf("unsupported direction: %v", requestBody.Direction), http.StatusInternalServerError)
-	}
-
-	actions := make([]*Action, 0, 1)
-	if err == nil {
+		return
+	} else if err == nil {
 		actions = append(actions,
 			newPlaceTileAction(requestBody.Direction, requestBody.Index))
 	}

@@ -138,6 +138,11 @@ func TestCoordinates(t *testing.T) {
 
 func TestBoard(t *testing.T) {
 
+	t.Run("Copy", func(t *testing.T) {
+		b := NewTestBoard()
+		assert.Equal(t, b, b.Copy())
+	})
+
 	t.Run("InsertTileTopAt()", func(t *testing.T) {
 		t.Run("Should fail if row is not odd", func(t *testing.T) {
 			err := NewTestBoard().InsertTileTopAt(0)
