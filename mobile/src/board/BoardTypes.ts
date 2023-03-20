@@ -22,6 +22,7 @@ export interface Board {
   gameState: GameState;
   currentPlayer?: Player | null;
   user?: Player | null;
+  accessibleTiles?: AccessibleTiles;
 }
 
 export interface BoardState {
@@ -72,6 +73,16 @@ export interface Player {
   score: number;
   isCurrentPlayer: boolean;
   isUser: boolean;
+}
+
+export interface AccessibleTiles {
+  isShortestPath: boolean;
+  coordinates: Coordinate[];
+}
+
+export interface Coordinate {
+  line: number;
+  row: number;
 }
 
 export type BoardID = number | string;
