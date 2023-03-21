@@ -53,3 +53,13 @@ type BoardTile struct {
 func (bt BoardTile) GetExits() TileExits {
 	return shapeExitMap[bt.Tile.Shape][bt.Rotation]
 }
+
+func (bt *BoardTile) Copy() *BoardTile {
+	return &BoardTile{
+		Tile: &Tile{
+			Shape:    bt.Tile.Shape,
+			Treasure: bt.Tile.Treasure,
+		},
+		Rotation: bt.Rotation,
+	}
+}

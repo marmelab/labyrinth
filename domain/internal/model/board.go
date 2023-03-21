@@ -17,8 +17,9 @@ const (
 var (
 	randomGenerator = rand.New(rand.NewSource(time.Now().UnixNano()))
 
-	ErrEvenRow       = errors.New("row must be odd")
-	ErrInvalidAction = errors.New("this action is not allowed in this state")
+	ErrEvenRow              = errors.New("row must be odd")
+	ErrInvalidAction        = errors.New("this action is not allowed in this state")
+	ErrUnsupportedDirection = errors.New("unsupported direction")
 )
 
 type GameState int
@@ -211,6 +212,21 @@ func (b *Board) InsertTileLeftAt(line int) error {
 	b.RemainingTile = current
 	b.State = GameStateMovePawn
 	return nil
+}
+
+func (b *Board) InsertTileAt(direction Direction, index int) error {
+	switch direction {
+	case DirectionTop:
+		return b.InsertTileTopAt(index)
+	case DirectionRight:
+		return b.InsertTileRightAt(index)
+	case DirectionBottom:
+		return b.InsertTileBottomAt(index)
+	case DirectionLeft:
+		return b.InsertTileLeftAt(index)
+	}
+
+	return ErrUnsupportedDirection
 }
 
 func (b *Board) RotateRemainingTileClockwise() {

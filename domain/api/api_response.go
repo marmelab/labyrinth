@@ -34,12 +34,12 @@ func newRotateRemainingAction(direction RotationDirection, rotation model.Rotati
 	}
 }
 
-func newPlaceTileAction(direction Direction, index int) *Action {
+func newPlaceTileAction(direction model.Direction, index int) *Action {
 	return &Action{
 		Kind: ActionKindPlaceTile,
 		Playload: &struct {
-			Direction Direction `json:"direction"`
-			Index     int       `json:"index"`
+			Direction model.Direction `json:"direction"`
+			Index     int             `json:"index"`
 		}{
 			Direction: direction,
 			Index:     index,

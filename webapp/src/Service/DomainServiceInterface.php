@@ -11,4 +11,6 @@ interface DomainServiceInterface
     function insertTile(array $board, Direction $direction, int $index): array;
 
     function movePlayer(array $board, int $line, int $row): array;
+
+    function getPlaceTileHint(array $board): array;
 }
