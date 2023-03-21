@@ -39,6 +39,12 @@ func (b *Board) Copy() *Board {
 }
 
 func (b *Board) GetPlaceTileHint() (*Board, *PlaceTileHint) {
+	var (
+		largestAccessibleTiles int            = 0
+		bestBoardCopy          *Board         = nil
+		bestPlaceTileHint      *PlaceTileHint = nil
+	)
+
 	for _, direction := range placeTileHintsDirections {
 		for _, index := range placeTileHintsIndexes {
 			for _, rotation := range placeTileHintsRotations {
@@ -46,17 +52,24 @@ func (b *Board) GetPlaceTileHint() (*Board, *PlaceTileHint) {
 				boardCopy.RemainingTile.Rotation = rotation
 				boardCopy.InsertTileAt(direction, index)
 
-				_, isShortestPath := boardCopy.GetAccessibleTiles()
+				accessibleTiles, isShortestPath := boardCopy.GetAccessibleTiles()
+				hint := &PlaceTileHint{
+					Direction: direction,
+					Index:     index,
+					Rotation:  rotation,
+				}
 				if isShortestPath {
-					return boardCopy, &PlaceTileHint{
-						Direction: direction,
-						Index:     index,
-						Rotation:  rotation,
-					}
+					return boardCopy, hint
+				}
+
+				if accessibleTileCount := len(accessibleTiles); accessibleTileCount > largestAccessibleTiles {
+					largestAccessibleTiles = accessibleTileCount
+					bestBoardCopy = boardCopy
+					bestPlaceTileHint = hint
 				}
 			}
 		}
 	}
 
-	return b, nil
+	return bestBoardCopy, bestPlaceTileHint
 }

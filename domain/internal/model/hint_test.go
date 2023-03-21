@@ -34,13 +34,13 @@ func TestHint(t *testing.T) {
 			assert.Equal(t, &PlaceTileHint{Direction: "RIGHT", Index: 1, Rotation: 90}, hint)
 		})
 
-		t.Run("GetPlaceTileHint should return nil if no move lead to the goal", func(t *testing.T) {
+		t.Run("GetPlaceTileHint should return the optimal move if no move lead to the goal", func(t *testing.T) {
 			board := Load("place-tile-no-hint")
 
 			updatedBoard, hint := board.GetPlaceTileHint()
 
-			assert.Equal(t, board, updatedBoard)
-			assert.Nil(t, hint)
+			assert.NotEqual(t, board, updatedBoard)
+			assert.Equal(t, &PlaceTileHint{Direction: "TOP", Index: 1, Rotation: 0}, hint)
 		})
 	})
 }
