@@ -39,6 +39,10 @@ abstract class BoardBaseController extends AbstractController
         }
 
         foreach ($board->getPlayers() as $player) {
+            if ($player->isIsBot()) {
+                return false;
+            }
+
             if ($player->getAttendee()->getId() == $user->getId()) {
                 return false;
             }
@@ -53,10 +57,13 @@ abstract class BoardBaseController extends AbstractController
             array_map(
                 /** @var Player $player */
                 function ($player) use ($user) {
-                    $isUser = $user && $player->getAttendee()->getId() == $user->getId();
+                    $attendee = $player->getAttendee();
+
+
+                    $isUser = $user && $attendee && $attendee->getId() == $user->getId();
 
                     return new PlayerViewModel(
-                        $player->getAttendee()->getUsername(),
+                        $attendee ? $attendee->getUsername() : "Bot #" . $player->getId(),
                         $player->getColor(),
                         $player->getLine(),
                         $player->getRow(),
@@ -69,7 +76,7 @@ abstract class BoardBaseController extends AbstractController
                 $board->getPlayers()->toArray()
             );
 
-        $canPlay = $user != null && $state['gameState'] != 2 && current(array_filter($players, function ($player) {
+        $canPlay = $user && $state['gameState'] != 2 && current(array_filter($players, function ($player) {
             return $player && $player->getIsCurrentPlayer() && $player->getIsUser();
         })) !== false;
 
@@ -191,12 +198,13 @@ abstract class BoardBaseController extends AbstractController
         $this->publishUpdate($board, $newState['actions']);
     }
 
-    protected function newBoard(User $user, int $playerCount): Board
+    protected function newBoard(User $user, int $playerCount, bool $isBotGame = false): Board
     {
         $boardState = $this->domainService->newBoard(intval($playerCount));
 
         $player = $this->bindPlayerFromState(new Player(), $boardState, 0);
         $player
+            ->setIsBot(false)
             ->setAttendee($user);
         $this->entityManager->persist($player);
 
@@ -204,9 +212,21 @@ abstract class BoardBaseController extends AbstractController
             ->setState($boardState)
             ->setGameState(0)
             ->addPlayer($player)
-            ->setRemainingSeats($playerCount - 1)
+            ->setRemainingSeats($isBotGame ? 0 : $playerCount - 1)
             ->setCreatedAt()
             ->setUpdatedAt();
+
+        if ($isBotGame) {
+            for ($i = 1; $i < $playerCount; $i++) {
+                $player = $this->bindPlayerFromState(new Player(), $boardState, $i);
+                $player
+                    ->setIsBot(true)
+                    ->setAttendee(null);
+                $this->entityManager->persist($player);
+                $board
+                    ->addPlayer($player);
+            }
+        }
 
         $this->entityManager->persist($board);
         $this->entityManager->flush();
@@ -247,6 +267,7 @@ abstract class BoardBaseController extends AbstractController
             $playerCount = $board->getPlayers()->count();
             $player = $this->bindPlayerFromState(new Player(), $board->getState(), $playerCount);
             $player
+                ->setIsBot(false)
                 ->setAttendee($user);
             $entityManager->persist($player);
 

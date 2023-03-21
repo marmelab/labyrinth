@@ -13,6 +13,7 @@ import {
 import { useNewBoardMutation } from "../BoardHooks";
 
 import { useUserContext } from "../../user/UserContext";
+import { OpponentKind } from "../BoardTypes";
 
 export function New() {
   const navigate = useNavigate();
@@ -20,15 +21,25 @@ export function New() {
   const mutation = useNewBoardMutation();
 
   const [playerCount, setPlayerCount] = useState("1");
+  const [opponentKind, setOpponentKind] = useState<OpponentKind>(
+    OpponentKind.Players
+  );
 
   const handlePlayerCountChange = (e: { target: { value: string } }) => {
     setPlayerCount(e.target.value);
   };
 
+  const handleOpponentKindChange = (e: { target: { value: string } }) => {
+    setOpponentKind(e.target.value as OpponentKind);
+  };
+
   const handleSubmit = async (e: MouseEvent) => {
     e.preventDefault();
 
-    const board = await mutation.mutateAsync({ playerCount: +playerCount });
+    const board = await mutation.mutateAsync({
+      playerCount: +playerCount,
+      opponentKind,
+    });
     navigate(`/board/${board.id}/view`);
   };
 
@@ -67,6 +78,21 @@ export function New() {
               ))}
             </Select>
           </FormControl>
+
+          <FormControl fullWidth>
+            <InputLabel id="player-count">Opponents</InputLabel>
+            <Select
+              labelId="opponents"
+              value={opponentKind}
+              label="Opponents"
+              onChange={handleOpponentKindChange}
+              sx={{ mb: 2 }}
+            >
+              <MenuItem value={OpponentKind.Players}>Players</MenuItem>
+              <MenuItem value={OpponentKind.Bots}>Bots</MenuItem>
+            </Select>
+          </FormControl>
+
           <Button variant="contained" onClick={handleSubmit}>
             Create New Game
           </Button>

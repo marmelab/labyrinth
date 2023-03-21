@@ -20,6 +20,8 @@ use App\Service\Rotation;
 #[Route('/api/v1/board', name: 'board_api_')]
 class BoardApiController extends BoardBaseController
 {
+    const OPPONENT_KIND_BOTS = "BOTS";
+
     public function __construct(
         protected DomainServiceInterface $domainService,
         protected ManagerRegistry $doctrine,
@@ -47,7 +49,7 @@ class BoardApiController extends BoardBaseController
             ], 400);
         }
 
-        $board = $this->newBoard($user, $playerCount);
+        $board = $this->newBoard($user, $playerCount, $form['opponentKind'] == static::OPPONENT_KIND_BOTS);
         return $this->json([
             'data' => $this->createBoardViewModel($user, $board),
         ]);

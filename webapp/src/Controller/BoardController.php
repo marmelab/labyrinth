@@ -67,7 +67,7 @@ class BoardController extends BoardBaseController
     }
 
     #[Route('/board/new', name: 'board_new', methods: 'POST')]
-    public function getNew(Request $request, ManagerRegistry $doctrine)
+    public function getNew(Request $request)
     {
         $user = $this->getUser();
         if ($user == NULL) {
