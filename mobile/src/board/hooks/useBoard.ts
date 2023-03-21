@@ -48,7 +48,8 @@ export function useBoard(id: number | string): [Board | null, Error | null] {
       return;
     }
 
-    if (!board.currentPlayer?.isBot || !board.isHumanPlayer) {
+    // Skip if this user has not created the game or is is not a bot's turn.
+    if (!board.isGameCreator || !board.currentPlayer?.isBot) {
       return;
     }
 

@@ -13,7 +13,7 @@ class BoardViewModel
         private array $state,
         private array $players,
         private bool $canPlay,
-        private bool $isHumanPlayer,
+        private bool $isGameCreator,
         private ?AccessibleTilesViewModel $accessibleTiles = null
     ) {
     }
@@ -82,8 +82,8 @@ class BoardViewModel
         return $this->accessibleTiles;
     }
 
-    public function getIsHumanPlayer(): bool
+    public function getIsGameCreator(): bool
     {
-        return $this->isHumanPlayer;
+        return $this->isGameCreator;
     }
 }

@@ -23,6 +23,7 @@ abstract class BoardBaseController extends AbstractController
 {
     const GAME_STATE_PLACE_TILE = 0;
     const GAME_STATE_MOVE_PAWN = 1;
+    const GAME_STATE_END = 2;
 
     protected function __construct(
         protected DomainServiceInterface $domainService,
@@ -77,11 +78,11 @@ abstract class BoardBaseController extends AbstractController
                 $board->getPlayers()->toArray()
             );
 
-        $canPlay = $user && $state['gameState'] != 2 && current(array_filter($players, function ($player) {
+        $canPlay = $user && $state['gameState'] != static::GAME_STATE_END && current(array_filter($players, function ($player) {
             return $player && $player->getIsCurrentPlayer() && $player->getIsUser();
         })) !== false;
 
-        $isHumanPlayer = $user && $state['gameState'] != 2 && current(array_filter($players, function ($player) {
+        $isGameCreator = $user && $state['gameState'] != static::GAME_STATE_END && current(array_filter($players, function ($player) {
             return $player && $player->getIsUser();
         })) !== false;
 
@@ -102,7 +103,7 @@ abstract class BoardBaseController extends AbstractController
             $state,
             $players,
             $canPlay,
-            $isHumanPlayer,
+            $isGameCreator,
             $accessibleTiles,
         );
     }
@@ -114,7 +115,7 @@ abstract class BoardBaseController extends AbstractController
             return true;
         }
 
-        if ($boardViewModel->getCurrentPlayer()->getIsBot() && $boardViewModel->getIsHumanPlayer()) {
+        if ($boardViewModel->getCurrentPlayer()->getIsBot() && $boardViewModel->getIsGameCreator()) {
             return true;
         }
 

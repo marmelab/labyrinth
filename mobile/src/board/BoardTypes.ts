@@ -22,7 +22,7 @@ export interface Board {
   gameState: GameState;
   currentPlayer?: Player | null;
   user?: Player | null;
-  isHumanPlayer: boolean;
+  isGameCreator: boolean;
   accessibleTiles?: AccessibleTiles;
 }
 
