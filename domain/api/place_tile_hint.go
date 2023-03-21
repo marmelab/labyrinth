@@ -34,6 +34,7 @@ func placeTileHintHandler(w http.ResponseWriter, r *http.Request) {
 	if err := parseJsonBody(r, &requestBody); err != nil {
 		log.Printf("POST '/place-tile-hint' - Failed to decode body: %v", err)
 		http.Error(w, "failed to decode body", http.StatusInternalServerError)
+		return
 	}
 
 	_, hint := requestBody.Board.GetPlaceTileHint()

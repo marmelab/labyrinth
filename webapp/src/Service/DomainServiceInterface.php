@@ -13,4 +13,6 @@ interface DomainServiceInterface
     function movePlayer(array $board, int $line, int $row): array;
 
     function getPlaceTileHint(array $board): array;
+
+    function getAccessibleTiles(array $board): array;
 }
