@@ -94,6 +94,11 @@ export enum Direction {
   Left = "LEFT",
 }
 
+export enum OpponentKind {
+  Players = "PLAYERS",
+  Bots = "BOTS",
+}
+
 export interface BoardRepository {
   list(page: number): Promise<BoardListItem[]>;
   getById(id: BoardID): Promise<Board>;

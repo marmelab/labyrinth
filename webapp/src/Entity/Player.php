@@ -39,11 +39,14 @@ class Player
     private ?Board $board = null;
 
     #[ORM\ManyToOne(inversedBy: 'games')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?User $attendee = null;
 
     #[ORM\Column]
     private ?bool $currentPlayer = null;
+
+    #[ORM\Column]
+    private ?bool $isBot = null;
 
     public function getId(): ?int
     {
@@ -154,6 +157,18 @@ class Player
     public function setCurrentPlayer(bool $currentPlayer): self
     {
         $this->currentPlayer = $currentPlayer;
+
+        return $this;
+    }
+
+    public function isIsBot(): ?bool
+    {
+        return $this->isBot;
+    }
+
+    public function setIsBot(bool $isBot): self
+    {
+        $this->isBot = $isBot;
 
         return $this;
     }

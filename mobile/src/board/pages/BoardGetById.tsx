@@ -135,7 +135,7 @@ export function GetById() {
             }
           >
             {board.players.map((player, i) => (
-              <ListItem>
+              <ListItem key={player?.color ?? i}>
                 <ListItemText primary={player?.name ?? "?"} />
               </ListItem>
             ))}

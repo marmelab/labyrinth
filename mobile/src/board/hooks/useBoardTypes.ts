@@ -202,6 +202,7 @@ export enum Action {
   RotateRemaining = "ROTATE_REMAINING",
   PlaceTile = "PLACE_TILE",
   MovePawn = "MOVE_PAWN",
+  NewPlayer = "NEW_PLAYER",
 }
 
 export enum RotationDirection {

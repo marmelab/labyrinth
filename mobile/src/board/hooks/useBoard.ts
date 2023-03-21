@@ -191,6 +191,7 @@ export function useBoard(id: number | string): [Board | null, Error | null] {
       },
     ],
     [Action.MovePawn, () => fetchBoard()],
+    [Action.NewPlayer, () => fetchBoard()],
   ]);
 
   useEffect(() => {

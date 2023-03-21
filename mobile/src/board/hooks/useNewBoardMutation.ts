@@ -1,21 +1,21 @@
 import { useMutation } from "react-query";
 
-import { Board } from "../BoardTypes";
+import { Board, OpponentKind } from "../BoardTypes";
 
 type MutationError = { message: string };
 
-type NewBoardVariables = { playerCount: number };
+type NewBoardVariables = { playerCount: number; opponentKind: OpponentKind };
 type NewBoardResponse = { data: MutationError | Board };
 
 export const useNewBoardMutation = () =>
   useMutation<Board, MutationError, NewBoardVariables, void>(
-    async ({ playerCount }) => {
+    async ({ playerCount, opponentKind }) => {
       const response = await fetch(`/api/v1/board`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ playerCount }),
+        body: JSON.stringify({ playerCount, opponentKind }),
       });
 
       const responseContent: NewBoardResponse = await response.json();
