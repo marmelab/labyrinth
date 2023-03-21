@@ -216,4 +216,33 @@ class BoardApiController extends BoardBaseController
             'data' => ['message' => 'No hint has been found.', 'severity' => 'info'],
         ], 409);
     }
+
+    #[Route('/{id}/move-pawn-hint', name: 'move_pawn_hint', methods: 'GET')]
+    public function getMovePawnHint(Board $board): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$this->canUserPlay($user, $board)) {
+            return $this->json([
+                'data' => ['message' => 'This is not your turn.', 'severity' => 'warning'],
+            ], 403);
+        }
+
+        if ($board->getGameState() != static::GAME_STATE_MOVE_PAWN) {
+            return $this->json([
+                'data' => ['message' => 'You cannot move pawn now.', 'severity' => 'warning'],
+            ], 400);
+        }
+
+        $movePawnHint = $this->domainService->getMovePawnHint($board->getState());
+
+        if ($movePawnHint['hint'] != null) {
+            return $this->json([
+                'data' => $movePawnHint['hint'],
+            ], 200);
+        }
+
+        return $this->json([
+            'data' => ['message' => 'No hint has been found.', 'severity' => 'info'],
+        ], 409);
+    }
 }

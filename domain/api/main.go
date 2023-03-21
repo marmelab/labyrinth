@@ -11,6 +11,7 @@ func main() {
 	http.HandleFunc("/insert-tile", insertTileHandler)
 	http.HandleFunc("/move-player", movePlayerHandler)
 	http.HandleFunc("/place-tile-hint", placeTileHintHandler)
+	http.HandleFunc("/move-pawn-hint", movePawnHintHandler)
 	http.HandleFunc("/get-accessible-tiles", getAccessibleTilesHandler)
 
 	if err := http.ListenAndServe("0.0.0.0:80", nil); err != nil {

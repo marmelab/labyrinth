@@ -22,7 +22,7 @@ func Load(name string) *Board {
 	return &board
 }
 
-func TestHint(t *testing.T) {
+func TestPlaceTileHint(t *testing.T) {
 
 	t.Run("GetPlaceTileHint", func(t *testing.T) {
 		t.Run("GetPlaceTileHint should return the right hint", func(t *testing.T) {

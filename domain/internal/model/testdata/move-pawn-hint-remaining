@@ -1,0 +1,407 @@
+{
+    "tiles": [
+        [
+            {
+                "tile": {
+                    "shape": 2,
+                    "treasure": "."
+                },
+                "rotation": 270
+            },
+            {
+                "tile": {
+                    "shape": 1,
+                    "treasure": "R"
+                },
+                "rotation": 0
+            },
+            {
+                "tile": {
+                    "shape": 1,
+                    "treasure": "."
+                },
+                "rotation": 180
+            },
+            {
+                "tile": {
+                    "shape": 0,
+                    "treasure": "."
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 1,
+                    "treasure": "B"
+                },
+                "rotation": 180
+            },
+            {
+                "tile": {
+                    "shape": 0,
+                    "treasure": "."
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 2,
+                    "treasure": "."
+                },
+                "rotation": 0
+            }
+        ],
+        [
+            {
+                "tile": {
+                    "shape": 1,
+                    "treasure": "Q"
+                },
+                "rotation": 270
+            },
+            {
+                "tile": {
+                    "shape": 2,
+                    "treasure": "T"
+                },
+                "rotation": 0
+            },
+            {
+                "tile": {
+                    "shape": 0,
+                    "treasure": "."
+                },
+                "rotation": 270
+            },
+            {
+                "tile": {
+                    "shape": 2,
+                    "treasure": "."
+                },
+                "rotation": 0
+            },
+            {
+                "tile": {
+                    "shape": 2,
+                    "treasure": "."
+                },
+                "rotation": 270
+            },
+            {
+                "tile": {
+                    "shape": 1,
+                    "treasure": "O"
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 0,
+                    "treasure": "."
+                },
+                "rotation": 0
+            }
+        ],
+        [
+            {
+                "tile": {
+                    "shape": 1,
+                    "treasure": "C"
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 0,
+                    "treasure": "."
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 1,
+                    "treasure": "D"
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 2,
+                    "treasure": "."
+                },
+                "rotation": 0
+            },
+            {
+                "tile": {
+                    "shape": 1,
+                    "treasure": "E"
+                },
+                "rotation": 180
+            },
+            {
+                "tile": {
+                    "shape": 2,
+                    "treasure": "."
+                },
+                "rotation": 0
+            },
+            {
+                "tile": {
+                    "shape": 1,
+                    "treasure": "F"
+                },
+                "rotation": 270
+            }
+        ],
+        [
+            {
+                "tile": {
+                    "shape": 0,
+                    "treasure": "."
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 2,
+                    "treasure": "."
+                },
+                "rotation": 0
+            },
+            {
+                "tile": {
+                    "shape": 2,
+                    "treasure": "."
+                },
+                "rotation": 0
+            },
+            {
+                "tile": {
+                    "shape": 0,
+                    "treasure": "."
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 0,
+                    "treasure": "."
+                },
+                "rotation": 270
+            },
+            {
+                "tile": {
+                    "shape": 2,
+                    "treasure": "."
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 0,
+                    "treasure": "."
+                },
+                "rotation": 90
+            }
+        ],
+        [
+            {
+                "tile": {
+                    "shape": 1,
+                    "treasure": "G"
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 2,
+                    "treasure": "."
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 1,
+                    "treasure": "H"
+                },
+                "rotation": 0
+            },
+            {
+                "tile": {
+                    "shape": 2,
+                    "treasure": "."
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 1,
+                    "treasure": "I"
+                },
+                "rotation": 270
+            },
+            {
+                "tile": {
+                    "shape": 1,
+                    "treasure": "M"
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 1,
+                    "treasure": "J"
+                },
+                "rotation": 270
+            }
+        ],
+        [
+            {
+                "tile": {
+                    "shape": 0,
+                    "treasure": "."
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 2,
+                    "treasure": "W"
+                },
+                "rotation": 270
+            },
+            {
+                "tile": {
+                    "shape": 2,
+                    "treasure": "U"
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 1,
+                    "treasure": "P"
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 0,
+                    "treasure": "."
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 1,
+                    "treasure": "N"
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 2,
+                    "treasure": "X"
+                },
+                "rotation": 0
+            }
+        ],
+        [
+            {
+                "tile": {
+                    "shape": 2,
+                    "treasure": "."
+                },
+                "rotation": 180
+            },
+            {
+                "tile": {
+                    "shape": 0,
+                    "treasure": "."
+                },
+                "rotation": 0
+            },
+            {
+                "tile": {
+                    "shape": 1,
+                    "treasure": "K"
+                },
+                "rotation": 0
+            },
+            {
+                "tile": {
+                    "shape": 2,
+                    "treasure": "."
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 1,
+                    "treasure": "L"
+                },
+                "rotation": 0
+            },
+            {
+                "tile": {
+                    "shape": 0,
+                    "treasure": "."
+                },
+                "rotation": 90
+            },
+            {
+                "tile": {
+                    "shape": 2,
+                    "treasure": "."
+                },
+                "rotation": 90
+            }
+        ]
+    ],
+    "remainingTile": {
+        "tile": {
+            "shape": 2,
+            "treasure": "S"
+        },
+        "rotation": 90
+    },
+    "players": [
+        {
+            "color": 0,
+            "position": {
+                "line": 3,
+                "row": 5
+            },
+            "targets": [
+                "S",
+                "Q",
+                "U",
+                "I",
+                "D",
+                "T",
+                "F",
+                "C",
+                "H",
+                "E",
+                "X",
+                "N",
+                "O",
+                "G",
+                "L",
+                "J",
+                "M",
+                "K",
+                "R",
+                "P",
+                "B",
+                "W"
+            ],
+            "score": 2
+        }
+    ],
+    "remainingPlayers": [
+        0
+    ],
+    "currentPlayerIndex": 0,
+    "gameState": 1
+}

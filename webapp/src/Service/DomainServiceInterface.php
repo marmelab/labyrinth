@@ -14,5 +14,7 @@ interface DomainServiceInterface
 
     function getPlaceTileHint(array $board): array;
 
+    function getMovePawnHint(array $board): array;
+
     function getAccessibleTiles(array $board): array;
 }

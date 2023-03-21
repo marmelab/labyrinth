@@ -434,27 +434,50 @@ func (b Board) buildGraph() (graph *dijkstra.Graph, getCoordinatesByVertex func(
 	}
 }
 
-func (b Board) getShortestPath() Coordinates {
+func (b Board) getCurrentTargetIndex() (int, int) {
 	var (
 		size          = b.GetSize()
+		currentPlayer = b.GetCurrentPlayer()
+	)
+
+	for line := 0; line < size; line++ {
+		for row := 0; row < size; row++ {
+			if b.Tiles[line][row].Tile.Treasure == currentPlayer.Targets[0] {
+				return line, row
+			}
+		}
+	}
+
+	return size, 0
+}
+
+func (b Board) GetCurrentTargetCoordinate() *Coordinate {
+	line, row := b.getCurrentTargetIndex()
+	if line >= len(b.Tiles) {
+		return nil
+	}
+
+	return &Coordinate{
+		Line: line,
+		Row:  row,
+	}
+}
+
+func (b Board) getShortestPath() Coordinates {
+	var (
+		size = b.GetSize()
+
 		currentPlayer = b.GetCurrentPlayer()
 
 		graph, getCoordinatesByVertex = b.buildGraph()
 
 		sourceVertex = b.vertextId(currentPlayer.Position.Line, currentPlayer.Position.Row)
-		// targetVertex is the target node, defaults to remaining tile ID.
-		targetVertex = size*size + 1
+
+		targetLine, targetRow = b.getCurrentTargetIndex()
+
+		// targetVertex is the target node
+		targetVertex = targetLine*size + targetRow
 	)
-
-	for line := 0; line < size; line++ {
-		for row := 0; row < size; row++ {
-			currentTile := b.vertextId(line, row)
-
-			if b.Tiles[line][row].Tile.Treasure == currentPlayer.Targets[0] {
-				targetVertex = currentTile
-			}
-		}
-	}
 
 	best, err := graph.Shortest(sourceVertex, targetVertex)
 	if err != nil { // No path was found.

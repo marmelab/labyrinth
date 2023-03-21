@@ -89,6 +89,20 @@ class DomainService implements DomainServiceInterface
         return $response->toArray();
     }
 
+    function getMovePawnHint(array $board): array
+    {
+        $response = $this->httpClient->request("POST", "{$this->domainServiceUrl}/move-pawn-hint", [
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+            'body' => json_encode([
+                'board' => $board,
+            ]),
+        ]);
+
+        return $response->toArray();
+    }
+
     function getAccessibleTiles(array $board): array
     {
         $response = $this->httpClient->request("POST", "{$this->domainServiceUrl}/get-accessible-tiles", [
