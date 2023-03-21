@@ -22,6 +22,7 @@ export interface Board {
   gameState: GameState;
   currentPlayer?: Player | null;
   user?: Player | null;
+  isHumanPlayer: boolean;
   accessibleTiles?: AccessibleTiles;
 }
 
@@ -65,6 +66,7 @@ export enum Color {
 
 export interface Player {
   name: string;
+  isBot: boolean;
   color: Color;
   line: number;
   row: number;

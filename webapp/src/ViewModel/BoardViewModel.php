@@ -13,6 +13,7 @@ class BoardViewModel
         private array $state,
         private array $players,
         private bool $canPlay,
+        private bool $isHumanPlayer,
         private ?AccessibleTilesViewModel $accessibleTiles = null
     ) {
     }
@@ -79,5 +80,10 @@ class BoardViewModel
     public function getAccessibleTiles(): ?AccessibleTilesViewModel
     {
         return $this->accessibleTiles;
+    }
+
+    public function getIsHumanPlayer(): bool
+    {
+        return $this->isHumanPlayer;
     }
 }

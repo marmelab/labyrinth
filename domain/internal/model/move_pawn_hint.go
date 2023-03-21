@@ -1,6 +1,8 @@
 package model
 
-import "math"
+import (
+	"math"
+)
 
 func (b *Board) GetMovePawnHint() (*Coordinate, error) {
 	if b.State != GameStateMovePawn {

@@ -24,6 +24,18 @@ export const RemainingTileView = ({
     opacity: boardTile.opacity ?? 1,
   };
 
+  if (gameState == GameState.Animating) {
+    return (
+      <Tile
+        disabled={!canPlay}
+        animate
+        playerTarget={playerTarget}
+        boardTile={bt}
+        remainingTile
+      ></Tile>
+    );
+  }
+
   if (!canPlay || gameState == GameState.End) {
     return (
       <Tile disabled boardTile={bt} playerTarget={playerTarget} remainingTile />
@@ -32,7 +44,6 @@ export const RemainingTileView = ({
 
   return (
     <Tile
-      animate={gameState == GameState.Animating}
       boardTile={bt}
       playerTarget={playerTarget}
       onClick={onRotateRemainingTile}

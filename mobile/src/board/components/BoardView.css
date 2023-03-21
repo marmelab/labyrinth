@@ -14,4 +14,6 @@
   grid-template-columns: repeat(7, 1fr);
   grid-template-rows: repeat(7, 1fr);
   background-color: #444444;
+  width: 355px;
+  height: 355px;
 }
