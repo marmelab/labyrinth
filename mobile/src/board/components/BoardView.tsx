@@ -34,7 +34,7 @@ interface BoardProps {
   user?: Player | null;
   children: ReactNode;
   errors: Error[];
-  handleGetPlaceTileHint: () => void;
+  handleGetHint: () => void;
 }
 
 const BoardStateItem = ({ label, value }: { label: string; value: string }) => (
@@ -54,7 +54,7 @@ const BoardView = ({
   user,
   children,
   errors,
-  handleGetPlaceTileHint,
+  handleGetHint,
 }: BoardProps) => {
   return (
     <>
@@ -88,8 +88,8 @@ const BoardView = ({
         <Box width="355px">
           <Grid container>
             <Grid item xs={12} display="flex" justifyContent="flex-end">
-              {gameState == GameState.PlaceTile && (
-                <Button variant="outlined" onClick={handleGetPlaceTileHint}>
+              {gameState != GameState.End && (
+                <Button variant="outlined" onClick={handleGetHint}>
                   Get Hint
                 </Button>
               )}
