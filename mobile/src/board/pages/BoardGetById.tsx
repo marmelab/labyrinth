@@ -85,12 +85,12 @@ export function GetById() {
   const placeTileHint = useGetPlaceTileHintMutation();
   const movePawnHint = useGetMovePawnHintMutation();
 
-  const handleUserAction = <F extends Handler>(handler: F): Handler => {
-    return (...args: any[]) => {
+  const handleUserAction = <F extends Handler>(handler: F): F => {
+    return ((...args: any[]) => {
       placeTileHint.reset();
       movePawnHint.reset();
       return handler(...args);
-    };
+    }) as Handler as F;
   };
 
   const onRotateRemainingTile = handleUserAction(() =>
