@@ -193,16 +193,22 @@ class BoardApiController extends BoardBaseController
             ], 400);
         }
 
-        $hint = $this->domainService->getPlaceTileHint($board->getState());
+        $placeTileHint = $this->domainService->getPlaceTileHint($board->getState());
 
-        if (count($hint['actions']) > 0) {
-            $this->updateBoard($board, $hint['board']);
+        if ($placeTileHint['hint'] != null && count($placeTileHint['actions']) > 0) {
+            $initialState = $board->getState();
+            $initialState['remainingTile']['rotation'] = $placeTileHint['hint']['remainingTileRotation'];
+
+            $this->updateBoard($board, $initialState);
 
             $this->entityManager->flush();
-            $this->publishUpdate($board, $hint['actions']);
+            $this->publishUpdate($board, $placeTileHint['actions']);
 
             return $this->json([
-                'data' => [],
+                'data' => [
+                    'direction' => $placeTileHint['hint']['insertDirection'],
+                    'index' => $placeTileHint['hint']['insertIndex'],
+                ],
             ], 200);
         }
 

@@ -58,6 +58,7 @@ export const Tile = ({
     left = 0,
     opacity = 1,
   },
+  hint = false,
   playerTarget,
   children,
   disabled,
@@ -67,24 +68,27 @@ export const Tile = ({
   remainingTile?: boolean;
   boardTile: BoardTile;
   children?: ReactNode;
+  hint?: boolean;
   playerTarget?: string;
   disabled?: boolean;
   onClick?: Handler;
 }) => {
   return (
-    <button
-      className={`tile tile--shape-${shape} ${
-        playerTarget == treasure ? "tile--target" : ""
-      } ${remainingTile ? "tile--remaining" : ""} ${
-        animate ? "tile--animate" : ""
-      }`}
-      disabled={disabled}
-      onClick={onClick}
-      style={{ transform: `rotate(${rotation}deg)`, top, left, opacity }}
-    >
-      <div className={`tile__path`}></div>
-      <div className="tile__treasure">{TREASURES[treasure]}</div>
-      {children}
-    </button>
+    <div className={`${hint ? "hint" : ""}`}>
+      <button
+        className={`tile tile--shape-${shape} ${
+          playerTarget == treasure ? "tile--target" : ""
+        } ${remainingTile ? "tile--remaining" : ""} ${
+          animate ? "tile--animate" : ""
+        }`}
+        disabled={disabled}
+        onClick={onClick}
+        style={{ transform: `rotate(${rotation}deg)`, top, left, opacity }}
+      >
+        <div className={`tile__path`}></div>
+        <div className="tile__treasure">{TREASURES[treasure]}</div>
+        {children}
+      </button>
+    </div>
   );
 };
