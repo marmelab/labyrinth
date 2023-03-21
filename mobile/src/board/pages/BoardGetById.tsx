@@ -10,7 +10,13 @@ import {
   Alert,
 } from "@mui/material";
 
-import { type Error, Direction, PlaceTileHint } from "../BoardTypes";
+import {
+  type Error,
+  Direction,
+  PlaceTileHint,
+  GameState,
+  Coordinate,
+} from "../BoardTypes";
 import { boardRepository } from "../BoardRepository";
 
 import { useBoard, useGetPlaceTileHintMutation } from "../BoardHooks";
@@ -18,6 +24,7 @@ import { useBoard, useGetPlaceTileHintMutation } from "../BoardHooks";
 import BoardView from "../components/BoardView";
 import { RemainingTileView, TileView } from "../components/TileView";
 import PlayerPawnView from "../components/PlayerPawnView";
+import { useGetMovePawnHintMutation } from "../hooks/useGetMovePawnHintMutation";
 
 const placeTileHintIndexes = new Map<Direction, Map<number, number>>([
   [
@@ -55,39 +62,60 @@ const placeTileHintIndexes = new Map<Direction, Map<number, number>>([
 ]);
 
 const getHintIndex = (
-  placeTileHint?: PlaceTileHint | null
+  placeTileHint?: PlaceTileHint | null,
+  movePawnHint?: (Coordinate & { size: number }) | null
 ): number | undefined => {
   if (placeTileHint) {
     const { direction, index } = placeTileHint;
     return placeTileHintIndexes.get(direction)?.get(index);
   }
 
+  if (movePawnHint) {
+    return movePawnHint.line * 7 + movePawnHint.row;
+  }
+
   return undefined;
 };
 
+type Handler = (...args: any[]) => Promise<any>;
 export function GetById() {
   const { id } = useParams();
   const [board, error] = useBoard(id!);
+
   const placeTileHint = useGetPlaceTileHintMutation();
+  const movePawnHint = useGetMovePawnHintMutation();
 
-  const onRotateRemainingTile = () => boardRepository.rotateRemainingTile(id!);
-
-  const onInsertTile = (direction: Direction, index: number) => {
-    placeTileHint.reset();
-    return boardRepository.insertTile(id!, direction, index);
+  const handleUserAction = <F extends Handler>(handler: F): Handler => {
+    return (...args: any[]) => {
+      placeTileHint.reset();
+      movePawnHint.reset();
+      return handler(...args);
+    };
   };
 
-  const onMovePlayer = (line: number, row: number) => {
-    placeTileHint.reset();
+  const onRotateRemainingTile = handleUserAction(() =>
+    boardRepository.rotateRemainingTile(id!)
+  );
+
+  const onInsertTile = handleUserAction(
+    (direction: Direction, index: number) => {
+      return boardRepository.insertTile(id!, direction, index);
+    }
+  );
+
+  const onMovePlayer = handleUserAction((line: number, row: number) => {
     return boardRepository.movePlayer(id!, line, row);
-  };
+  });
 
   const handleJoin = () => boardRepository.joinBoard(id!);
 
-  const handleGetPlaceTileHint = () => {
-    placeTileHint.reset();
-    return placeTileHint.mutate(id!);
-  };
+  const handleGetHint = handleUserAction(async () => {
+    if (board?.gameState == GameState.PlaceTile) {
+      await placeTileHint.mutateAsync(id!);
+    } else if (board?.gameState == GameState.MovePawn) {
+      await movePawnHint.mutateAsync(id!);
+    }
+  });
 
   if (board) {
     if (board.remainingSeats > 0) {
@@ -138,7 +166,16 @@ export function GetById() {
       errors.push(placeTileHint.error);
     }
 
-    const hintIndex = getHintIndex(placeTileHint.data);
+    if (movePawnHint.isError) {
+      errors.push(movePawnHint.error);
+    }
+
+    const hintIndex = getHintIndex(
+      placeTileHint.data,
+      movePawnHint.data
+        ? { ...movePawnHint.data, size: board.state.tiles.length }
+        : undefined
+    );
 
     return (
       <BoardView
@@ -154,7 +191,7 @@ export function GetById() {
         }
         user={user}
         errors={errors}
-        handleGetPlaceTileHint={handleGetPlaceTileHint}
+        handleGetHint={handleGetHint}
       >
         {tiles.flatMap((lineTiles, line) =>
           lineTiles.map((boardTile, row) => {
