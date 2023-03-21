@@ -14,6 +14,7 @@ import {
   PlaceTileHint,
   type Player,
   GameState,
+  Direction,
 } from "../BoardTypes";
 
 import { TREASURES } from "./Tile";
@@ -33,7 +34,6 @@ interface BoardProps {
   user?: Player | null;
   children: ReactNode;
   errors: Error[];
-  placeTileHint?: PlaceTileHint | null;
   handleGetPlaceTileHint: () => void;
 }
 

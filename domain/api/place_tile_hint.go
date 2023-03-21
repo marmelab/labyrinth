@@ -12,6 +12,17 @@ type placeTileHintRequestBody struct {
 	Board *model.Board `json:"board"`
 }
 
+type placeTileHint struct {
+	InsertDirection       model.Direction `json:"insertDirection"`
+	InsertIndex           int             `json:"insertIndex"`
+	RemainingTileRotation model.Rotation  `json:"remainingTileRotation"`
+}
+
+type placeTileHintResponse struct {
+	Hint    *placeTileHint `json:"hint"`
+	Actions []*Action      `json:"actions"`
+}
+
 func placeTileHintHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		log.Printf("Got '%v /place-tile-hint', expected 'POST /place-tile-hint'", r.Method)
@@ -25,20 +36,23 @@ func placeTileHintHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to decode body", http.StatusInternalServerError)
 	}
 
-	updatedBoard, hint := requestBody.Board.GetPlaceTileHint()
+	_, hint := requestBody.Board.GetPlaceTileHint()
 	if hint == nil {
-		writeJsonResponse(w, http.StatusOK, &BoardResponse{
-			Board:   requestBody.Board,
+		writeJsonResponse(w, http.StatusOK, &placeTileHintResponse{
+			Hint:    nil,
 			Actions: []*Action{},
 		})
 		return
 	}
 
-	writeJsonResponse(w, http.StatusOK, &BoardResponse{
-		Board: updatedBoard,
+	writeJsonResponse(w, http.StatusOK, &placeTileHintResponse{
+		Hint: &placeTileHint{
+			InsertDirection:       hint.Direction,
+			InsertIndex:           hint.Index,
+			RemainingTileRotation: hint.Rotation,
+		},
 		Actions: []*Action{
 			newRotateRemainingAction("", hint.Rotation),
-			newPlaceTileAction(hint.Direction, hint.Index),
 		},
 	})
 }

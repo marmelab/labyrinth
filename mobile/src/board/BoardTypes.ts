@@ -96,5 +96,4 @@ export type Error = { severity: AlertColor; message: string };
 export interface PlaceTileHint {
   direction: Direction;
   index: number;
-  rotation: Rotation;
 }

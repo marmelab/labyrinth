@@ -49,6 +49,7 @@ interface TileViewProps {
     line: number;
     row: number;
   };
+  hint: boolean;
   playerTarget?: string;
   onInsertTile: InsertTileHandler;
   onMovePlayer: MovePlayerHandler;
@@ -60,6 +61,7 @@ export const TileView = ({
   canPlay,
   gameState,
   coordinates,
+  hint,
   playerTarget,
   onInsertTile,
   onMovePlayer,
@@ -91,6 +93,7 @@ export const TileView = ({
           boardTile={boardTile}
           playerTarget={playerTarget}
           onClick={onInsertTile.bind(null, ...direction)}
+          hint={hint}
         >
           {children}
         </Tile>
@@ -108,6 +111,7 @@ export const TileView = ({
       boardTile={boardTile}
       playerTarget={playerTarget}
       onClick={onMovePlayer.bind(null, coordinates.line, coordinates.row)}
+      hint={hint}
     >
       {children}
     </Tile>
