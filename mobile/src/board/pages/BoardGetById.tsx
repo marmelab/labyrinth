@@ -13,7 +13,7 @@ import {
 import {
   type Error,
   Direction,
-  PlaceTileHint,
+  TileInsertion,
   GameState,
   Coordinate,
 } from "../BoardTypes";
@@ -62,7 +62,7 @@ const placeTileHintIndexes = new Map<Direction, Map<number, number>>([
 ]);
 
 const getHintIndex = (
-  placeTileHint?: PlaceTileHint | null,
+  placeTileHint?: TileInsertion | null,
   movePawnHint?: (Coordinate & { size: number }) | null
 ): number | undefined => {
   if (placeTileHint) {
@@ -155,6 +155,7 @@ export function GetById() {
       state: { tiles, remainingTile },
       players,
       user,
+      lastInsertion,
     } = board;
 
     const errors: Error[] = [];
@@ -189,6 +190,7 @@ export function GetById() {
             onRotateRemainingTile={onRotateRemainingTile}
           />
         }
+        players={board.players}
         currentPlayer={board.currentPlayer}
         user={user}
         errors={errors}
@@ -205,6 +207,7 @@ export function GetById() {
                 gameState={gameState}
                 coordinates={{ line, row }}
                 hint={hintIndex == index}
+                lastInsertion={lastInsertion}
                 playerTarget={user?.currentTarget}
                 onInsertTile={onInsertTile}
                 onMovePlayer={onMovePlayer}

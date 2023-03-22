@@ -15,6 +15,7 @@ class PlayerViewModel
         private int $row,
         private array $targets,
         private int $score,
+        private ?int $winOrder,
         private bool $isCurrentPlayer,
         private bool $isUser,
     ) {
@@ -53,6 +54,11 @@ class PlayerViewModel
     public function getScore(): int
     {
         return $this->score;
+    }
+
+    public function getWinOrder(): ?int
+    {
+        return $this->winOrder;
     }
 
     #[SerializedName("totalTargets")]

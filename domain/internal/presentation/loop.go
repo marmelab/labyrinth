@@ -50,21 +50,13 @@ func (g gameLoop) insertTile(button Button, buttonIndex int) GuiHandler {
 
 		switch button {
 		case TopButton:
-			if err := g.board.InsertTileTopAt(buttonIndex); err != nil {
-				return err
-			}
+			g.board.InsertTileTopAt(buttonIndex)
 		case RightButton:
-			if err := g.board.InsertTileRightAt(buttonIndex); err != nil {
-				return err
-			}
+			g.board.InsertTileRightAt(buttonIndex)
 		case BottomButton:
-			if err := g.board.InsertTileBottomAt(buttonIndex); err != nil {
-				return err
-			}
+			g.board.InsertTileBottomAt(buttonIndex)
 		case LeftButton:
-			if err := g.board.InsertTileLeftAt(buttonIndex); err != nil {
-				return err
-			}
+			g.board.InsertTileLeftAt(buttonIndex)
 		}
 
 		return g.saveBoard()

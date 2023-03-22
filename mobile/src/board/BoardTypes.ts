@@ -23,7 +23,8 @@ export interface Board {
   currentPlayer?: Player | null;
   user?: Player | null;
   isGameCreator: boolean;
-  accessibleTiles?: AccessibleTiles;
+  lastInsertion: TileInsertion | null;
+  accessibleTiles: AccessibleTiles | null;
 }
 
 export interface BoardState {
@@ -71,8 +72,10 @@ export interface Player {
   line: number;
   row: number;
   targets: string[];
+  totalTargets: number;
   currentTarget: string;
   score: number;
+  winOrder: number | null;
   isCurrentPlayer: boolean;
   isUser: boolean;
 }
@@ -111,7 +114,7 @@ export interface BoardRepository {
 
 export type Error = { severity: AlertColor; message: string };
 
-export interface PlaceTileHint {
+export interface TileInsertion {
   direction: Direction;
   index: number;
 }

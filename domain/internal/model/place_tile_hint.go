@@ -7,9 +7,7 @@ type PlaceTileHint struct {
 }
 
 var (
-	placeTileHintsDirections = []Direction{DirectionTop, DirectionRight, DirectionBottom, DirectionLeft}
-	placeTileHintsIndexes    = []int{1, 3, 5}
-	placeTileHintsRotations  = []Rotation{Rotation0, Rotation90, Rotation180, Rotation270}
+	placeTileHintsRotations = []Rotation{Rotation0, Rotation90, Rotation180, Rotation270}
 )
 
 func (b *Board) Copy() *Board {
@@ -45,28 +43,26 @@ func (b *Board) GetPlaceTileHint() (*Board, *PlaceTileHint) {
 		bestPlaceTileHint      *PlaceTileHint = nil
 	)
 
-	for _, direction := range placeTileHintsDirections {
-		for _, index := range placeTileHintsIndexes {
-			for _, rotation := range placeTileHintsRotations {
-				boardCopy := b.Copy()
-				boardCopy.RemainingTile.Rotation = rotation
-				boardCopy.InsertTileAt(direction, index)
+	for _, insertion := range b.getAvailableInsertions() {
+		for _, rotation := range placeTileHintsRotations {
+			boardCopy := b.Copy()
+			boardCopy.RemainingTile.Rotation = rotation
+			boardCopy.InsertTileAt(insertion.Direction, insertion.Index)
 
-				accessibleTiles, isShortestPath := boardCopy.GetAccessibleTiles()
-				hint := &PlaceTileHint{
-					Direction: direction,
-					Index:     index,
-					Rotation:  rotation,
-				}
-				if isShortestPath {
-					return boardCopy, hint
-				}
+			accessibleTiles, isShortestPath := boardCopy.GetAccessibleTiles()
+			hint := &PlaceTileHint{
+				Direction: insertion.Direction,
+				Index:     insertion.Index,
+				Rotation:  rotation,
+			}
+			if isShortestPath {
+				return boardCopy, hint
+			}
 
-				if accessibleTileCount := len(accessibleTiles); accessibleTileCount > largestAccessibleTiles {
-					largestAccessibleTiles = accessibleTileCount
-					bestBoardCopy = boardCopy
-					bestPlaceTileHint = hint
-				}
+			if accessibleTileCount := len(accessibleTiles); accessibleTileCount > largestAccessibleTiles {
+				largestAccessibleTiles = accessibleTileCount
+				bestBoardCopy = boardCopy
+				bestPlaceTileHint = hint
 			}
 		}
 	}

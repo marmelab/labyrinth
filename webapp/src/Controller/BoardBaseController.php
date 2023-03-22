@@ -18,6 +18,7 @@ use App\ViewModel\BoardViewModel;
 use App\ViewModel\PlayerViewModel;
 use App\Service\DomainServiceInterface;
 use App\Service\Rotation;
+use App\ViewModel\LastInsertionViewModel;
 
 abstract class BoardBaseController extends AbstractController
 {
@@ -56,11 +57,10 @@ abstract class BoardBaseController extends AbstractController
         $state = $board->getState();
         $players =
             array_map(
-                /** @var Player $player */
                 function ($player) use ($user) {
+                    /** @var Player $player */
+
                     $attendee = $player->getAttendee();
-
-
                     $isUser = $user && $attendee && $attendee->getId() == $user->getId();
 
                     return new PlayerViewModel(
@@ -71,6 +71,7 @@ abstract class BoardBaseController extends AbstractController
                         $player->getRow(),
                         $player->getTargets(),
                         $player->getScore(),
+                        $player->getWinOrder(),
                         $player->isCurrentPlayer(),
                         $isUser
                     );
@@ -85,6 +86,13 @@ abstract class BoardBaseController extends AbstractController
         $isGameCreator = $user && $state['gameState'] != static::GAME_STATE_END && current(array_filter($players, function ($player) {
             return $player && $player->getIsUser();
         })) !== false;
+
+        $lastInsertion = isset($state['lastInsertion']) ?
+            new LastInsertionViewModel(
+                constant("\\App\\Service\\Direction::{$state['lastInsertion']['direction']}"),
+                $state['lastInsertion']['index']
+            ) :
+            null;
 
         /** @var ?AccessibleTilesViewModel */
         $accessibleTiles = null;
@@ -104,6 +112,7 @@ abstract class BoardBaseController extends AbstractController
             $players,
             $canPlay,
             $isGameCreator,
+            $lastInsertion,
             $accessibleTiles,
         );
     }

@@ -109,9 +109,12 @@ type Board struct {
 
 	// GameState is the current game state
 	State GameState `json:"gameState"`
+
+	// LastInsertion is the last tile insertion.
+	LastInsertion *TileInsertion `json:"lastInsertion"`
 }
 
-func (b Board) validatePlaceTile(index int) error {
+func (b Board) validatePlaceTile(direction Direction, index int) error {
 	if b.State != GameStatePlaceTile {
 		return ErrInvalidAction
 	}
@@ -120,11 +123,15 @@ func (b Board) validatePlaceTile(index int) error {
 		return ErrEvenRow
 	}
 
+	if b.LastInsertion != nil && b.LastInsertion.isOppositeTo(direction, index) {
+		return ErrInvalidAction
+	}
+
 	return nil
 }
 
 func (b *Board) InsertTileTopAt(row int) error {
-	if err := b.validatePlaceTile(row); err != nil {
+	if err := b.validatePlaceTile(DirectionTop, row); err != nil {
 		return err
 	}
 
@@ -142,11 +149,15 @@ func (b *Board) InsertTileTopAt(row int) error {
 
 	b.RemainingTile = current
 	b.State = GameStateMovePawn
+	b.LastInsertion = &TileInsertion{
+		Direction: DirectionTop,
+		Index:     row,
+	}
 	return nil
 }
 
 func (b *Board) InsertTileRightAt(line int) error {
-	if err := b.validatePlaceTile(line); err != nil {
+	if err := b.validatePlaceTile(DirectionRight, line); err != nil {
 		return err
 	}
 
@@ -166,11 +177,15 @@ func (b *Board) InsertTileRightAt(line int) error {
 
 	b.RemainingTile = current
 	b.State = GameStateMovePawn
+	b.LastInsertion = &TileInsertion{
+		Direction: DirectionRight,
+		Index:     line,
+	}
 	return nil
 }
 
 func (b *Board) InsertTileBottomAt(row int) error {
-	if err := b.validatePlaceTile(row); err != nil {
+	if err := b.validatePlaceTile(DirectionBottom, row); err != nil {
 		return err
 	}
 
@@ -190,11 +205,15 @@ func (b *Board) InsertTileBottomAt(row int) error {
 
 	b.RemainingTile = current
 	b.State = GameStateMovePawn
+	b.LastInsertion = &TileInsertion{
+		Direction: DirectionBottom,
+		Index:     row,
+	}
 	return nil
 }
 
 func (b *Board) InsertTileLeftAt(line int) error {
-	if err := b.validatePlaceTile(line); err != nil {
+	if err := b.validatePlaceTile(DirectionLeft, line); err != nil {
 		return err
 	}
 
@@ -211,6 +230,10 @@ func (b *Board) InsertTileLeftAt(line int) error {
 
 	b.RemainingTile = current
 	b.State = GameStateMovePawn
+	b.LastInsertion = &TileInsertion{
+		Direction: DirectionLeft,
+		Index:     line,
+	}
 	return nil
 }
 

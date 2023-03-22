@@ -1,7 +1,18 @@
 import type { ReactNode } from "react";
-import { Alert, Box, Button, Grid, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Grid,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Typography,
+} from "@mui/material";
 
-import { Color, type Error, type Player, GameState } from "../BoardTypes";
+import { Color, type Error, type Player } from "../BoardTypes";
 
 import { TREASURES } from "./Tile";
 
@@ -19,6 +30,7 @@ interface BoardProps {
   remainingTile: ReactNode;
   user?: Player | null;
   currentPlayer?: Player | null;
+  players: Player[];
   children: ReactNode;
   errors: Error[];
   handleGetHint: () => void;
@@ -35,11 +47,37 @@ const BoardStateItem = ({ label, value }: { label: string; value: string }) => (
   </Grid>
 );
 
+const BoardPlayers = ({ players }: { players: Player[] }) => (
+  <Table aria-label="simple table">
+    <TableHead>
+      <TableRow>
+        <TableCell>Name</TableCell>
+        <TableCell>Score</TableCell>
+        <TableCell>End</TableCell>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {players.map((player) => (
+        <TableRow key={player.name}>
+          <TableCell component="th" scope="row">
+            {player.name}
+          </TableCell>
+          <TableCell>
+            {player.score} / {player.totalTargets}
+          </TableCell>
+          <TableCell>{player.winOrder}</TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+);
+
 const BoardView = ({
   canPlay,
   remainingTile,
   user,
   currentPlayer,
+  players,
   children,
   errors,
   handleGetHint,
@@ -86,15 +124,14 @@ const BoardView = ({
                 Get Hint
               </Button>
             )}
-          </Grid>
 
-          {!canPlay && currentPlayer && (
-            <Grid item xs={12} mb={2}>
-              <Alert severity="info">
+            {!canPlay && currentPlayer && (
+              <Alert severity="info" sx={{ width: "100%" }}>
                 <strong>Waiting:</strong> {currentPlayer.name}
               </Alert>
-            </Grid>
-          )}
+            )}
+          </Grid>
+
           {canPlay &&
             errors.map((error, i) => (
               <Grid item xs={12} mt={2} key={i}>
@@ -102,6 +139,9 @@ const BoardView = ({
               </Grid>
             ))}
         </Grid>
+      </Box>
+      <Box width="355px" mt={2}>
+        <BoardPlayers players={players} />
       </Box>
     </>
   );
