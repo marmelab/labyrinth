@@ -267,24 +267,26 @@ func NewBoard(size, playerCount int) (*Board, error) {
 
 	board := &Board{
 		Tiles:                make([][]*BoardTile, size),
-		Players:              players[:playerCount],
+		Players:              make([]*Player, playerCount),
 		RemainingPlayers:     remainingPlayers[:playerCount],
 		RemainingPlayerIndex: 0,
 		State:                GameStatePlaceTile,
 	}
 
-	for i, player := range board.Players {
+	for i := 0; i < playerCount; i++ {
+		board.Players[i] = players[i].Copy()
 		treasureOffset := i * targetPerPlayer
 
-		if player.Position.Line == -1 {
-			player.Position.Line = size - 1
+		if board.Players[i].Position.Line == -1 {
+			board.Players[i].Position.Line = size - 1
 		}
 
-		if player.Position.Row == -1 {
-			player.Position.Row = size - 1
+		if board.Players[i].Position.Row == -1 {
+			board.Players[i].Position.Row = size - 1
 		}
 
-		player.Targets = treasures[treasureOffset : treasureOffset+targetPerPlayer]
+		board.Players[i].Targets = treasures[treasureOffset : treasureOffset+targetPerPlayer]
+		board.Players[i].Weights = NewBestHintWeights()
 	}
 
 	// The tile index is required here to track placed tiles on the board.
@@ -297,21 +299,21 @@ func NewBoard(size, playerCount int) (*Board, error) {
 		for row := 0; row < size; row++ {
 			template, ok := boardTemplate[size][line][row]
 			if ok {
-				board.Tiles[line][row] = template
+				board.Tiles[line][row] = template.Copy()
 			} else {
-				board.Tiles[line][row] = &BoardTile{
+				board.Tiles[line][row] = (&BoardTile{
 					Tile:     tiles[tileIndex],
 					Rotation: randomRotation(),
-				}
+				}).Copy()
 				tileIndex++
 			}
 		}
 	}
 
-	board.RemainingTile = &BoardTile{
+	board.RemainingTile = (&BoardTile{
 		Tile:     tiles[len(tiles)-1],
 		Rotation: Rotation0,
-	}
+	}).Copy()
 
 	return board, nil
 }

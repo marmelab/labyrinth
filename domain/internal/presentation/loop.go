@@ -31,7 +31,8 @@ const (
 type GuiHandler func(gui *gocui.Gui, view *gocui.View) error
 
 type gameLoop struct {
-	boardDrawer BoardDrawer
+	boardDrawer   BoardDrawer
+	enableActions bool
 
 	board     *model.Board
 	saveBoard storage.BoardSaveFn
@@ -102,8 +103,9 @@ func (g *gameLoop) Run() error {
 	g.gui = gui
 
 	gameUi := &gameUi{
-		gui:  gui,
-		loop: g,
+		gui:           gui,
+		loop:          g,
+		enableActions: g.enableActions,
 
 		boardDrawer: g.boardDrawer,
 		board:       g.board,
@@ -126,9 +128,10 @@ func (g *gameLoop) Run() error {
 }
 
 // RunGameLoop runs the labyrinth game with the provided initial state.
-func RunGameLoop(initialState *model.Board, saveBoard storage.BoardSaveFn) error {
+func RunGameLoop(initialState *model.Board, enableActions bool, saveBoard storage.BoardSaveFn) error {
 	return (&gameLoop{
-		boardDrawer: NewBoardDrawer(),
+		boardDrawer:   NewBoardDrawer(),
+		enableActions: enableActions,
 
 		board:     initialState,
 		saveBoard: saveBoard,

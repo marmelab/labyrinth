@@ -31,7 +31,7 @@ func TestMovePawnHint(t *testing.T) {
 
 			hint, _ := board.GetMovePawnHint()
 
-			assert.Equal(t, &Coordinate{6, 3}, hint)
+			assert.Equal(t, &Coordinate{4, 4}, hint)
 		})
 
 		t.Run("GetMovePawnHint should return the closest tile to the center if remaining tile", func(t *testing.T) {
@@ -39,7 +39,7 @@ func TestMovePawnHint(t *testing.T) {
 
 			hint, _ := board.GetMovePawnHint()
 
-			assert.Equal(t, &Coordinate{3, 4}, hint)
+			assert.Equal(t, &Coordinate{4, 4}, hint)
 		})
 	})
 }

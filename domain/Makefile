@@ -22,3 +22,6 @@ run: 				## Run the program
 
 clean: 				## Cleans all existing saves, use with caution.
 	@(rm ${HOME}/.labyrinth/*)
+
+ai-train:			## Train the AI
+	@(go run ai/main.go)

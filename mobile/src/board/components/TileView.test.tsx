@@ -30,6 +30,7 @@ describe("Tile", () => {
           onMovePlayer={onMovePlayer}
           isAccessible={true}
           hint={false}
+          lastInsertion={null}
         />
       );
 
@@ -52,6 +53,7 @@ describe("Tile", () => {
           onMovePlayer={onMovePlayer}
           isAccessible={true}
           hint={false}
+          lastInsertion={null}
         />
       );
 
@@ -79,6 +81,7 @@ describe("Tile", () => {
           onMovePlayer={onMovePlayer}
           isAccessible={true}
           hint={false}
+          lastInsertion={null}
         />
       );
 

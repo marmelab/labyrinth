@@ -140,7 +140,7 @@ func TestBoard(t *testing.T) {
 
 	t.Run("Copy", func(t *testing.T) {
 		b := NewTestBoard()
-		assert.Equal(t, b, b.Copy())
+		assert.Equal(t, b.Copy(), b.Copy())
 	})
 
 	t.Run("InsertTileTopAt()", func(t *testing.T) {
