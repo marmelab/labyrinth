@@ -190,6 +190,7 @@ export function GetById() {
             onRotateRemainingTile={onRotateRemainingTile}
           />
         }
+        players={board.players}
         currentPlayer={board.currentPlayer}
         user={user}
         errors={errors}

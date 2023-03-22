@@ -57,11 +57,10 @@ abstract class BoardBaseController extends AbstractController
         $state = $board->getState();
         $players =
             array_map(
-                /** @var Player $player */
                 function ($player) use ($user) {
+                    /** @var Player $player */
+
                     $attendee = $player->getAttendee();
-
-
                     $isUser = $user && $attendee && $attendee->getId() == $user->getId();
 
                     return new PlayerViewModel(
@@ -72,6 +71,7 @@ abstract class BoardBaseController extends AbstractController
                         $player->getRow(),
                         $player->getTargets(),
                         $player->getScore(),
+                        $player->getWinOrder(),
                         $player->isCurrentPlayer(),
                         $isUser
                     );
@@ -87,7 +87,7 @@ abstract class BoardBaseController extends AbstractController
             return $player && $player->getIsUser();
         })) !== false;
 
-        $lastInsertion = $state['lastInsertion'] ?
+        $lastInsertion = isset($state['lastInsertion']) ?
             new LastInsertionViewModel(
                 constant("\\App\\Service\\Direction::{$state['lastInsertion']['direction']}"),
                 $state['lastInsertion']['index']

@@ -72,8 +72,10 @@ export interface Player {
   line: number;
   row: number;
   targets: string[];
+  totalTargets: number;
   currentTarget: string;
   score: number;
+  winOrder: number | null;
   isCurrentPlayer: boolean;
   isUser: boolean;
 }
