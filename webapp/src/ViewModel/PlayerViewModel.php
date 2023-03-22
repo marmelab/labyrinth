@@ -9,6 +9,7 @@ class PlayerViewModel
 
     public function __construct(
         private string $name,
+        private bool $isBot,
         private int $color,
         private int $line,
         private int $row,
@@ -22,6 +23,11 @@ class PlayerViewModel
     public function getName(): string
     {
         return $this->name;
+    }
+
+    public function getIsBot(): bool
+    {
+        return $this->isBot;
     }
 
     public function getColor(): int

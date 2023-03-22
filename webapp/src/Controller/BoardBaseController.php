@@ -23,6 +23,7 @@ abstract class BoardBaseController extends AbstractController
 {
     const GAME_STATE_PLACE_TILE = 0;
     const GAME_STATE_MOVE_PAWN = 1;
+    const GAME_STATE_END = 2;
 
     protected function __construct(
         protected DomainServiceInterface $domainService,
@@ -64,6 +65,7 @@ abstract class BoardBaseController extends AbstractController
 
                     return new PlayerViewModel(
                         $attendee ? $attendee->getUsername() : "Bot #" . $player->getId(),
+                        $player->isIsBot(),
                         $player->getColor(),
                         $player->getLine(),
                         $player->getRow(),
@@ -76,8 +78,12 @@ abstract class BoardBaseController extends AbstractController
                 $board->getPlayers()->toArray()
             );
 
-        $canPlay = $user && $state['gameState'] != 2 && current(array_filter($players, function ($player) {
+        $canPlay = $user && $state['gameState'] != static::GAME_STATE_END && current(array_filter($players, function ($player) {
             return $player && $player->getIsCurrentPlayer() && $player->getIsUser();
+        })) !== false;
+
+        $isGameCreator = $user && $state['gameState'] != static::GAME_STATE_END && current(array_filter($players, function ($player) {
+            return $player && $player->getIsUser();
         })) !== false;
 
         /** @var ?AccessibleTilesViewModel */
@@ -97,14 +103,25 @@ abstract class BoardBaseController extends AbstractController
             $state,
             $players,
             $canPlay,
+            $isGameCreator,
             $accessibleTiles,
         );
     }
 
     protected function canUserPlay(?User $user, Board $board): bool
     {
-        return $this->createBoardViewModel($user, $board)->getCanPlay();
+        $boardViewModel = $this->createBoardViewModel($user, $board);
+        if ($boardViewModel->getCanPlay()) {
+            return true;
+        }
+
+        if ($boardViewModel->getCurrentPlayer()->getIsBot() && $boardViewModel->getIsGameCreator()) {
+            return true;
+        }
+
+        return false;
     }
+
 
     protected function publishUpdate(Board $board, array $actions)
     {
@@ -123,6 +140,11 @@ abstract class BoardBaseController extends AbstractController
         $isCurrentPlayer =
             count($remainingPlayers) > 0 &&
             $remainingPlayers[$state['currentPlayerIndex']] == $playerIndex;
+
+
+        usort($state['players'], function ($a, $b) {
+            return $a['color'] <=> $b['color'];
+        });
 
         $playerState = $state['players'][$playerIndex];
         return $player
@@ -151,6 +173,9 @@ abstract class BoardBaseController extends AbstractController
             return $current;
         }, 0);
 
+        usort($players, function ($a, $b) {
+            return $a->getColor() <=> $b->getColor();
+        });
         foreach ($players as $index => $player) {
             /** @var Player $player */
 

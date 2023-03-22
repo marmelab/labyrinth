@@ -479,6 +479,12 @@ func (b Board) getShortestPath() Coordinates {
 		targetVertex = targetLine*size + targetRow
 	)
 
+	if sourceVertex == targetVertex {
+		return Coordinates{
+			currentPlayer.Position,
+		}
+	}
+
 	best, err := graph.Shortest(sourceVertex, targetVertex)
 	if err != nil { // No path was found.
 		return nil

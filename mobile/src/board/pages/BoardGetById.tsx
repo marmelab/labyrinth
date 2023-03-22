@@ -179,7 +179,7 @@ export function GetById() {
 
     return (
       <BoardView
-        gameState={gameState}
+        canPlay={board.canPlay}
         remainingTile={
           <RemainingTileView
             boardTile={remainingTile}
@@ -189,6 +189,7 @@ export function GetById() {
             onRotateRemainingTile={onRotateRemainingTile}
           />
         }
+        currentPlayer={board.currentPlayer}
         user={user}
         errors={errors}
         handleGetHint={handleGetHint}

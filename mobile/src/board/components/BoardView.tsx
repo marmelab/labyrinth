@@ -1,21 +1,7 @@
 import type { ReactNode } from "react";
-import {
-  Alert,
-  AlertColor,
-  Box,
-  Button,
-  Grid,
-  Typography,
-} from "@mui/material";
+import { Alert, Box, Button, Grid, Typography } from "@mui/material";
 
-import {
-  Color,
-  type Error,
-  PlaceTileHint,
-  type Player,
-  GameState,
-  Direction,
-} from "../BoardTypes";
+import { Color, type Error, type Player, GameState } from "../BoardTypes";
 
 import { TREASURES } from "./Tile";
 
@@ -29,9 +15,10 @@ const colorNames = {
 };
 
 interface BoardProps {
-  gameState: GameState;
+  canPlay: boolean;
   remainingTile: ReactNode;
   user?: Player | null;
+  currentPlayer?: Player | null;
   children: ReactNode;
   errors: Error[];
   handleGetHint: () => void;
@@ -49,9 +36,10 @@ const BoardStateItem = ({ label, value }: { label: string; value: string }) => (
 );
 
 const BoardView = ({
-  gameState,
+  canPlay,
   remainingTile,
   user,
+  currentPlayer,
   children,
   errors,
   handleGetHint,
@@ -84,25 +72,37 @@ const BoardView = ({
         </Grid>
       </Box>
 
-      {user?.isCurrentPlayer && (
-        <Box width="355px">
-          <Grid container>
-            <Grid item xs={12} display="flex" justifyContent="flex-end">
-              {gameState != GameState.End && (
-                <Button variant="outlined" onClick={handleGetHint}>
-                  Get Hint
-                </Button>
-              )}
-            </Grid>
+      <Box width="355px">
+        <Grid container>
+          <Grid
+            item
+            xs={12}
+            display="flex"
+            justifyContent="flex-end"
+            minHeight={50}
+          >
+            {canPlay && (
+              <Button variant="outlined" onClick={handleGetHint}>
+                Get Hint
+              </Button>
+            )}
+          </Grid>
 
-            {errors.map((error, i) => (
+          {!canPlay && currentPlayer && (
+            <Grid item xs={12} mb={2}>
+              <Alert severity="info">
+                <strong>Waiting:</strong> {currentPlayer.name}
+              </Alert>
+            </Grid>
+          )}
+          {canPlay &&
+            errors.map((error, i) => (
               <Grid item xs={12} mt={2} key={i}>
                 <Alert severity={error.severity}>{error.message}</Alert>
               </Grid>
             ))}
-          </Grid>
-        </Box>
-      )}
+        </Grid>
+      </Box>
     </>
   );
 };

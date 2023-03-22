@@ -69,17 +69,22 @@ export const TileView = ({
   isAccessible,
   children,
 }: TileViewProps) => {
-  if (!canPlay || gameState == GameState.End) {
+  if (gameState == GameState.Animating) {
     return (
-      <Tile disabled boardTile={boardTile} playerTarget={playerTarget}>
+      <Tile
+        disabled={!canPlay}
+        animate
+        boardTile={boardTile}
+        playerTarget={playerTarget}
+      >
         {children}
       </Tile>
     );
   }
 
-  if (gameState == GameState.Animating) {
+  if (!canPlay || gameState == GameState.End) {
     return (
-      <Tile animate boardTile={boardTile} playerTarget={playerTarget}>
+      <Tile disabled boardTile={boardTile} playerTarget={playerTarget}>
         {children}
       </Tile>
     );
