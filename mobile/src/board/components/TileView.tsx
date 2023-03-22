@@ -1,6 +1,11 @@
 import type { ReactNode } from "react";
 
-import { type BoardTile, Direction, GameState } from "../BoardTypes";
+import {
+  type BoardTile,
+  Direction,
+  GameState,
+  TileInsertion,
+} from "../BoardTypes";
 import { type InsertTileHandler, type MovePlayerHandler, Tile } from "./Tile";
 
 const insertableIndexes = [1, 3, 5];
@@ -50,6 +55,7 @@ interface TileViewProps {
     row: number;
   };
   hint: boolean;
+  lastInsertion: TileInsertion | null;
   playerTarget?: string;
   onInsertTile: InsertTileHandler;
   onMovePlayer: MovePlayerHandler;
@@ -57,12 +63,20 @@ interface TileViewProps {
   children?: ReactNode;
 }
 
+const oppositeDirections = {
+  [Direction.Top]: Direction.Bottom,
+  [Direction.Right]: Direction.Left,
+  [Direction.Bottom]: Direction.Top,
+  [Direction.Left]: Direction.Right,
+};
+
 export const TileView = ({
   boardTile,
   canPlay,
   gameState,
   coordinates,
   hint,
+  lastInsertion,
   playerTarget,
   onInsertTile,
   onMovePlayer,
@@ -94,7 +108,14 @@ export const TileView = ({
     let direction = placeTileDirection
       .get(coordinates.line)
       ?.get(coordinates.row);
-    if (direction) {
+
+    if (
+      direction &&
+      !(
+        oppositeDirections[direction[0]] == lastInsertion?.direction &&
+        direction[1] == lastInsertion?.index
+      )
+    ) {
       return (
         <Tile
           boardTile={boardTile}

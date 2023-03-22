@@ -1,16 +1,16 @@
 import { AlertColor } from "@mui/material";
 import { useMutation } from "react-query";
 
-import type { BoardID, Error, PlaceTileHint } from "../BoardTypes";
+import type { BoardID, Error, TileInsertion } from "../BoardTypes";
 
 type MutationError = { message: string; severity?: AlertColor };
 
 interface PlaceTileHintResponse {
-  data: MutationError | PlaceTileHint;
+  data: MutationError | TileInsertion;
 }
 
 export const useGetPlaceTileHintMutation = () =>
-  useMutation<PlaceTileHint | null, Error, BoardID, void>(async (id) => {
+  useMutation<TileInsertion | null, Error, BoardID, void>(async (id) => {
     const response = await fetch(`/api/v1/board/${id}/place-tile-hint`, {
       method: "PUT",
       headers: {
@@ -27,7 +27,7 @@ export const useGetPlaceTileHintMutation = () =>
       };
     }
 
-    const data = responseContent.data as PlaceTileHint;
+    const data = responseContent.data as TileInsertion;
     if (!data) {
       return null;
     }

@@ -1,7 +1,13 @@
 import type { ReactNode } from "react";
 import { Alert, Box, Button, Grid, Typography } from "@mui/material";
 
-import { Color, type Error, type Player, GameState } from "../BoardTypes";
+import {
+  Color,
+  type Error,
+  type Player,
+  GameState,
+  TileInsertion,
+} from "../BoardTypes";
 
 import { TREASURES } from "./Tile";
 

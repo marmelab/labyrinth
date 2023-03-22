@@ -18,6 +18,7 @@ use App\ViewModel\BoardViewModel;
 use App\ViewModel\PlayerViewModel;
 use App\Service\DomainServiceInterface;
 use App\Service\Rotation;
+use App\ViewModel\LastInsertionViewModel;
 
 abstract class BoardBaseController extends AbstractController
 {
@@ -86,6 +87,13 @@ abstract class BoardBaseController extends AbstractController
             return $player && $player->getIsUser();
         })) !== false;
 
+        $lastInsertion = $state['lastInsertion'] ?
+            new LastInsertionViewModel(
+                constant("\\App\\Service\\Direction::{$state['lastInsertion']['direction']}"),
+                $state['lastInsertion']['index']
+            ) :
+            null;
+
         /** @var ?AccessibleTilesViewModel */
         $accessibleTiles = null;
         if ($canPlay && $state['gameState'] == static::GAME_STATE_MOVE_PAWN) {
@@ -104,6 +112,7 @@ abstract class BoardBaseController extends AbstractController
             $players,
             $canPlay,
             $isGameCreator,
+            $lastInsertion,
             $accessibleTiles,
         );
     }

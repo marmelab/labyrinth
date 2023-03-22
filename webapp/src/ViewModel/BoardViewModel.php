@@ -14,6 +14,7 @@ class BoardViewModel
         private array $players,
         private bool $canPlay,
         private bool $isGameCreator,
+        private ?LastInsertionViewModel $lastInsertion,
         private ?AccessibleTilesViewModel $accessibleTiles = null
     ) {
     }
@@ -75,6 +76,11 @@ class BoardViewModel
     public function getGameState(): int
     {
         return $this->state['gameState'];
+    }
+
+    public function getLastInsertion(): ?LastInsertionViewModel
+    {
+        return $this->lastInsertion;
     }
 
     public function getAccessibleTiles(): ?AccessibleTilesViewModel

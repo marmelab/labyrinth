@@ -1,7 +1,7 @@
 import { AlertColor } from "@mui/material";
 import { useMutation } from "react-query";
 
-import type { BoardID, Coordinate, Error, PlaceTileHint } from "../BoardTypes";
+import type { BoardID, Coordinate, Error, TileInsertion } from "../BoardTypes";
 
 type MutationError = { message: string; severity?: AlertColor };
 
