@@ -123,7 +123,7 @@ func (b Board) validatePlaceTile(direction Direction, index int) error {
 		return ErrEvenRow
 	}
 
-	if b.LastInsertion != nil && b.LastInsertion.Direction == oppositeDirection[direction] && b.LastInsertion.Index == index {
+	if b.LastInsertion != nil && b.LastInsertion.isOppositeTo(direction, index) {
 		return ErrInvalidAction
 	}
 

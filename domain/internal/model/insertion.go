@@ -10,7 +10,7 @@ const (
 )
 
 var (
-	oppositeDirection = map[Direction]Direction{
+	oppositeDirections = map[Direction]Direction{
 		DirectionTop:    DirectionBottom,
 		DirectionRight:  DirectionLeft,
 		DirectionBottom: DirectionTop,
@@ -28,12 +28,16 @@ type TileInsertion struct {
 	Index     int       `json:"index"`
 }
 
+func (t TileInsertion) isOppositeTo(direction Direction, index int) bool {
+	return direction == oppositeDirections[t.Direction] && index == t.Index
+}
+
 func (b *Board) getAvailableInsertions() []*TileInsertion {
 	availableInsertions := make([]*TileInsertion, 0, 12)
 
 	for _, direction := range insertionDirections {
 		for _, index := range insertionIndexes {
-			if b.LastInsertion != nil && b.LastInsertion.Direction == direction && b.LastInsertion.Index == index {
+			if b.LastInsertion != nil && b.LastInsertion.isOppositeTo(direction, index) {
 				continue
 			}
 

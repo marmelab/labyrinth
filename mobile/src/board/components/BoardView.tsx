@@ -124,15 +124,14 @@ const BoardView = ({
                 Get Hint
               </Button>
             )}
-          </Grid>
 
-          {!canPlay && currentPlayer && (
-            <Grid item xs={12} mb={2}>
-              <Alert severity="info">
+            {!canPlay && currentPlayer && (
+              <Alert severity="info" sx={{ width: "100%" }}>
                 <strong>Waiting:</strong> {currentPlayer.name}
               </Alert>
-            </Grid>
-          )}
+            )}
+          </Grid>
+
           {canPlay &&
             errors.map((error, i) => (
               <Grid item xs={12} mt={2} key={i}>
