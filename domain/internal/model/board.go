@@ -278,25 +278,27 @@ func (b *Board) RotateRemainingTileAntiClockwise() {
 	}
 }
 
-func (b *Board) MoveCurrentPlayerTo(line, row int) error {
+func (b *Board) MoveCurrentPlayerTo(line, row int) (Coordinates, error) {
 	if b.State != GameStateMovePawn {
-		return ErrInvalidAction
+		return nil, ErrInvalidAction
 	}
 
 	if line >= b.GetSize() {
-		return ErrInvalidAction
+		return nil, ErrInvalidAction
 	}
 
 	if row >= b.GetSize() {
-		return ErrInvalidAction
+		return nil, ErrInvalidAction
 	}
 
 	accessibleTiles, isShortestPath := b.GetAccessibleTiles()
 	if targetTile := accessibleTiles[len(accessibleTiles)-1]; isShortestPath && (targetTile.Line != line || targetTile.Row != row) {
-		return ErrInvalidAction
+		return nil, ErrInvalidAction
 	} else if !accessibleTiles.Contains(&Coordinate{line, row}) {
-		return ErrInvalidAction
+		return nil, ErrInvalidAction
 	}
+
+	path := b.getShortestPathTo(line, row)
 
 	currentPlayer := b.GetCurrentPlayer()
 	currentPlayer.Position.Line = line
@@ -330,7 +332,7 @@ func (b *Board) MoveCurrentPlayerTo(line, row int) error {
 	} else {
 		b.State = GameStatePlaceTile
 	}
-	return nil
+	return path, nil
 }
 
 func (b Board) GetCurrentPlayer() *Player {
@@ -400,7 +402,7 @@ func (b Board) GetAccessibleTiles() (tiles Coordinates, isShortestPath bool) {
 	for _, coordinate := range accessibleTiles {
 		currentTile := b.Tiles[coordinate.Line][coordinate.Row]
 		if currentTile.Tile.Treasure == currentPlayer.Targets[0] {
-			return b.getShortestPath(), true
+			return b.getShortestPathToTarget(), true
 		}
 	}
 
@@ -486,7 +488,7 @@ func (b Board) GetCurrentTargetCoordinate() *Coordinate {
 	}
 }
 
-func (b Board) getShortestPath() Coordinates {
+func (b Board) getShortestPathTo(targetLine, targetRow int) Coordinates {
 	var (
 		size = b.GetSize()
 
@@ -495,8 +497,6 @@ func (b Board) getShortestPath() Coordinates {
 		graph, getCoordinatesByVertex = b.buildGraph()
 
 		sourceVertex = b.vertextId(currentPlayer.Position.Line, currentPlayer.Position.Row)
-
-		targetLine, targetRow = b.getCurrentTargetIndex()
 
 		// targetVertex is the target node
 		targetVertex = targetLine*size + targetRow
@@ -519,4 +519,8 @@ func (b Board) getShortestPath() Coordinates {
 	}
 
 	return path
+}
+
+func (b Board) getShortestPathToTarget() Coordinates {
+	return b.getShortestPathTo(b.getCurrentTargetIndex())
 }

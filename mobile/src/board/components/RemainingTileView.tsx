@@ -24,7 +24,7 @@ export const RemainingTileView = ({
     opacity: boardTile.opacity ?? 1,
   };
 
-  if (gameState == GameState.Animating) {
+  if (gameState == GameState.PlaceTileAnimate) {
     return (
       <Tile
         disabled={!canPlay}

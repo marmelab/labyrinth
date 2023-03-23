@@ -217,21 +217,25 @@ export function GetById() {
                       coordinate.line === line && coordinate.row === row
                   )
                 }
-              >
-                {players
-                  .filter((player) => player.line == line && player.row == row)
-                  .map((player) => {
-                    return (
-                      <PlayerPawnView
-                        key={`${player.color}`}
-                        color={player.color}
-                      />
-                    );
-                  })}
-              </TileView>
+              />
             );
           })
         )}
+
+        {players.map(({ color, line, row }) => {
+          return (
+            <PlayerPawnView
+              key={`${color}`}
+              color={color}
+              line={line}
+              row={row}
+              animate={
+                gameState == GameState.MovePawnAnimate &&
+                board.currentPlayer?.color == color
+              }
+            />
+          );
+        })}
       </BoardView>
     );
   } else if (error) {

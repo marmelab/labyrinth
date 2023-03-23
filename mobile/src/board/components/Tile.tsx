@@ -1,6 +1,4 @@
-import type { ReactNode } from "react";
-
-import { type BoardTile, Direction, GameState } from "../BoardTypes";
+import { type BoardTile, Direction } from "../BoardTypes";
 
 import "./Tile.css";
 
@@ -60,14 +58,12 @@ export const Tile = ({
   },
   hint = false,
   playerTarget,
-  children,
   disabled,
   onClick,
 }: {
   animate?: boolean;
   remainingTile?: boolean;
   boardTile: BoardTile;
-  children?: ReactNode;
   hint?: boolean;
   playerTarget?: string;
   disabled?: boolean;
@@ -87,7 +83,6 @@ export const Tile = ({
       >
         <div className={`tile__path`}></div>
         <div className="tile__treasure">{TREASURES[treasure]}</div>
-        {children}
       </button>
     </div>
   );

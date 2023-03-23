@@ -124,7 +124,8 @@ const BoardView = ({
                 Get Hint
               </Button>
             )}
-
+          </Grid>
+          <Grid item xs={12}>
             {!canPlay && currentPlayer && (
               <Alert severity="info" sx={{ width: "100%" }}>
                 <strong>Waiting:</strong> {currentPlayer.name}

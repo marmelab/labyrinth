@@ -46,15 +46,17 @@ func newPlaceTileAction(direction model.Direction, index int) *Action {
 	}
 }
 
-func newMovePawnAction(line, row int) *Action {
+func newMovePawnAction(line, row int, path model.Coordinates) *Action {
 	return &Action{
 		Kind: ActionKindMovePawn,
 		Playload: &struct {
-			Line int `json:"line"`
-			Row  int `json:"row"`
+			Line int               `json:"line"`
+			Row  int               `json:"row"`
+			Path model.Coordinates `json:"path"`
 		}{
 			Line: line,
 			Row:  row,
+			Path: path,
 		},
 	}
 }
