@@ -160,3 +160,7 @@ cli-run: 										## Run the CLI version of the labyrinth.
 
 cli-clean: 										## Cleans all existing saves, use with caution.
 	@(rm ${HOME}/.labyrinth/*)
+
+ai-train: 										## Train the AI
+	@(${MAKE} -C domain ai-train)
+

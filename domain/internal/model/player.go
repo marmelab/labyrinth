@@ -23,6 +23,9 @@ type Player struct {
 
 	// Player score
 	Score int `json:"score"`
+
+	// Weigths is the hint weights that are applied.
+	Weights *HintWeights `json:"weights"`
 }
 
 func (p Player) Name() string {
@@ -38,7 +41,19 @@ func (p Player) Name() string {
 	}
 }
 
+func (p *Player) GetWeights() *HintWeights {
+	if p.Weights == nil {
+		p.Weights = NewBestHintWeights()
+	}
+
+	return p.Weights
+}
+
 func (p *Player) Copy() *Player {
+	if p.Weights == nil {
+		p.Weights = NewBestHintWeights()
+	}
+
 	playerCopy := &Player{
 		Color: p.Color,
 		Position: &Coordinate{
@@ -47,6 +62,7 @@ func (p *Player) Copy() *Player {
 		},
 		Targets: make([]Treasure, len(p.Targets)),
 		Score:   p.Score,
+		Weights: p.Weights.Copy(),
 	}
 	copy(playerCopy.Targets, p.Targets)
 	return playerCopy

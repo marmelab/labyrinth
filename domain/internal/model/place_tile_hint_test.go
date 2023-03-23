@@ -40,7 +40,7 @@ func TestPlaceTileHint(t *testing.T) {
 			updatedBoard, hint := board.GetPlaceTileHint()
 
 			assert.NotEqual(t, board, updatedBoard)
-			assert.Equal(t, &PlaceTileHint{Direction: "TOP", Index: 1, Rotation: 0}, hint)
+			assert.Equal(t, &PlaceTileHint{Direction: "TOP", Index: 3, Rotation: 0}, hint)
 		})
 	})
 }

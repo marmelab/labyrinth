@@ -36,8 +36,9 @@ var (
 )
 
 type gameUi struct {
-	gui  *gocui.Gui
-	loop *gameLoop
+	gui           *gocui.Gui
+	loop          *gameLoop
+	enableActions bool
 
 	boardDrawer BoardDrawer
 	board       *model.Board
@@ -75,8 +76,10 @@ func (g gameUi) drawButton(name, text string, topLeftX, topLeftY, bottomRightX, 
 		button.Frame = false
 
 		fmt.Fprint(button, text)
-		if err := g.gui.SetKeybinding(name, gocui.MouseLeft, gocui.ModNone, handler); err != nil {
-			return nil, errors.Join(fmt.Errorf("failed to set mouse click to %s", name), err)
+		if g.enableActions {
+			if err := g.gui.SetKeybinding(name, gocui.MouseLeft, gocui.ModNone, handler); err != nil {
+				return nil, errors.Join(fmt.Errorf("failed to set mouse click to %s", name), err)
+			}
 		}
 	}
 
@@ -154,8 +157,10 @@ func (g gameUi) drawTiles(tileCount int) error {
 				}
 				tileView.Frame = false
 
-				if err := g.gui.SetKeybinding(name, gocui.MouseLeft, gocui.ModNone, g.loop.moveCurrentPlayerTo(line, row)); err != nil {
-					return errors.Join(fmt.Errorf("failed to set mouse click to %s", name), err)
+				if g.enableActions {
+					if err := g.gui.SetKeybinding(name, gocui.MouseLeft, gocui.ModNone, g.loop.moveCurrentPlayerTo(line, row)); err != nil {
+						return errors.Join(fmt.Errorf("failed to set mouse click to %s", name), err)
+					}
 				}
 			}
 

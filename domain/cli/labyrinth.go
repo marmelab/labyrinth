@@ -37,7 +37,7 @@ func RunApplication(cmd *cobra.Command, args []string) {
 		log.Fatalf("Failed to initialize board: %v.", err)
 	}
 
-	if err := presentation.RunGameLoop(board, saveBoard); err != nil {
+	if err := presentation.RunGameLoop(board, true, saveBoard); err != nil {
 		log.Fatalf("Failed to run main loop: %v.", err)
 	}
 }
