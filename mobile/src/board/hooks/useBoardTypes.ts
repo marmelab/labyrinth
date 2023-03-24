@@ -1,4 +1,4 @@
-import { type Board, GameState, Rotation, Direction } from "../BoardTypes";
+import { Rotation, Direction, type Coordinate } from "../BoardTypes";
 
 export const timeout = (duration: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, duration));
@@ -168,6 +168,49 @@ export const moveTileIndexes = new Map<Direction, Map<number, number[]>>([
     ]),
   ],
 ]);
+
+export const movePlayerIndex = new Map<
+  Direction,
+  (index: number, lastTileIndex: number) => number
+>([
+  [
+    Direction.Top,
+    (index, lastTileIndex) => {
+      if (index == lastTileIndex) {
+        return 0;
+      }
+      return index + 1;
+    },
+  ],
+  [
+    Direction.Right,
+    (index, lastTileIndex) => {
+      if (index == 0) {
+        return lastTileIndex;
+      }
+      return index - 1;
+    },
+  ],
+  [
+    Direction.Bottom,
+    (index, lastTileIndex) => {
+      if (index == 0) {
+        return lastTileIndex;
+      }
+      return index - 1;
+    },
+  ],
+  [
+    Direction.Left,
+    (index, lastTileIndex) => {
+      if (index == lastTileIndex) {
+        return 0;
+      }
+      return index + 1;
+    },
+  ],
+]);
+
 export const moveTileOffsets = new Map<
   Direction,
   { top?: number; left?: number }
@@ -223,6 +266,7 @@ export interface PlaceTilePayload {
 export interface MovePawnPayload {
   line: number;
   row: number;
+  path: Coordinate[];
 }
 
 export interface UserAction {

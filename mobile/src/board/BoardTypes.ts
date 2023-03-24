@@ -4,7 +4,8 @@ export enum GameState {
   PlaceTile = 0,
   MovePawn = 1,
   End = 2,
-  Animating = -1,
+  PlaceTileAnimate = -1,
+  MovePawnAnimate = -2,
 }
 
 export interface BoardListItem {

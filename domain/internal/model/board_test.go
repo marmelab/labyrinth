@@ -520,7 +520,7 @@ func TestBoard(t *testing.T) {
 		t.Run("Should return an error if state is not move player", func(t *testing.T) {
 			board := NewTestBoard()
 
-			err := board.MoveCurrentPlayerTo(1, 1)
+			_, err := board.MoveCurrentPlayerTo(1, 1)
 			assert.Equal(t, ErrInvalidAction, err)
 		})
 
@@ -529,7 +529,7 @@ func TestBoard(t *testing.T) {
 			board.State = GameStateMovePawn
 			board.GetCurrentPlayer().Targets = []Treasure{'E'}
 
-			err := board.MoveCurrentPlayerTo(1, 1)
+			_, err := board.MoveCurrentPlayerTo(1, 1)
 			assert.Nil(t, err)
 			assert.Equal(t, 1, board.Players[0].Position.Line)
 			assert.Equal(t, 1, board.Players[0].Position.Row)
@@ -550,7 +550,7 @@ func TestBoard(t *testing.T) {
 				State: GameStateMovePawn,
 			}
 
-			err := board.MoveCurrentPlayerTo(4, 1)
+			_, err := board.MoveCurrentPlayerTo(4, 1)
 			assert.Equal(t, ErrInvalidAction, err)
 		})
 
@@ -558,7 +558,7 @@ func TestBoard(t *testing.T) {
 			board := NewTestBoard()
 			board.State = GameStateMovePawn
 
-			err := board.MoveCurrentPlayerTo(1, 4)
+			_, err := board.MoveCurrentPlayerTo(1, 4)
 			assert.Equal(t, ErrInvalidAction, err)
 		})
 
@@ -567,7 +567,7 @@ func TestBoard(t *testing.T) {
 			board.State = GameStateMovePawn
 			board.GetCurrentPlayer().Targets = []Treasure{'E'}
 
-			err := board.MoveCurrentPlayerTo(0, 2)
+			_, err := board.MoveCurrentPlayerTo(0, 2)
 			assert.Nil(t, err)
 			assert.Equal(t, 0, board.Players[0].Position.Line)
 			assert.Equal(t, 2, board.Players[0].Position.Row)
@@ -578,7 +578,7 @@ func TestBoard(t *testing.T) {
 			board.State = GameStateMovePawn
 			board.GetCurrentPlayer().Targets = []Treasure{'E'}
 
-			err := board.MoveCurrentPlayerTo(1, 1)
+			_, err := board.MoveCurrentPlayerTo(1, 1)
 			assert.Nil(t, err)
 			assert.Equal(t, GameStatePlaceTile, board.State)
 		})
@@ -588,7 +588,7 @@ func TestBoard(t *testing.T) {
 			board.State = GameStateMovePawn
 			board.GetCurrentPlayer().Targets = []Treasure{'E'}
 
-			err := board.MoveCurrentPlayerTo(1, 1)
+			_, err := board.MoveCurrentPlayerTo(1, 1)
 			assert.Nil(t, err)
 			assert.Equal(t, 0, board.Players[0].Score)
 		})
@@ -597,7 +597,7 @@ func TestBoard(t *testing.T) {
 			board := NewTestBoard()
 			board.State = GameStateMovePawn
 
-			err := board.MoveCurrentPlayerTo(0, 1)
+			_, err := board.MoveCurrentPlayerTo(0, 1)
 			assert.Nil(t, err)
 			assert.Equal(t, 1, board.Players[0].Score)
 		})
@@ -607,16 +607,28 @@ func TestBoard(t *testing.T) {
 			board.State = GameStateMovePawn
 			board.GetCurrentPlayer().Targets = []Treasure{'E'}
 
-			err := board.MoveCurrentPlayerTo(1, 1)
+			_, err := board.MoveCurrentPlayerTo(1, 1)
 			assert.Nil(t, err)
 			assert.Equal(t, Treasure('E'), board.Players[0].Targets[0])
+		})
+
+		t.Run("Should return path to tile", func(t *testing.T) {
+			board := NewTestBoard()
+			board.State = GameStateMovePawn
+			board.GetCurrentPlayer().Targets = []Treasure{'E'}
+
+			path, err := board.MoveCurrentPlayerTo(2, 1)
+			assert.Nil(t, err)
+			assert.Equal(t, 2, len(path))
+			assert.Equal(t, &Coordinate{1, 1}, path[0])
+			assert.Equal(t, &Coordinate{2, 1}, path[1])
 		})
 
 		t.Run("Should pop treasure from hand if on target treasure", func(t *testing.T) {
 			board := NewTestBoard()
 			board.State = GameStateMovePawn
 
-			err := board.MoveCurrentPlayerTo(0, 1)
+			_, err := board.MoveCurrentPlayerTo(0, 1)
 			assert.Nil(t, err)
 			assert.Equal(t, Treasure('D'), board.Players[0].Targets[0])
 		})
@@ -626,7 +638,7 @@ func TestBoard(t *testing.T) {
 			board.State = GameStateMovePawn
 			board.GetCurrentPlayer().Targets = []Treasure{'E'}
 
-			err := board.MoveCurrentPlayerTo(1, 1)
+			_, err := board.MoveCurrentPlayerTo(1, 1)
 			assert.Nil(t, err)
 			assert.Equal(t, Treasure('E'), board.RemainingTile.Tile.Treasure)
 		})
@@ -635,7 +647,7 @@ func TestBoard(t *testing.T) {
 			board := NewTestBoard()
 			board.State = GameStateMovePawn
 
-			err := board.MoveCurrentPlayerTo(0, 1)
+			_, err := board.MoveCurrentPlayerTo(0, 1)
 			assert.Nil(t, err)
 			assert.Equal(t, NoTreasure, board.Tiles[0][1].Tile.Treasure)
 		})
@@ -644,7 +656,7 @@ func TestBoard(t *testing.T) {
 			board := NewTestBoard()
 			board.State = GameStateMovePawn
 
-			err := board.MoveCurrentPlayerTo(2, 1)
+			_, err := board.MoveCurrentPlayerTo(2, 1)
 			assert.Equal(t, ErrInvalidAction, err)
 		})
 
@@ -654,7 +666,7 @@ func TestBoard(t *testing.T) {
 			board.Players[0].Targets = []Treasure{'B'}
 			{
 				board.State = GameStateMovePawn
-				err := board.MoveCurrentPlayerTo(0, 1)
+				_, err := board.MoveCurrentPlayerTo(0, 1)
 				assert.Nil(t, err)
 				assert.Equal(t, GameStateEnd, board.State)
 			}
@@ -667,7 +679,7 @@ func TestBoard(t *testing.T) {
 				// Blue
 				board.State = GameStateMovePawn
 				board.GetCurrentPlayer().Targets = []Treasure{'E'}
-				err := board.MoveCurrentPlayerTo(0, 1)
+				_, err := board.MoveCurrentPlayerTo(0, 1)
 				assert.Nil(t, err)
 				assert.Equal(t, 1, board.RemainingPlayerIndex)
 			}
@@ -676,7 +688,7 @@ func TestBoard(t *testing.T) {
 				// Green
 				board.State = GameStateMovePawn
 				board.GetCurrentPlayer().Targets = []Treasure{'E'}
-				err := board.MoveCurrentPlayerTo(1, 1)
+				_, err := board.MoveCurrentPlayerTo(1, 1)
 				assert.Nil(t, err)
 				assert.Equal(t, 0, board.RemainingPlayerIndex)
 			}
@@ -690,7 +702,7 @@ func TestBoard(t *testing.T) {
 				board.State = GameStateMovePawn
 
 				board.Players[0].Targets = []Treasure{'D'}
-				err := board.MoveCurrentPlayerTo(2, 1)
+				_, err := board.MoveCurrentPlayerTo(2, 1)
 				assert.Nil(t, err)
 				assert.Equal(t, 0, board.RemainingPlayerIndex)
 				assert.Equal(t, 1, len(board.RemainingPlayers))
@@ -704,7 +716,7 @@ func TestBoard(t *testing.T) {
 
 				board.Players[1].Targets = []Treasure{'A'}
 				board.RemainingPlayerIndex = 1
-				err := board.MoveCurrentPlayerTo(0, 2)
+				_, err := board.MoveCurrentPlayerTo(0, 2)
 				assert.Nil(t, err)
 				assert.Equal(t, 0, board.RemainingPlayerIndex)
 				assert.Equal(t, 1, len(board.RemainingPlayers))
@@ -826,7 +838,7 @@ func TestBoard(t *testing.T) {
 			board.Players[0].Position.Line = 2
 			board.Players[0].Position.Row = 1
 
-			path := board.getShortestPath()
+			path := board.getShortestPathToTarget()
 			assert.Equal(t, Coordinates{
 				{2, 1},
 				{1, 1},

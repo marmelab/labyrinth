@@ -1,5 +1,3 @@
-import type { ReactNode } from "react";
-
 import {
   type BoardTile,
   Direction,
@@ -60,7 +58,6 @@ interface TileViewProps {
   onInsertTile: InsertTileHandler;
   onMovePlayer: MovePlayerHandler;
   isAccessible: boolean;
-  children?: ReactNode;
 }
 
 const oppositeDirections = {
@@ -81,27 +78,20 @@ export const TileView = ({
   onInsertTile,
   onMovePlayer,
   isAccessible,
-  children,
 }: TileViewProps) => {
-  if (gameState == GameState.Animating) {
+  if (gameState == GameState.PlaceTileAnimate) {
     return (
       <Tile
         disabled={!canPlay}
         animate
         boardTile={boardTile}
         playerTarget={playerTarget}
-      >
-        {children}
-      </Tile>
+      />
     );
   }
 
   if (!canPlay || gameState == GameState.End) {
-    return (
-      <Tile disabled boardTile={boardTile} playerTarget={playerTarget}>
-        {children}
-      </Tile>
-    );
+    return <Tile disabled boardTile={boardTile} playerTarget={playerTarget} />;
   }
 
   if (gameState == GameState.PlaceTile) {
@@ -122,16 +112,10 @@ export const TileView = ({
           playerTarget={playerTarget}
           onClick={onInsertTile.bind(null, ...direction)}
           hint={hint}
-        >
-          {children}
-        </Tile>
+        />
       );
     }
-    return (
-      <Tile disabled boardTile={boardTile} playerTarget={playerTarget}>
-        {children}
-      </Tile>
-    );
+    return <Tile disabled boardTile={boardTile} playerTarget={playerTarget} />;
   }
 
   return (
@@ -141,9 +125,7 @@ export const TileView = ({
       playerTarget={playerTarget}
       onClick={onMovePlayer.bind(null, coordinates.line, coordinates.row)}
       hint={hint}
-    >
-      {children}
-    </Tile>
+    />
   );
 };
 

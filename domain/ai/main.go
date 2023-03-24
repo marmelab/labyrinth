@@ -64,7 +64,7 @@ outer:
 				continue outer
 			}
 
-			if err := board.MoveCurrentPlayerTo(movePawnHint.Line, movePawnHint.Row); err != nil {
+			if _, err := board.MoveCurrentPlayerTo(movePawnHint.Line, movePawnHint.Row); err != nil {
 				fmt.Printf("[Round #%d] Encountered move pawn error: %v", round, err)
 				continue outer
 			}

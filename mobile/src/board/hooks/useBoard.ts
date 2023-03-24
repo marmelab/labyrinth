@@ -9,12 +9,14 @@ import {
   animationFrame,
   moveTileIndexes,
   moveTileOffsets,
+  movePlayerIndex,
   type PlaceTilePayload,
   remainingTileViewPositions,
   RotationDirection,
   type RotationPayload,
   timeout,
   type UserAction,
+  MovePawnPayload,
 } from "./useBoardTypes";
 
 import { useGetPlaceTileHintMutation } from "./useGetPlaceTileHintMutation";
@@ -43,7 +45,7 @@ export function useBoard(id: number | string): [Board | null, Error | null] {
   const handleBotTurn = async (board: Board) => {
     if (
       board.gameState == GameState.End ||
-      board.gameState == GameState.Animating
+      board.gameState == GameState.PlaceTileAnimate
     ) {
       return;
     }
@@ -87,6 +89,29 @@ export function useBoard(id: number | string): [Board | null, Error | null] {
     });
   };
 
+  const setCurrentPlayerPosition = (line: number, row: number) => {
+    setBoard((board) => {
+      if (!board) {
+        return null;
+      }
+
+      return {
+        ...board,
+        players: board.players.map((player) => {
+          if (player.isCurrentPlayer) {
+            return {
+              ...player,
+              line,
+              row,
+            };
+          }
+
+          return player;
+        }),
+      };
+    });
+  };
+
   const handleMercureMessage = async ({ data }: { data: string }) => {
     const actions: UserAction[] = JSON.parse(data);
     if (actions.length == 0) {
@@ -117,9 +142,36 @@ export function useBoard(id: number | string): [Board | null, Error | null] {
 
         const { state } = board;
         const { tiles, remainingTile } = state;
+        const lastTileIndex = tiles.length - 1;
 
         return {
           ...board,
+          players: board.players.map((player) => {
+            if (
+              (direction == Direction.Top || direction == Direction.Bottom) &&
+              player.row == index
+            ) {
+              return {
+                ...player,
+                line: movePlayerIndex.get(direction)!(
+                  player.line,
+                  lastTileIndex
+                ),
+              };
+            }
+
+            if (
+              (direction == Direction.Right || direction == Direction.Left) &&
+              player.line == index
+            ) {
+              return {
+                ...player,
+                row: movePlayerIndex.get(direction)!(player.row, lastTileIndex),
+              };
+            }
+
+            return player;
+          }),
           state: {
             ...state,
             tiles: tiles.map((tileLine, line) => {
@@ -199,7 +251,7 @@ export function useBoard(id: number | string): [Board | null, Error | null] {
     [
       Action.PlaceTile,
       async (payload: PlaceTilePayload) => {
-        setGameState(GameState.Animating);
+        setGameState(GameState.PlaceTileAnimate);
 
         // Move remaining tile
         await animationFrame(() => {
@@ -234,7 +286,22 @@ export function useBoard(id: number | string): [Board | null, Error | null] {
         await fetchBoard();
       },
     ],
-    [Action.MovePawn, () => fetchBoard()],
+    [
+      Action.MovePawn,
+      async ({ path }: MovePawnPayload) => {
+        setGameState(GameState.MovePawnAnimate);
+        await timeout(500);
+
+        for (const { line, row } of path) {
+          await animationFrame(() => {
+            setCurrentPlayerPosition(line, row);
+          });
+          await timeout(300);
+        }
+
+        await fetchBoard();
+      },
+    ],
     [Action.NewPlayer, () => fetchBoard()],
   ]);
 
